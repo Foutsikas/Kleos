@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://jhx0aahhlhlc"]
+
+[ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_vq61f"]
+
+[resource]
+script = ExtResource("1_vq61f")
+EnemyName = "Nemean Lion Cub"
+EnemyId = "nemean_lion_cub"
+Health = 650.0
+DamagePerSecond = 8.5
+AttackRate = 1.8
+KleosReward = 30
+metadata/_custom_type_script = "uid://b1ahgi2bsjm0e"

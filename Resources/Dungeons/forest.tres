@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="DungeonData" format=3 uid="uid://b0e3xnavstfvg"]
+
+[ext_resource type="Script" uid="uid://ccj4wwkg6mwva" path="res://Resources/DungeonData.cs" id="1_g3qi8"]
+
+[sub_resource type="CSharpScript" id="CSharpScript_jfpfg"]
+
+[resource]
+script = ExtResource("1_g3qi8")
+DungeonName = "Forest of Trials"
+DungeonId = "forest"
+Layers = Array[SubResource("CSharpScript_jfpfg")]([null])
+metadata/_custom_type_script = "uid://ccj4wwkg6mwva"

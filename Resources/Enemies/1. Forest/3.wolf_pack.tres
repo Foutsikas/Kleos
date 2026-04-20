@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://yhsij0tvopab"]
+
+[ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_8jbaj"]
+
+[resource]
+script = ExtResource("1_8jbaj")
+EnemyName = "Wolf Pack"
+EnemyId = "wolf_pack"
+Health = 350.0
+DamagePerSecond = 5.5
+AttackRate = 1.6
+KleosReward = 10
+metadata/_custom_type_script = "uid://b1ahgi2bsjm0e"

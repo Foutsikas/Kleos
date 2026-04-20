@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://b36b7lwrmsy21"]
+
+[ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_2oeaa"]
+
+[resource]
+script = ExtResource("1_2oeaa")
+EnemyName = "Large Wolf"
+EnemyId = "large_wolf"
+Health = 450.0
+DamagePerSecond = 6.5
+AttackRate = 1.6
+KleosReward = 14
+metadata/_custom_type_script = "uid://b1ahgi2bsjm0e"

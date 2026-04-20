@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://b4npkae5kdirg"]
+
+[ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_lxlwr"]
+
+[resource]
+script = ExtResource("1_lxlwr")
+EnemyName = "Nemean Lion"
+EnemyId = "nemean_lion"
+Health = 800.0
+DamagePerSecond = 10.0
+AttackRate = 1.9
+KleosReward = 50
+metadata/_custom_type_script = "uid://b1ahgi2bsjm0e"
