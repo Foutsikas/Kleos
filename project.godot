@@ -1,0 +1,38 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Kleos"
+run/main_scene="uid://b8ad0qdlb2cyt"
+config/features=PackedStringArray("4.6", "C#", "Forward Plus")
+
+[autoload]
+
+SettingsManager="*uid://6ylry65jiekk"
+SaveManager="*uid://bw5j2gppeckj8"
+UpgradeManager="*uid://degfkyyxstnn4"
+KleosManager="*uid://cykw1bqglvnt8"
+ArtisanManager="*uid://nki51nmxgx2o"
+HeroManager="*uid://b4gmgsimbjrcm"
+DungeonManager="*uid://daoroywp56byu"
+RandomEncounterManager="*uid://25u2g1l7njm7"
+
+[dotnet]
+
+project/assembly_name="Kleos"
+
+[physics]
+
+3d/physics_engine="Jolt Physics"
+
+[rendering]
+
+rendering_device/driver.windows="d3d12"

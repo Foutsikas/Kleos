@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ArtisanData" format=3 uid="uid://bsqapc5yhe2k3"]
+
+[ext_resource type="Script" uid="uid://m8ou3y8lx4kt" path="res://Resources/ArtisanData.cs" id="1_cdokw"]
+
+[resource]
+script = ExtResource("1_cdokw")
+ArtisanName = "Sculptor"
+ArtisanId = "sculptor"
+BaseCost = 1800.0
+KleosPerSecond = 4.0
+CostMultiplier = 1.2
+RequiredArtisanId = "potter"
+RequiredArtisanCount = 5
+metadata/_custom_type_script = "uid://m8ou3y8lx4kt"

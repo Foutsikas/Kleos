@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ArtisanData" format=3 uid="uid://bb6hqi2usqndr"]
+
+[ext_resource type="Script" uid="uid://m8ou3y8lx4kt" path="res://Resources/ArtisanData.cs" id="1_wcurt"]
+
+[resource]
+script = ExtResource("1_wcurt")
+ArtisanName = "Scribe"
+ArtisanId = "scribe"
+metadata/_custom_type_script = "uid://m8ou3y8lx4kt"
