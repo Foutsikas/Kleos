@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="EncounterPool" format=3 uid="uid://dl5qx7561221f"]
+
+[ext_resource type="Resource" uid="uid://dhy6iyri13k12" path="res://Resources/Enemies/1. Forest/1.wild_dog.tres" id="1_ewvij"]
+[ext_resource type="Script" uid="uid://s7fl6a0p44k6" path="res://Resources/EncounterPool.cs" id="1_ombx0"]
+[ext_resource type="Script" uid="uid://ckh8qm7xv6xp" path="res://Resources/EncounterPoolEntry.cs" id="2_6hrsw"]
+[ext_resource type="Resource" uid="uid://dxbupdfyiodo4" path="res://Resources/Enemies/1. Forest/2.wolf.tres" id="3_j4dtp"]
+[ext_resource type="Resource" uid="uid://yhsij0tvopab" path="res://Resources/Enemies/1. Forest/3.wolf_pack.tres" id="4_018fc"]
+[ext_resource type="Resource" uid="uid://b36b7lwrmsy21" path="res://Resources/Enemies/1. Forest/4.large_wolf.tres" id="5_ptdfy"]
+
+[sub_resource type="Resource" id="Resource_spqiy"]
+script = ExtResource("2_6hrsw")
+Enemy = ExtResource("1_ewvij")
+Weight = 3.0
+metadata/_custom_type_script = "uid://ckh8qm7xv6xp"
+
+[sub_resource type="Resource" id="Resource_uy8yv"]
+script = ExtResource("2_6hrsw")
+Enemy = ExtResource("3_j4dtp")
+Weight = 2.5
+metadata/_custom_type_script = "uid://ckh8qm7xv6xp"
+
+[sub_resource type="Resource" id="Resource_vtlxa"]
+script = ExtResource("2_6hrsw")
+Enemy = ExtResource("4_018fc")
+Weight = 1.5
+metadata/_custom_type_script = "uid://ckh8qm7xv6xp"
+
+[sub_resource type="Resource" id="Resource_dtu35"]
+script = ExtResource("2_6hrsw")
+Enemy = ExtResource("5_ptdfy")
+metadata/_custom_type_script = "uid://ckh8qm7xv6xp"
+
+[resource]
+script = ExtResource("1_ombx0")
+PoolName = "Forest Encounters"
+Entries = [SubResource("Resource_spqiy"), SubResource("Resource_uy8yv"), SubResource("Resource_vtlxa"), SubResource("Resource_dtu35")]
+metadata/_custom_type_script = "uid://s7fl6a0p44k6"

@@ -2,13 +2,6 @@ using Godot;
 using Godot.Collections;
 
 [GlobalClass]
-public partial class EncounterPoolEntry : Resource
-{
-    [Export] public EnemyData Enemy { get; set; }
-    [Export] public float Weight { get; set; } = 1.0f;
-}
-
-[GlobalClass]
 public partial class EncounterPool : Resource
 {
     [ExportGroup("Identity")]
@@ -18,5 +11,11 @@ public partial class EncounterPool : Resource
     [Export] public DungeonData RequiredDungeon { get; set; }
 
     [ExportGroup("Enemies")]
-    [Export] public Array<EncounterPoolEntry> Entries { get; set; } = new();
+    [Export] public Array Entries { get; set; } = new();
+
+    public EncounterPoolEntry GetEntry(int index)
+    {
+        if (index < 0 || index >= Entries.Count) return null;
+        return Entries[index].As<EncounterPoolEntry>();
+    }
 }

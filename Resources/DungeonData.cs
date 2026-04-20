@@ -2,15 +2,6 @@ using Godot;
 using Godot.Collections;
 
 [GlobalClass]
-public partial class DungeonLayer : Resource
-{
-    [Export] public EnemyData Enemy { get; set; }
-    [Export] public float BaseKleosReward { get; set; } = 10f;
-    [Export] public bool IsBossLayer { get; set; } = false;
-    [Export] public bool IsMiniBossLayer { get; set; } = false;
-}
-
-[GlobalClass]
 public partial class DungeonData : Resource
 {
     [ExportGroup("Identity")]
@@ -20,7 +11,13 @@ public partial class DungeonData : Resource
     [Export] public Texture2D DungeonIcon { get; set; }
 
     [ExportGroup("Layers")]
-    [Export] public Array<DungeonLayer> Layers { get; set; } = new();
+    [Export] public Array Layers { get; set; } = new();
+
+    public DungeonLayer GetLayer(int index)
+    {
+        if (index < 0 || index >= Layers.Count) return null;
+        return Layers[index].As<DungeonLayer>();
+    }
 
     [ExportGroup("Unlock Requirements")]
     [Export] public float KleosRequirement { get; set; } = 0f;

@@ -1,12 +1,79 @@
 [gd_resource type="Resource" script_class="DungeonData" format=3 uid="uid://b0e3xnavstfvg"]
 
+[ext_resource type="Resource" uid="uid://dhy6iyri13k12" path="res://Resources/Enemies/1. Forest/1.wild_dog.tres" id="1_ea1n5"]
 [ext_resource type="Script" uid="uid://ccj4wwkg6mwva" path="res://Resources/DungeonData.cs" id="1_g3qi8"]
+[ext_resource type="Script" uid="uid://cqbeopwqiwa7h" path="res://Resources/DungeonLayer.cs" id="2_jp5oh"]
+[ext_resource type="Resource" uid="uid://dxbupdfyiodo4" path="res://Resources/Enemies/1. Forest/2.wolf.tres" id="3_jp5oh"]
+[ext_resource type="Resource" uid="uid://yhsij0tvopab" path="res://Resources/Enemies/1. Forest/3.wolf_pack.tres" id="4_xtpoy"]
+[ext_resource type="Resource" uid="uid://c041pfctmsi2a" path="res://Resources/Enemies/1. Forest/5.large_wolf_pack.tres" id="5_ih12l"]
+[ext_resource type="Resource" uid="uid://jhx0aahhlhlc" path="res://Resources/Enemies/1. Forest/6.nemean_lion_cub.tres" id="6_0ni5f"]
+[ext_resource type="Resource" uid="uid://b4npkae5kdirg" path="res://Resources/Enemies/1. Forest/7.nemean_lion.tres" id="7_w70yd"]
 
-[sub_resource type="CSharpScript" id="CSharpScript_jfpfg"]
+[sub_resource type="Resource" id="Resource_2xhn7"]
+script = ExtResource("2_jp5oh")
+Enemy = ExtResource("1_ea1n5")
+BaseKleosReward = 5.0
+metadata/_custom_type_script = "uid://cqbeopwqiwa7h"
+
+[sub_resource type="Resource" id="Resource_c4tsf"]
+script = ExtResource("2_jp5oh")
+Enemy = ExtResource("1_ea1n5")
+BaseKleosReward = 8.0
+metadata/_custom_type_script = "uid://cqbeopwqiwa7h"
+
+[sub_resource type="Resource" id="Resource_bouo8"]
+script = ExtResource("2_jp5oh")
+Enemy = ExtResource("3_jp5oh")
+BaseKleosReward = 25.0
+metadata/_custom_type_script = "uid://cqbeopwqiwa7h"
+
+[sub_resource type="Resource" id="Resource_r7tvn"]
+script = ExtResource("2_jp5oh")
+Enemy = ExtResource("4_xtpoy")
+BaseKleosReward = 40.0
+metadata/_custom_type_script = "uid://cqbeopwqiwa7h"
+
+[sub_resource type="Resource" id="Resource_ouo86"]
+script = ExtResource("2_jp5oh")
+Enemy = ExtResource("4_xtpoy")
+BaseKleosReward = 50.0
+metadata/_custom_type_script = "uid://cqbeopwqiwa7h"
+
+[sub_resource type="Resource" id="Resource_g76rw"]
+script = ExtResource("2_jp5oh")
+Enemy = ExtResource("5_ih12l")
+BaseKleosReward = 80.0
+metadata/_custom_type_script = "uid://cqbeopwqiwa7h"
+
+[sub_resource type="Resource" id="Resource_4xok2"]
+script = ExtResource("2_jp5oh")
+Enemy = ExtResource("5_ih12l")
+BaseKleosReward = 100.0
+metadata/_custom_type_script = "uid://cqbeopwqiwa7h"
+
+[sub_resource type="Resource" id="Resource_4tixh"]
+script = ExtResource("2_jp5oh")
+Enemy = ExtResource("5_ih12l")
+BaseKleosReward = 120.0
+metadata/_custom_type_script = "uid://cqbeopwqiwa7h"
+
+[sub_resource type="Resource" id="Resource_biyct"]
+script = ExtResource("2_jp5oh")
+Enemy = ExtResource("6_0ni5f")
+BaseKleosReward = 200.0
+IsMiniBossLayer = true
+metadata/_custom_type_script = "uid://cqbeopwqiwa7h"
+
+[sub_resource type="Resource" id="Resource_8u4at"]
+script = ExtResource("2_jp5oh")
+Enemy = ExtResource("7_w70yd")
+BaseKleosReward = 400.0
+IsBossLayer = true
+metadata/_custom_type_script = "uid://cqbeopwqiwa7h"
 
 [resource]
 script = ExtResource("1_g3qi8")
 DungeonName = "Forest of Trials"
 DungeonId = "forest"
-Layers = Array[SubResource("CSharpScript_jfpfg")]([null])
+Layers = [SubResource("Resource_2xhn7"), SubResource("Resource_c4tsf"), SubResource("Resource_bouo8"), SubResource("Resource_r7tvn"), SubResource("Resource_ouo86"), SubResource("Resource_g76rw"), SubResource("Resource_4xok2"), SubResource("Resource_4tixh"), SubResource("Resource_biyct"), SubResource("Resource_8u4at")]
 metadata/_custom_type_script = "uid://ccj4wwkg6mwva"
