@@ -33,10 +33,6 @@ public partial class ArtisanManager : Node
             Initialize();
 
         GD.Print("[ArtisanManager] Ready.");
-
-        GD.Print($"[ArtisanManager Test] Configs loaded: {ArtisanConfigs.Count}");
-        GD.Print($"[ArtisanManager Test] Scribe owned: {GetOwnedCount("scribe")}");
-        GD.Print($"[ArtisanManager Test] Total KPS: {KleosManager.Instance.TotalKleosPerSecond}");
     }
 
     private void Initialize()
