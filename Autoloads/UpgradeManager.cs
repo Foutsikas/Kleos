@@ -4,10 +4,7 @@ public partial class UpgradeManager : Node
 {
     public static UpgradeManager Instance { get; private set; }
 
-    // --- Signals ---
     [Signal] public delegate void UpgradePurchasedEventHandler(string upgradeId);
-
-    // --- Lifecycle ---
 
     public override void _Ready()
     {
@@ -18,5 +15,10 @@ public partial class UpgradeManager : Node
         }
         Instance = this;
         GD.Print("[UpgradeManager] Ready.");
+    }
+
+    public float GetFlat(ModifierType type)
+    {
+        return 0f;
     }
 }
