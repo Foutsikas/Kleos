@@ -1,4 +1,5 @@
 using Godot;
+using Godot.Collections;
 
 public partial class DungeonManager : Node
 {
@@ -7,6 +8,13 @@ public partial class DungeonManager : Node
     // --- Signals ---
     [Signal] public delegate void DungeonCompletedEventHandler(string dungeonId);
     [Signal] public delegate void LayerClearedEventHandler(string dungeonId, int layerIndex);
+
+    // --- Config ---
+    [Export] public Array DungeonConfigs { get; set; } = new();
+
+    // --- State ---
+    private Dictionary<string, int> dungeonProgress = new();
+    private Dictionary<string, bool> completedDungeons = new();
 
     // --- Lifecycle ---
 
@@ -21,8 +29,118 @@ public partial class DungeonManager : Node
         GD.Print("[DungeonManager] Ready.");
     }
 
+    // --- Dungeon Queries ---
+
+    public bool IsDungeonUnlocked(string dungeonId)
+    {
+        DungeonData dungeon = GetDungeonById(dungeonId);
+        if (dungeon == null) return false;
+
+        if (dungeon.KleosRequirement > 0)
+        {
+            if (KleosManager.Instance.CurrentKleos < dungeon.KleosRequirement)
+                return false;
+        }
+
+        if (dungeon.RequiredDungeon != null)
+        {
+            if (!IsDungeonCompleted(dungeon.RequiredDungeon.DungeonId))
+                return false;
+        }
+
+        return true;
+    }
+
     public bool IsDungeonCompleted(string dungeonId)
     {
-        return false;
+        return completedDungeons.TryGetValue(dungeonId, out bool completed) && completed;
+    }
+
+    public int GetHighestClearedLayer(string dungeonId)
+    {
+        return dungeonProgress.TryGetValue(dungeonId, out int layer) ? layer : -1;
+    }
+
+    public int GetNextLayer(string dungeonId)
+    {
+        return GetHighestClearedLayer(dungeonId) + 1;
+    }
+
+    public bool CanAccessLayer(string dungeonId, int layerIndex)
+    {
+        if (!IsDungeonUnlocked(dungeonId)) return false;
+        int highestCleared = GetHighestClearedLayer(dungeonId);
+        return layerIndex <= highestCleared + 1;
+    }
+
+    public DungeonData GetDungeonById(string dungeonId)
+    {
+        for (int i = 0; i < DungeonConfigs.Count; i++)
+        {
+            var dungeon = DungeonConfigs[i].As<DungeonData>();
+            if (dungeon != null && dungeon.DungeonId == dungeonId)
+                return dungeon;
+        }
+        return null;
+    }
+
+    // --- Layer Completion ---
+
+    public void OnLayerCleared(string dungeonId, int layerIndex)
+    {
+        int current = GetHighestClearedLayer(dungeonId);
+        if (layerIndex > current)
+            dungeonProgress[dungeonId] = layerIndex;
+
+        EmitSignal(SignalName.LayerCleared, dungeonId, layerIndex);
+        GD.Print($"[DungeonManager] Layer {layerIndex} cleared in {dungeonId}.");
+
+        CheckDungeonCompletion(dungeonId);
+    }
+
+    private void CheckDungeonCompletion(string dungeonId)
+    {
+        DungeonData dungeon = GetDungeonById(dungeonId);
+        if (dungeon == null) return;
+
+        int totalLayers = dungeon.Layers.Count;
+        int highestCleared = GetHighestClearedLayer(dungeonId);
+
+        if (highestCleared >= totalLayers - 1 && !IsDungeonCompleted(dungeonId))
+        {
+            completedDungeons[dungeonId] = true;
+            EmitSignal(SignalName.DungeonCompleted, dungeonId);
+            GD.Print($"[DungeonManager] Dungeon completed: {dungeonId}.");
+        }
+    }
+
+    // --- Save / Load ---
+
+    public DungeonSaveData GetSaveData()
+    {
+        var saveData = new DungeonSaveData();
+
+        foreach (var kvp in dungeonProgress)
+            saveData.DungeonProgress[kvp.Key] = kvp.Value;
+
+        foreach (var kvp in completedDungeons)
+            if (kvp.Value)
+                saveData.CompletedDungeons.Add(kvp.Key);
+
+        return saveData;
+    }
+
+    public void LoadFromSaveData(DungeonSaveData data)
+    {
+        dungeonProgress.Clear();
+        completedDungeons.Clear();
+
+        foreach (var kvp in data.DungeonProgress)
+            dungeonProgress[kvp.Key] = kvp.Value;
+
+        foreach (var id in data.CompletedDungeons)
+            completedDungeons[id] = true;
+
+        GD.Print($"[DungeonManager] Loaded progress for {dungeonProgress.Count} dungeons.");
     }
 }
