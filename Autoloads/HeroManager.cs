@@ -29,10 +29,6 @@ public partial class HeroManager : Node
         KleosManager.Instance.KleosGained += OnKleosGained;
 
         GD.Print("[HeroManager] Ready.");
-
-        GD.Print($"[HeroManager Test] Max HP: {GetMaxHP()}, Damage: {GetDamage()}");
-        GD.Print($"[HeroManager Test] XP to level 2: {GetXPToNextLevel()}");
-
     }
 
     // --- XP and Leveling ---
