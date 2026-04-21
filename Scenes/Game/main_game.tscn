@@ -1,3 +1,234 @@
-[gd_scene format=3 uid="uid://b8ad0qdlb2cyt"]
+[gd_scene format=3 uid="uid://de48adstmsyf4"]
 
-[node name="Node2D" type="Node2D" unique_id=1182328524]
+[node name="MainGame" type="Control" unique_id=365822274]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="ColorRect" parent="." unique_id=1115374356]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.3491902, 0.3133042, 0.24780053, 1)
+
+[node name="RootLayout" type="VBoxContainer" parent="." unique_id=2019629818]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TopBar" type="HBoxContainer" parent="RootLayout" unique_id=1452036823]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="KleosLabel" type="Label" parent="RootLayout/TopBar" unique_id=2089950162]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Kleos: 0"
+
+[node name="ProductionLabel" type="Label" parent="RootLayout/TopBar" unique_id=321792533]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0.0 K/s"
+horizontal_alignment = 2
+
+[node name="MainPanel" type="HBoxContainer" parent="RootLayout" unique_id=158759040]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LeftPanel" type="VBoxContainer" parent="RootLayout/MainPanel" unique_id=1927792257]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DeedButton" type="Button" parent="RootLayout/MainPanel/LeftPanel" unique_id=2121452232]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+text = "Deed"
+
+[node name="DeedContextLabel" type="Label" parent="RootLayout/MainPanel/LeftPanel" unique_id=1760823127]
+custom_minimum_size = Vector2(1, 0)
+layout_mode = 2
+text = "Training in solitude..."
+autowrap_mode = 2
+
+[node name="HeroPortrait" type="PanelContainer" parent="RootLayout/MainPanel/LeftPanel" unique_id=1794417106]
+custom_minimum_size = Vector2(0, 70)
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="RootLayout/MainPanel/LeftPanel/HeroPortrait" unique_id=1680266025]
+layout_mode = 2
+
+[node name="HeroLevelLabel" type="Label" parent="RootLayout/MainPanel/LeftPanel/HeroPortrait/VBoxContainer" unique_id=177388205]
+layout_mode = 2
+text = "Lv. 1"
+
+[node name="HeroHPBar" type="ProgressBar" parent="RootLayout/MainPanel/LeftPanel/HeroPortrait/VBoxContainer" unique_id=765863648]
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+size_flags_vertical = 2
+value = 100.0
+
+[node name="HeroXPBar" type="ProgressBar" parent="RootLayout/MainPanel/LeftPanel/HeroPortrait/VBoxContainer" unique_id=622401475]
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+size_flags_vertical = 2
+
+[node name="CenterPanel" type="VBoxContainer" parent="RootLayout/MainPanel" unique_id=636368352]
+custom_minimum_size = Vector2(350, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ArtisanScrollContainer" type="ScrollContainer" parent="RootLayout/MainPanel/CenterPanel" unique_id=1800082175]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ArtisanList" type="VBoxContainer" parent="RootLayout/MainPanel/CenterPanel/ArtisanScrollContainer" unique_id=723193549]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DungeonScrollContainer" type="ScrollContainer" parent="RootLayout/MainPanel/CenterPanel" unique_id=427603015]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="DungeonList" type="VBoxContainer" parent="RootLayout/MainPanel/CenterPanel/DungeonScrollContainer" unique_id=22376275]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RightPanel" type="VBoxContainer" parent="RootLayout/MainPanel" unique_id=1659221913]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="UpgradeScrollContainer" type="ScrollContainer" parent="RootLayout/MainPanel/RightPanel" unique_id=1012016364]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="UpgradeList" type="VBoxContainer" parent="RootLayout/MainPanel/RightPanel/UpgradeScrollContainer" unique_id=1963859551]
+layout_mode = 2
+
+[node name="HeroPanel" type="PanelContainer" parent="." unique_id=935143896]
+visible = false
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 300.0
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HeroPanel" unique_id=1701153296]
+layout_mode = 2
+
+[node name="HeroPanelTitle" type="Label" parent="HeroPanel/VBoxContainer" unique_id=789750424]
+layout_mode = 2
+
+[node name="HeroNameLabel" type="Label" parent="HeroPanel/VBoxContainer" unique_id=1485738283]
+layout_mode = 2
+
+[node name="HeroLevelDetailLabel" type="Label" parent="HeroPanel/VBoxContainer" unique_id=1540001889]
+layout_mode = 2
+
+[node name="HeroHPDetailBar" type="ProgressBar" parent="HeroPanel/VBoxContainer" unique_id=1551877966]
+layout_mode = 2
+show_percentage = false
+
+[node name="HeroXPDetailBar" type="ProgressBar" parent="HeroPanel/VBoxContainer" unique_id=981476515]
+layout_mode = 2
+show_percentage = false
+
+[node name="StatsContainer" type="VBoxContainer" parent="HeroPanel/VBoxContainer" unique_id=454431303]
+layout_mode = 2
+
+[node name="StrengthRow" type="HBoxContainer" parent="HeroPanel/VBoxContainer/StatsContainer" unique_id=1569281266]
+layout_mode = 2
+
+[node name="StrengthLabel" type="Label" parent="HeroPanel/VBoxContainer/StatsContainer/StrengthRow" unique_id=1487955218]
+layout_mode = 2
+text = "Strength"
+
+[node name="StrengthValueLabel" type="Label" parent="HeroPanel/VBoxContainer/StatsContainer/StrengthRow" unique_id=74288502]
+layout_mode = 2
+text = "10"
+
+[node name="StrengthUpgradeButton" type="Button" parent="HeroPanel/VBoxContainer/StatsContainer/StrengthRow" unique_id=833748729]
+custom_minimum_size = Vector2(30, 0)
+layout_mode = 2
+text = "+"
+
+[node name="EnduranceRow" type="HBoxContainer" parent="HeroPanel/VBoxContainer/StatsContainer" unique_id=1977336200]
+layout_mode = 2
+
+[node name="EnduranceLabel" type="Label" parent="HeroPanel/VBoxContainer/StatsContainer/EnduranceRow" unique_id=2130024909]
+layout_mode = 2
+text = "Endurance"
+
+[node name="EnduranceValueLabel" type="Label" parent="HeroPanel/VBoxContainer/StatsContainer/EnduranceRow" unique_id=2074300803]
+layout_mode = 2
+text = "10"
+
+[node name="EnduranceUpgradeButton" type="Button" parent="HeroPanel/VBoxContainer/StatsContainer/EnduranceRow" unique_id=211471987]
+custom_minimum_size = Vector2(30, 0)
+layout_mode = 2
+text = "+"
+
+[node name="CunningRow" type="HBoxContainer" parent="HeroPanel/VBoxContainer/StatsContainer" unique_id=475058959]
+layout_mode = 2
+
+[node name="CunningLabel" type="Label" parent="HeroPanel/VBoxContainer/StatsContainer/CunningRow" unique_id=131872072]
+layout_mode = 2
+text = "Cunning"
+
+[node name="CunningValueLabel" type="Label" parent="HeroPanel/VBoxContainer/StatsContainer/CunningRow" unique_id=122208947]
+layout_mode = 2
+text = "10"
+
+[node name="CunningUpgradeButton" type="Button" parent="HeroPanel/VBoxContainer/StatsContainer/CunningRow" unique_id=1326911538]
+custom_minimum_size = Vector2(30, 0)
+layout_mode = 2
+text = "+"
+
+[node name="FavorRow" type="HBoxContainer" parent="HeroPanel/VBoxContainer/StatsContainer" unique_id=273443935]
+layout_mode = 2
+
+[node name="FavorLabel" type="Label" parent="HeroPanel/VBoxContainer/StatsContainer/FavorRow" unique_id=1412049601]
+layout_mode = 2
+text = "Favor"
+
+[node name="FavorValueLabel" type="Label" parent="HeroPanel/VBoxContainer/StatsContainer/FavorRow" unique_id=1984207798]
+layout_mode = 2
+text = "10"
+
+[node name="FavorUpgradeButton" type="Button" parent="HeroPanel/VBoxContainer/StatsContainer/FavorRow" unique_id=919085318]
+custom_minimum_size = Vector2(30, 0)
+layout_mode = 2
+text = "+"
+
+[node name="StatPointsLabel" type="Label" parent="HeroPanel/VBoxContainer" unique_id=42998247]
+layout_mode = 2
+text = "Stat Points: 0"
+
+[node name="CombatStatsLabel" type="Label" parent="HeroPanel/VBoxContainer" unique_id=292492263]
+layout_mode = 2
+text = "DMG: 13  DODGE: 5%  CRIT: 2.5%"
+
+[node name="FadeOverlay" type="ColorRect" parent="." unique_id=680385733]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
