@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://de48adstmsyf4"]
 
 [ext_resource type="Script" uid="uid://crok31g5yprgt" path="res://Scenes/Game/MainGameController.cs" id="1_gucqa"]
+[ext_resource type="PackedScene" uid="uid://b1lhhdy386h51" path="res://Scenes/Game/ArtisanRow.tscn" id="2_88ity"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gucqa"]
 bg_color = Color(0.3133042, 0.2716998, 0.22091639, 1)
@@ -10,7 +11,7 @@ border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.6262097, 0.50638646, 0.3491902, 1)
 
-[node name="MainGame" type="Control" unique_id=365822274 node_paths=PackedStringArray("KleosLabel", "ProductionLabel", "DeedButton", "DeedContextLabel", "HeroPortrait", "HeroLevelLabel", "HeroHPBar", "HeroXPBar", "HeroPanel", "HeroPanelTitle", "HeroNameLabel", "HeroLevelDetailLabel", "HeroHPDetailBar", "HeroXPDetailBar", "StrengthValueLabel", "EnduranceValueLabel", "CunningValueLabel", "FavorValueLabel", "StrengthUpgradeButton", "EnduranceUpgradeButton", "CunningUpgradeButton", "FavorUpgradeButton", "StatPointsLabel", "CombatStatsLabel", "FadeOverlay")]
+[node name="MainGame" type="Control" unique_id=365822274 node_paths=PackedStringArray("KleosLabel", "ProductionLabel", "DeedButton", "DeedContextLabel", "HeroPortrait", "HeroLevelLabel", "HeroHPBar", "HeroXPBar", "HeroPanel", "HeroPanelTitle", "HeroNameLabel", "HeroLevelDetailLabel", "HeroHPDetailBar", "HeroXPDetailBar", "StrengthValueLabel", "EnduranceValueLabel", "CunningValueLabel", "FavorValueLabel", "StrengthUpgradeButton", "EnduranceUpgradeButton", "CunningUpgradeButton", "FavorUpgradeButton", "StatPointsLabel", "CombatStatsLabel", "FadeOverlay", "ArtisanList")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -20,12 +21,12 @@ grow_vertical = 2
 script = ExtResource("1_gucqa")
 KleosLabel = NodePath("RootLayout/TopBar/KleosLabel")
 ProductionLabel = NodePath("RootLayout/TopBar/ProductionLabel")
-DeedButton = NodePath("RootLayout/MainPanel/LeftPanel/DeedButton")
-DeedContextLabel = NodePath("RootLayout/MainPanel/LeftPanel/DeedContextLabel")
-HeroPortrait = NodePath("RootLayout/MainPanel/LeftPanel/HeroPortrait")
-HeroLevelLabel = NodePath("RootLayout/MainPanel/LeftPanel/HeroPortrait/VBoxContainer/HeroLevelLabel")
-HeroHPBar = NodePath("RootLayout/MainPanel/LeftPanel/HeroPortrait/VBoxContainer/HeroHPBar")
-HeroXPBar = NodePath("RootLayout/MainPanel/LeftPanel/HeroPortrait/VBoxContainer/HeroXPBar")
+DeedButton = NodePath("RootLayout/MainPanel/CenterPanel/DeedButton")
+DeedContextLabel = NodePath("RootLayout/MainPanel/CenterPanel/DeedContextLabel")
+HeroPortrait = NodePath("RootLayout/TopBar/HeroPortrait")
+HeroLevelLabel = NodePath("RootLayout/TopBar/HeroPortrait/VBoxContainer/HeroLevelLabel")
+HeroHPBar = NodePath("RootLayout/TopBar/HeroPortrait/VBoxContainer/HeroHPBar")
+HeroXPBar = NodePath("RootLayout/TopBar/HeroPortrait/VBoxContainer/HeroXPBar")
 HeroPanel = NodePath("HeroPanel")
 HeroPanelTitle = NodePath("HeroPanel/VBoxContainer/HeroPanelTitle")
 HeroNameLabel = NodePath("HeroPanel/VBoxContainer/HeroNameLabel")
@@ -43,6 +44,8 @@ FavorUpgradeButton = NodePath("HeroPanel/VBoxContainer/StatsContainer/FavorRow/F
 StatPointsLabel = NodePath("HeroPanel/VBoxContainer/StatPointsLabel")
 CombatStatsLabel = NodePath("HeroPanel/VBoxContainer/CombatStatsLabel")
 FadeOverlay = NodePath("FadeOverlay")
+ArtisanRowScene = ExtResource("2_88ity")
+ArtisanList = NodePath("RootLayout/MainPanel/RightPanel/ArtisanScrollContainer/ArtisanList")
 
 [node name="Background" type="ColorRect" parent="." unique_id=1115374356]
 layout_mode = 1
@@ -66,6 +69,28 @@ custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 theme_override_constants/separation = 20
 
+[node name="HeroPortrait" type="PanelContainer" parent="RootLayout/TopBar" unique_id=1794417106]
+custom_minimum_size = Vector2(100, 50)
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="RootLayout/TopBar/HeroPortrait" unique_id=1680266025]
+layout_mode = 2
+
+[node name="HeroLevelLabel" type="Label" parent="RootLayout/TopBar/HeroPortrait/VBoxContainer" unique_id=177388205]
+layout_mode = 2
+text = "Lv. 1"
+
+[node name="HeroHPBar" type="ProgressBar" parent="RootLayout/TopBar/HeroPortrait/VBoxContainer" unique_id=765863648]
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+size_flags_vertical = 2
+value = 100.0
+
+[node name="HeroXPBar" type="ProgressBar" parent="RootLayout/TopBar/HeroPortrait/VBoxContainer" unique_id=622401475]
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+size_flags_vertical = 2
+
 [node name="KleosLabel" type="Label" parent="RootLayout/TopBar" unique_id=2089950162]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -82,77 +107,64 @@ layout_mode = 2
 size_flags_vertical = 3
 
 [node name="LeftPanel" type="VBoxContainer" parent="RootLayout/MainPanel" unique_id=1927792257]
-custom_minimum_size = Vector2(200, 0)
+custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="HeroPortrait" type="PanelContainer" parent="RootLayout/MainPanel/LeftPanel" unique_id=1794417106]
-custom_minimum_size = Vector2(0, 70)
+[node name="TopSpacer" type="Control" parent="RootLayout/MainPanel/LeftPanel" unique_id=947048180]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="DungeonButton" type="Button" parent="RootLayout/MainPanel/LeftPanel" unique_id=1458184694]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Dungeons"
+
+[node name="MiddleSpacer" type="Control" parent="RootLayout/MainPanel/LeftPanel" unique_id=2098654664]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="RootLayout/MainPanel/LeftPanel/HeroPortrait" unique_id=1680266025]
+[node name="UpgradeButton" type="Button" parent="RootLayout/MainPanel/LeftPanel" unique_id=2073831653]
+custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
+size_flags_horizontal = 0
+text = "Upgrades "
 
-[node name="HeroLevelLabel" type="Label" parent="RootLayout/MainPanel/LeftPanel/HeroPortrait/VBoxContainer" unique_id=177388205]
+[node name="BottomSpacer" type="Control" parent="RootLayout/MainPanel/LeftPanel" unique_id=579639927]
 layout_mode = 2
-text = "Lv. 1"
-
-[node name="HeroHPBar" type="ProgressBar" parent="RootLayout/MainPanel/LeftPanel/HeroPortrait/VBoxContainer" unique_id=765863648]
-custom_minimum_size = Vector2(0, 12)
-layout_mode = 2
-size_flags_vertical = 2
-value = 100.0
-
-[node name="HeroXPBar" type="ProgressBar" parent="RootLayout/MainPanel/LeftPanel/HeroPortrait/VBoxContainer" unique_id=622401475]
-custom_minimum_size = Vector2(0, 12)
-layout_mode = 2
-size_flags_vertical = 2
-
-[node name="DeedButton" type="Button" parent="RootLayout/MainPanel/LeftPanel" unique_id=2121452232]
-custom_minimum_size = Vector2(0, 80)
-layout_mode = 2
-text = "Deed"
-
-[node name="DeedContextLabel" type="Label" parent="RootLayout/MainPanel/LeftPanel" unique_id=1760823127]
-custom_minimum_size = Vector2(1, 0)
-layout_mode = 2
-text = "Training in solitude..."
-autowrap_mode = 2
+size_flags_vertical = 3
 
 [node name="CenterPanel" type="VBoxContainer" parent="RootLayout/MainPanel" unique_id=636368352]
 custom_minimum_size = Vector2(350, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ArtisanScrollContainer" type="ScrollContainer" parent="RootLayout/MainPanel/CenterPanel" unique_id=1800082175]
-custom_minimum_size = Vector2(0, 200)
+[node name="DeedButton" type="Button" parent="RootLayout/MainPanel/CenterPanel" unique_id=2121452232]
+custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
-size_flags_vertical = 3
+text = "Deed"
 
-[node name="ArtisanList" type="VBoxContainer" parent="RootLayout/MainPanel/CenterPanel/ArtisanScrollContainer" unique_id=723193549]
+[node name="DeedContextLabel" type="Label" parent="RootLayout/MainPanel/CenterPanel" unique_id=1760823127]
+custom_minimum_size = Vector2(1, 0)
 layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="DungeonScrollContainer" type="ScrollContainer" parent="RootLayout/MainPanel/CenterPanel" unique_id=427603015]
-custom_minimum_size = Vector2(0, 200)
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="DungeonList" type="VBoxContainer" parent="RootLayout/MainPanel/CenterPanel/DungeonScrollContainer" unique_id=22376275]
-layout_mode = 2
-size_flags_horizontal = 3
+text = "Training in solitude..."
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
 
 [node name="RightPanel" type="VBoxContainer" parent="RootLayout/MainPanel" unique_id=1659221913]
-custom_minimum_size = Vector2(250, 0)
+custom_minimum_size = Vector2(280, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="UpgradeScrollContainer" type="ScrollContainer" parent="RootLayout/MainPanel/RightPanel" unique_id=1012016364]
+[node name="ArtisanScrollContainer" type="ScrollContainer" parent="RootLayout/MainPanel/RightPanel" unique_id=1800082175]
+custom_minimum_size = Vector2(0, 200)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="UpgradeList" type="VBoxContainer" parent="RootLayout/MainPanel/RightPanel/UpgradeScrollContainer" unique_id=1963859551]
+[node name="ArtisanList" type="VBoxContainer" parent="RootLayout/MainPanel/RightPanel/ArtisanScrollContainer" unique_id=723193549]
 layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="HeroPanel" type="PanelContainer" parent="." unique_id=935143896]
 visible = false
@@ -258,6 +270,39 @@ text = "Stat Points: 0"
 [node name="CombatStatsLabel" type="Label" parent="HeroPanel/VBoxContainer" unique_id=292492263]
 layout_mode = 2
 text = "DMG: 13  DODGE: 5%  CRIT: 2.5%"
+
+[node name="DungeonPanel" type="PanelContainer" parent="." unique_id=267715734]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.09
+anchor_top = 0.08
+anchor_right = 0.295
+anchor_bottom = 0.95
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ScrollContainer" type="ScrollContainer" parent="DungeonPanel" unique_id=468546237]
+layout_mode = 2
+
+[node name="DungeonList" type="VBoxContainer" parent="DungeonPanel/ScrollContainer" unique_id=1118783433]
+layout_mode = 2
+
+[node name="UpgradePanel" type="PanelContainer" parent="." unique_id=1058359160]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.09
+anchor_top = 0.08
+anchor_right = 0.295
+anchor_bottom = 0.95
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ScrollContainer" type="ScrollContainer" parent="UpgradePanel" unique_id=1829725307]
+layout_mode = 2
+
+[node name="UpgradeList" type="VBoxContainer" parent="UpgradePanel/ScrollContainer" unique_id=603568789]
+layout_mode = 2
 
 [node name="FadeOverlay" type="ColorRect" parent="." unique_id=680385733]
 visible = false

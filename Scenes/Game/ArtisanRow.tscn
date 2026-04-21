@@ -1,0 +1,53 @@
+[gd_scene format=3 uid="uid://b1lhhdy386h51"]
+
+[ext_resource type="Script" uid="uid://2mhgoieykcft" path="res://Scenes/Game/ArtisanRow.cs" id="1_mnok5"]
+
+[node name="ArtisanRow" type="PanelContainer" unique_id=1839284199 node_paths=PackedStringArray("ArtisanNameLabel", "ArtisanKPSLabel", "ArtisanCostLabel", "ArtisanBuyButton", "ArtisanOwnedLabel")]
+custom_minimum_size = Vector2(0, 70)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_mnok5")
+ArtisanNameLabel = NodePath("HBoxContainer/ArtisanInfoContainer/ArtisanNameLabel")
+ArtisanKPSLabel = NodePath("HBoxContainer/ArtisanInfoContainer/ArtisanKPSLabel")
+ArtisanCostLabel = NodePath("HBoxContainer/ArtisanRightContainer/ArtisanCostLabel")
+ArtisanBuyButton = NodePath("HBoxContainer/ArtisanRightContainer/ArtisanBuyButton")
+ArtisanOwnedLabel = NodePath("HBoxContainer/ArtisanRightContainer/ArtisanOwnedLabel")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=114585363]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ArtisanInfoContainer" type="VBoxContainer" parent="HBoxContainer" unique_id=308539607]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ArtisanNameLabel" type="Label" parent="HBoxContainer/ArtisanInfoContainer" unique_id=1259711482]
+layout_mode = 2
+text = "Scribe"
+
+[node name="ArtisanKPSLabel" type="Label" parent="HBoxContainer/ArtisanInfoContainer" unique_id=392470560]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "0.2 K/s"
+
+[node name="ArtisanRightContainer" type="VBoxContainer" parent="HBoxContainer" unique_id=437106416]
+layout_mode = 2
+size_flags_horizontal = 8
+
+[node name="ArtisanCostLabel" type="Label" parent="HBoxContainer/ArtisanRightContainer" unique_id=280193388]
+layout_mode = 2
+text = "10"
+horizontal_alignment = 2
+
+[node name="ArtisanBuyButton" type="Button" parent="HBoxContainer/ArtisanRightContainer" unique_id=737144348]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "Hire"
+
+[node name="ArtisanOwnedLabel" type="Label" parent="HBoxContainer/ArtisanRightContainer" unique_id=722428830]
+layout_mode = 2
+text = "Owned: 0"
+horizontal_alignment = 2

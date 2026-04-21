@@ -28,9 +28,16 @@ public partial class MainGameController : Control
     [Export] public Label StatPointsLabel { get; set; }
     [Export] public Label CombatStatsLabel { get; set; }
     [Export] public ColorRect FadeOverlay { get; set; }
+    [Export] public PackedScene ArtisanRowScene { get; set; }
+    [Export] public VBoxContainer ArtisanList { get; set; }
 
     // --- State ---
     private bool heroPanelOpen = false;
+
+    private void OnArtisanUnlocked(string artisanId)
+    {
+        PopulateArtisanList();
+    }
 
     // --- Lifecycle ---
 
@@ -43,6 +50,7 @@ public partial class MainGameController : Control
         RefreshProductionDisplay(KleosManager.Instance.TotalKleosPerSecond);
         RefreshHeroDisplay();
         RefreshDeedContext();
+        PopulateArtisanList();
     }
 
     // --- Signal Connections ---
@@ -54,6 +62,7 @@ public partial class MainGameController : Control
         KleosManager.Instance.DeedContextChanged += RefreshDeedContext;
         HeroManager.Instance.StatsChanged += RefreshHeroDisplay;
         HeroManager.Instance.LevelUp += OnHeroLevelUp;
+        ArtisanManager.Instance.ArtisanUnlocked += OnArtisanUnlocked;
     }
 
     private void ConnectButtons()
@@ -217,6 +226,26 @@ public partial class MainGameController : Control
     private void OnHeroLevelUp(int newLevel)
     {
         GD.Print($"[MainGame] Hero reached level {newLevel}!");
+    }
+
+    // --- Artisan ---
+    private void PopulateArtisanList()
+    {
+        if (ArtisanList == null || ArtisanRowScene == null) return;
+
+        foreach (Node child in ArtisanList.GetChildren())
+            child.QueueFree();
+
+        for (int i = 0; i < ArtisanManager.Instance.ArtisanConfigs.Count; i++)
+        {
+            var artisan = ArtisanManager.Instance.ArtisanConfigs[i].As<ArtisanData>();
+            if (artisan == null) continue;
+            if (!ArtisanManager.Instance.IsArtisanUnlocked(artisan)) continue;
+
+            var row = ArtisanRowScene.Instantiate<ArtisanRow>();
+            ArtisanList.AddChild(row);
+            row.Setup(artisan);
+        }
     }
 
     // --- Fade ---
