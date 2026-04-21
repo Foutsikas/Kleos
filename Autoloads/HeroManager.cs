@@ -20,4 +20,9 @@ public partial class HeroManager : Node
         Instance = this;
         GD.Print("[HeroManager] Ready.");
     }
+
+    public int GetLevel()
+    {
+        return 1;
+    }
 }

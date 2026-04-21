@@ -20,4 +20,9 @@ public partial class DungeonManager : Node
         Instance = this;
         GD.Print("[DungeonManager] Ready.");
     }
+
+    public bool IsDungeonCompleted(string dungeonId)
+    {
+        return false;
+    }
 }

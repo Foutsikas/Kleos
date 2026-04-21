@@ -20,4 +20,9 @@ public partial class ArtisanManager : Node
         Instance = this;
         GD.Print("[ArtisanManager] Ready.");
     }
+
+    public int GetOwnedCount(string artisanId)
+    {
+        return 0;
+    }
 }
