@@ -1,0 +1,162 @@
+[gd_scene format=3 uid="uid://dv24mlf0q4sox"]
+
+[ext_resource type="Script" uid="uid://bv3q7j8qheojl" path="res://Scenes/MainMenu/MainMenuController.cs" id="1_uqdog"]
+
+[node name="MainMenu" type="Control" unique_id=1232211877 node_paths=PackedStringArray("PromptLabel", "StartButton", "SettingsButton", "SettingsPanel", "CloseSettingsButton", "DeleteSaveButton", "MusicSlider", "SfxSlider", "FullscreenToggle", "FadeOverlay")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_uqdog")
+PromptLabel = NodePath("CenterContainer/PromptLabel")
+StartButton = NodePath("StartButton")
+SettingsButton = NodePath("SettingsButton")
+SettingsPanel = NodePath("SettingsPanel")
+CloseSettingsButton = NodePath("SettingsPanel/VBoxContainer/CloseSettingsButton")
+DeleteSaveButton = NodePath("SettingsPanel/VBoxContainer/DeleteSaveButton")
+MusicSlider = NodePath("SettingsPanel/VBoxContainer/MusicRow/MusicSlider")
+SfxSlider = NodePath("SettingsPanel/VBoxContainer/SfxRow/SfxSlider")
+FullscreenToggle = NodePath("SettingsPanel/VBoxContainer/FullscreenToggle")
+FadeOverlay = NodePath("FadeOverlay")
+
+[node name="Background" type="ColorRect" parent="." unique_id=1026084877]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="StartButton" type="Button" parent="." unique_id=383976911]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+flat = true
+
+[node name="CenterContainer" type="VBoxContainer" parent="." unique_id=217609261]
+custom_minimum_size = Vector2(400, 200)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="CenterContainer" unique_id=1227788369]
+layout_mode = 2
+theme_override_font_sizes/font_size = 72
+text = "KLEOS"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PromptLabel" type="Label" parent="CenterContainer" unique_id=2051697982]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Begin Your Journey"
+horizontal_alignment = 1
+
+[node name="SettingsButton" type="Button" parent="." unique_id=356853228]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -102.0
+offset_top = 20.0
+offset_right = -32.0
+offset_bottom = 51.0
+grow_horizontal = 0
+text = "Settings"
+
+[node name="SettingsPanel" type="PanelContainer" parent="." unique_id=672793811]
+visible = false
+custom_minimum_size = Vector2(420, 320)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SettingsPanel" unique_id=1792212444]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="SettingsTitle" type="Label" parent="SettingsPanel/VBoxContainer" unique_id=540117012]
+layout_mode = 2
+text = "Settings"
+horizontal_alignment = 1
+
+[node name="MusicRow" type="HBoxContainer" parent="SettingsPanel/VBoxContainer" unique_id=1397674044]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SettingsPanel/VBoxContainer/MusicRow" unique_id=740760166]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "Music"
+horizontal_alignment = 1
+
+[node name="MusicSlider" type="HSlider" parent="SettingsPanel/VBoxContainer/MusicRow" unique_id=992615087]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="SfxRow" type="HBoxContainer" parent="SettingsPanel/VBoxContainer" unique_id=1820466519]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SettingsPanel/VBoxContainer/SfxRow" unique_id=488662539]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "SFX"
+horizontal_alignment = 1
+
+[node name="SfxSlider" type="HSlider" parent="SettingsPanel/VBoxContainer/SfxRow" unique_id=1612444941]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="FullscreenToggle" type="CheckBox" parent="SettingsPanel/VBoxContainer" unique_id=1815918980]
+layout_mode = 2
+text = "Fullscreen"
+
+[node name="DeleteSaveButton" type="Button" parent="SettingsPanel/VBoxContainer" unique_id=889884698]
+layout_mode = 2
+text = "Delete Save Data
+"
+
+[node name="CloseSettingsButton" type="Button" parent="SettingsPanel/VBoxContainer" unique_id=629078824]
+layout_mode = 2
+text = "Close"
+
+[node name="FadeOverlay" type="ColorRect" parent="." unique_id=697810332]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
