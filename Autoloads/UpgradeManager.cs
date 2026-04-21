@@ -10,7 +10,13 @@ public partial class UpgradeManager : Node
     [Signal] public delegate void TiersRefreshedEventHandler();
 
     // --- Config ---
-    [Export] public Array UpgradeConfigs { get; set; } = new();
+    public Array UpgradeConfigs { get; private set; } = new();
+
+    private void LoadConfigs()
+    {
+        UpgradeConfigs.Clear();
+        // Upgrade assets will be added here as they are created
+    }
 
     // --- State ---
     private Array<string> purchasedUpgradeIds = new();
@@ -26,6 +32,7 @@ public partial class UpgradeManager : Node
             return;
         }
         Instance = this;
+        LoadConfigs();
         BuildLookup();
         GD.Print("[UpgradeManager] Ready.");
     }

@@ -9,7 +9,13 @@ public partial class RandomEncounterManager : Node
     [Signal] public delegate void EncounterTriggeredEventHandler(EnemyData enemy);
 
     // --- Config ---
-    [Export] public Array EncounterPools { get; set; } = new();
+    public Array EncounterPools { get; private set; } = new();
+
+    private void LoadConfigs()
+    {
+        EncounterPools.Clear();
+        EncounterPools.Add(GD.Load<EncounterPool>("res://Resources/EncounterPools/pool_forest.tres"));
+    }
 
     // --- State ---
     private int clickAccumulator = 0;
@@ -28,7 +34,9 @@ public partial class RandomEncounterManager : Node
         }
         Instance = this;
 
+        LoadConfigs();
         RollNewThreshold();
+        RefreshPoolsIfDirty();
 
         // Refresh active pools when a dungeon is completed
         DungeonManager.Instance.DungeonCompleted += OnDungeonCompleted;

@@ -11,7 +11,23 @@ public partial class ArtisanManager : Node
     [Signal] public delegate void ProductionRecalculatedEventHandler(float totalKPS);
 
     // --- Config ---
-    [Export] public Array ArtisanConfigs { get; set; } = new();
+    public Array ArtisanConfigs { get; private set; } = new();
+
+    private void LoadConfigs()
+    {
+        ArtisanConfigs.Clear();
+        string[] paths = new[]
+        {
+        "res://Resources/Artisans/scribe.tres",
+        "res://Resources/Artisans/bard.tres",
+        "res://Resources/Artisans/potter.tres",
+        "res://Resources/Artisans/sculptor.tres",
+        "res://Resources/Artisans/playwright.tres",
+        "res://Resources/Artisans/historian.tres"
+    };
+        foreach (var path in paths)
+            ArtisanConfigs.Add(GD.Load<ArtisanData>(path));
+    }
 
     // --- State ---
     private Dictionary<string, int> ownedCounts = new();
@@ -37,6 +53,7 @@ public partial class ArtisanManager : Node
 
     private void Initialize()
     {
+        LoadConfigs();
         hasInitialized = true;
         RefreshUnlocks();
         RecalculateTotalProduction();

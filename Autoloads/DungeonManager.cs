@@ -10,7 +10,13 @@ public partial class DungeonManager : Node
     [Signal] public delegate void LayerClearedEventHandler(string dungeonId, int layerIndex);
 
     // --- Config ---
-    [Export] public Array DungeonConfigs { get; set; } = new();
+    public Array DungeonConfigs { get; private set; } = new();
+
+    private void LoadConfigs()
+    {
+        DungeonConfigs.Clear();
+        DungeonConfigs.Add(GD.Load<DungeonData>("res://Resources/Dungeons/forest.tres"));
+    }
 
     // --- State ---
     private Dictionary<string, int> dungeonProgress = new();
@@ -27,6 +33,9 @@ public partial class DungeonManager : Node
         }
         Instance = this;
         GD.Print("[DungeonManager] Ready.");
+
+        LoadConfigs();
+        GD.Print($"[DungeonManager] Loaded {DungeonConfigs.Count} dungeon configs.");
     }
 
     // --- Dungeon Queries ---
