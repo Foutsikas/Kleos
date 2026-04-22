@@ -90,7 +90,6 @@ public partial class MainGameController : Control
         KleosManager.Instance.DeedContextChanged += RefreshDeedContext;
         HeroManager.Instance.StatsChanged += RefreshHeroDisplay;
         HeroManager.Instance.LevelUp += OnHeroLevelUp;
-        ArtisanManager.Instance.ArtisanUnlocked += OnArtisanUnlocked;
     }
 
     private void ConnectButtons()
@@ -184,11 +183,6 @@ public partial class MainGameController : Control
     // Artisan List
     // -------------------------------------------------------------------------
 
-    private void OnArtisanUnlocked(string artisanId)
-    {
-        PopulateArtisanList();
-    }
-
     private void PopulateArtisanList()
     {
         if (ArtisanList == null || ArtisanRowScene == null) return;
@@ -200,7 +194,6 @@ public partial class MainGameController : Control
         {
             var artisan = ArtisanManager.Instance.ArtisanConfigs[i].As<ArtisanData>();
             if (artisan == null) continue;
-            if (!ArtisanManager.Instance.IsArtisanUnlocked(artisan)) continue;
 
             var row = ArtisanRowScene.Instantiate<ArtisanRow>();
             ArtisanList.AddChild(row);
