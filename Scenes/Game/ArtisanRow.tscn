@@ -27,11 +27,13 @@ size_flags_horizontal = 3
 [node name="ArtisanNameLabel" type="Label" parent="HBoxContainer/ArtisanInfoContainer" unique_id=1259711482]
 layout_mode = 2
 text = "Scribe"
+horizontal_alignment = 1
 
 [node name="ArtisanKPSLabel" type="Label" parent="HBoxContainer/ArtisanInfoContainer" unique_id=392470560]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "0.2 K/s"
+horizontal_alignment = 1
 
 [node name="ArtisanRightContainer" type="VBoxContainer" parent="HBoxContainer" unique_id=437106416]
 layout_mode = 2
@@ -40,7 +42,7 @@ size_flags_horizontal = 8
 [node name="ArtisanCostLabel" type="Label" parent="HBoxContainer/ArtisanRightContainer" unique_id=280193388]
 layout_mode = 2
 text = "10"
-horizontal_alignment = 2
+horizontal_alignment = 1
 
 [node name="ArtisanBuyButton" type="Button" parent="HBoxContainer/ArtisanRightContainer" unique_id=737144348]
 custom_minimum_size = Vector2(80, 0)
@@ -50,4 +52,4 @@ text = "Hire"
 [node name="ArtisanOwnedLabel" type="Label" parent="HBoxContainer/ArtisanRightContainer" unique_id=722428830]
 layout_mode = 2
 text = "Owned: 0"
-horizontal_alignment = 2
+horizontal_alignment = 1

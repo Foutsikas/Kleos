@@ -11,7 +11,7 @@ border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.6262097, 0.50638646, 0.3491902, 1)
 
-[node name="MainGame" type="Control" unique_id=365822274 node_paths=PackedStringArray("KleosLabel", "ProductionLabel", "DeedButton", "DeedContextLabel", "HeroPortrait", "HeroLevelLabel", "HeroHPBar", "HeroXPBar", "HeroPanel", "HeroPanelTitle", "HeroNameLabel", "HeroLevelDetailLabel", "HeroHPDetailBar", "HeroXPDetailBar", "StrengthValueLabel", "EnduranceValueLabel", "CunningValueLabel", "FavorValueLabel", "StrengthUpgradeButton", "EnduranceUpgradeButton", "CunningUpgradeButton", "FavorUpgradeButton", "StatPointsLabel", "CombatStatsLabel", "FadeOverlay", "ArtisanList")]
+[node name="MainGame" type="Control" unique_id=365822274 node_paths=PackedStringArray("KleosLabel", "ProductionLabel", "DeedButton", "DeedContextLabel", "HeroPortrait", "HeroLevelLabel", "HeroHPBar", "HeroXPBar", "HeroPanel", "HeroPanelTitle", "HeroNameLabel", "HeroLevelDetailLabel", "HeroHPDetailBar", "HeroXPDetailBar", "StrengthValueLabel", "EnduranceValueLabel", "CunningValueLabel", "FavorValueLabel", "StrengthUpgradeButton", "EnduranceUpgradeButton", "CunningUpgradeButton", "FavorUpgradeButton", "StatPointsLabel", "CombatStatsLabel", "FadeOverlay", "ArtisanList", "DungeonPanel", "UpgradePanel", "DungeonButton", "UpgradeButton")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -46,6 +46,10 @@ CombatStatsLabel = NodePath("HeroPanel/VBoxContainer/CombatStatsLabel")
 FadeOverlay = NodePath("FadeOverlay")
 ArtisanRowScene = ExtResource("2_88ity")
 ArtisanList = NodePath("RootLayout/MainPanel/RightPanel/ArtisanScrollContainer/ArtisanList")
+DungeonPanel = NodePath("DungeonPanel")
+UpgradePanel = NodePath("UpgradePanel")
+DungeonButton = NodePath("RootLayout/MainPanel/LeftPanel/DungeonButton")
+UpgradeButton = NodePath("RootLayout/MainPanel/LeftPanel/UpgradeButton")
 
 [node name="Background" type="ColorRect" parent="." unique_id=1115374356]
 layout_mode = 1
@@ -172,7 +176,8 @@ custom_minimum_size = Vector2(300, 0)
 layout_mode = 1
 anchors_preset = 9
 anchor_bottom = 1.0
-offset_right = 300.0
+offset_left = 84.145
+offset_right = 384.145
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_gucqa")
 
@@ -272,6 +277,7 @@ layout_mode = 2
 text = "DMG: 13  DODGE: 5%  CRIT: 2.5%"
 
 [node name="DungeonPanel" type="PanelContainer" parent="." unique_id=267715734]
+visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.09

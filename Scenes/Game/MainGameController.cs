@@ -2,16 +2,34 @@ using Godot;
 
 public partial class MainGameController : Control
 {
-    // --- Node References ---
+    // -------------------------------------------------------------------------
+    // Exports
+    // -------------------------------------------------------------------------
+
+    // Top Bar
     [Export] public Label KleosLabel { get; set; }
     [Export] public Label ProductionLabel { get; set; }
-    [Export] public Button DeedButton { get; set; }
-    [Export] public Label DeedContextLabel { get; set; }
+
+    // Hero Portrait (compact)
     [Export] public PanelContainer HeroPortrait { get; set; }
     [Export] public Label HeroLevelLabel { get; set; }
     [Export] public ProgressBar HeroHPBar { get; set; }
     [Export] public ProgressBar HeroXPBar { get; set; }
+
+    // Deed
+    [Export] public Button DeedButton { get; set; }
+    [Export] public Label DeedContextLabel { get; set; }
+
+    // Panel Toggle Buttons
+    [Export] public Button DungeonButton { get; set; }
+    [Export] public Button UpgradeButton { get; set; }
+
+    // Overlay Panels
+    [Export] public Control DungeonPanel { get; set; }
+    [Export] public Control UpgradePanel { get; set; }
     [Export] public Control HeroPanel { get; set; }
+
+    // Hero Panel (detail)
     [Export] public Label HeroPanelTitle { get; set; }
     [Export] public Label HeroNameLabel { get; set; }
     [Export] public Label HeroLevelDetailLabel { get; set; }
@@ -27,24 +45,32 @@ public partial class MainGameController : Control
     [Export] public Button FavorUpgradeButton { get; set; }
     [Export] public Label StatPointsLabel { get; set; }
     [Export] public Label CombatStatsLabel { get; set; }
-    [Export] public ColorRect FadeOverlay { get; set; }
+
+    // Artisan List
     [Export] public PackedScene ArtisanRowScene { get; set; }
     [Export] public VBoxContainer ArtisanList { get; set; }
 
-    // --- State ---
+    // Fade
+    [Export] public ColorRect FadeOverlay { get; set; }
+
+    // -------------------------------------------------------------------------
+    // State
+    // -------------------------------------------------------------------------
+
     private bool heroPanelOpen = false;
 
-    private void OnArtisanUnlocked(string artisanId)
-    {
-        PopulateArtisanList();
-    }
+    private enum ActivePanel { None, Dungeon, Upgrade }
+    private ActivePanel activePanel = ActivePanel.None;
 
-    // --- Lifecycle ---
+    // -------------------------------------------------------------------------
+    // Lifecycle
+    // -------------------------------------------------------------------------
 
     public override void _Ready()
     {
         ConnectSignals();
         ConnectButtons();
+        SetActivePanel(ActivePanel.None);
         FadeIn();
         RefreshKleosDisplay(KleosManager.Instance.CurrentKleos);
         RefreshProductionDisplay(KleosManager.Instance.TotalKleosPerSecond);
@@ -53,7 +79,9 @@ public partial class MainGameController : Control
         PopulateArtisanList();
     }
 
-    // --- Signal Connections ---
+    // -------------------------------------------------------------------------
+    // Signal Connections
+    // -------------------------------------------------------------------------
 
     private void ConnectSignals()
     {
@@ -69,10 +97,12 @@ public partial class MainGameController : Control
     {
         if (DeedButton != null)
             DeedButton.Pressed += OnDeedButtonPressed;
-
+        if (DungeonButton != null)
+            DungeonButton.Pressed += OnDungeonButtonPressed;
+        if (UpgradeButton != null)
+            UpgradeButton.Pressed += OnUpgradeButtonPressed;
         if (HeroPortrait != null)
             HeroPortrait.GuiInput += OnHeroPortraitInput;
-
         if (StrengthUpgradeButton != null)
             StrengthUpgradeButton.Pressed += () => OnStatUpgradePressed(HeroStat.Strength);
         if (EnduranceUpgradeButton != null)
@@ -83,7 +113,9 @@ public partial class MainGameController : Control
             FavorUpgradeButton.Pressed += () => OnStatUpgradePressed(HeroStat.Favor);
     }
 
-    // --- Deed Button ---
+    // -------------------------------------------------------------------------
+    // Deed
+    // -------------------------------------------------------------------------
 
     private void OnDeedButtonPressed()
     {
@@ -91,7 +123,36 @@ public partial class MainGameController : Control
         RandomEncounterManager.Instance.OnDeedClicked();
     }
 
-    // --- Hero Portrait ---
+    // -------------------------------------------------------------------------
+    // Panel Toggles
+    // -------------------------------------------------------------------------
+
+    private void OnDungeonButtonPressed()
+    {
+        SetActivePanel(activePanel == ActivePanel.Dungeon
+            ? ActivePanel.None
+            : ActivePanel.Dungeon);
+    }
+
+    private void OnUpgradeButtonPressed()
+    {
+        SetActivePanel(activePanel == ActivePanel.Upgrade
+            ? ActivePanel.None
+            : ActivePanel.Upgrade);
+    }
+
+    private void SetActivePanel(ActivePanel panel)
+    {
+        activePanel = panel;
+        if (DungeonPanel != null)
+            DungeonPanel.Visible = panel == ActivePanel.Dungeon;
+        if (UpgradePanel != null)
+            UpgradePanel.Visible = panel == ActivePanel.Upgrade;
+    }
+
+    // -------------------------------------------------------------------------
+    // Hero Portrait
+    // -------------------------------------------------------------------------
 
     private void OnHeroPortraitInput(InputEvent e)
     {
@@ -110,14 +171,46 @@ public partial class MainGameController : Control
             HeroPanel.Visible = heroPanelOpen;
     }
 
-    // --- Stat Upgrades ---
+    // -------------------------------------------------------------------------
+    // Stat Upgrades
+    // -------------------------------------------------------------------------
 
     private void OnStatUpgradePressed(HeroStat stat)
     {
         HeroManager.Instance.UpgradeStat(stat);
     }
 
-    // --- Display Refresh ---
+    // -------------------------------------------------------------------------
+    // Artisan List
+    // -------------------------------------------------------------------------
+
+    private void OnArtisanUnlocked(string artisanId)
+    {
+        PopulateArtisanList();
+    }
+
+    private void PopulateArtisanList()
+    {
+        if (ArtisanList == null || ArtisanRowScene == null) return;
+
+        foreach (Node child in ArtisanList.GetChildren())
+            child.QueueFree();
+
+        for (int i = 0; i < ArtisanManager.Instance.ArtisanConfigs.Count; i++)
+        {
+            var artisan = ArtisanManager.Instance.ArtisanConfigs[i].As<ArtisanData>();
+            if (artisan == null) continue;
+            if (!ArtisanManager.Instance.IsArtisanUnlocked(artisan)) continue;
+
+            var row = ArtisanRowScene.Instantiate<ArtisanRow>();
+            ArtisanList.AddChild(row);
+            row.Setup(artisan);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Display Refresh
+    // -------------------------------------------------------------------------
 
     private void RefreshKleosDisplay(float amount)
     {
@@ -178,7 +271,7 @@ public partial class MainGameController : Control
             HeroXPBar.Value = currentXP;
         }
 
-        // Full hero panel
+        // Hero panel detail
         if (HeroLevelDetailLabel != null)
             HeroLevelDetailLabel.Text = $"Level {level}";
         if (HeroHPDetailBar != null)
@@ -202,11 +295,9 @@ public partial class MainGameController : Control
         if (FavorValueLabel != null)
             FavorValueLabel.Text = HeroManager.Instance.GetFavor().ToString();
 
-        // Stat points
+        // Stat points and combat stats
         if (StatPointsLabel != null)
             StatPointsLabel.Text = $"Stat Points: {statPoints}";
-
-        // Combat stats
         if (CombatStatsLabel != null)
         {
             float dodge = HeroManager.Instance.GetDodgeChance() * 100f;
@@ -223,32 +314,18 @@ public partial class MainGameController : Control
         if (FavorUpgradeButton != null) FavorUpgradeButton.Disabled = !hasPoints;
     }
 
+    // -------------------------------------------------------------------------
+    // Event Handlers
+    // -------------------------------------------------------------------------
+
     private void OnHeroLevelUp(int newLevel)
     {
         GD.Print($"[MainGame] Hero reached level {newLevel}!");
     }
 
-    // --- Artisan ---
-    private void PopulateArtisanList()
-    {
-        if (ArtisanList == null || ArtisanRowScene == null) return;
-
-        foreach (Node child in ArtisanList.GetChildren())
-            child.QueueFree();
-
-        for (int i = 0; i < ArtisanManager.Instance.ArtisanConfigs.Count; i++)
-        {
-            var artisan = ArtisanManager.Instance.ArtisanConfigs[i].As<ArtisanData>();
-            if (artisan == null) continue;
-            if (!ArtisanManager.Instance.IsArtisanUnlocked(artisan)) continue;
-
-            var row = ArtisanRowScene.Instantiate<ArtisanRow>();
-            ArtisanList.AddChild(row);
-            row.Setup(artisan);
-        }
-    }
-
-    // --- Fade ---
+    // -------------------------------------------------------------------------
+    // Fade
+    // -------------------------------------------------------------------------
 
     private async void FadeIn()
     {
