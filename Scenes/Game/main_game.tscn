@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://crok31g5yprgt" path="res://Scenes/Game/MainGameController.cs" id="1_gucqa"]
 [ext_resource type="PackedScene" uid="uid://b1lhhdy386h51" path="res://Scenes/Game/ArtisanRow.tscn" id="2_88ity"]
+[ext_resource type="PackedScene" uid="uid://ckusmx83iyvu5" path="res://Scenes/Game/DungeonRow.tscn" id="3_aefse"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gucqa"]
 bg_color = Color(0.3133042, 0.2716998, 0.22091639, 1)
@@ -11,7 +12,7 @@ border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.6262097, 0.50638646, 0.3491902, 1)
 
-[node name="MainGame" type="Control" unique_id=365822274 node_paths=PackedStringArray("KleosLabel", "ProductionLabel", "DeedButton", "DeedContextLabel", "HeroPortrait", "HeroLevelLabel", "HeroHPBar", "HeroXPBar", "HeroPanel", "HeroPanelTitle", "HeroNameLabel", "HeroLevelDetailLabel", "HeroHPDetailBar", "HeroXPDetailBar", "StrengthValueLabel", "EnduranceValueLabel", "CunningValueLabel", "FavorValueLabel", "StrengthUpgradeButton", "EnduranceUpgradeButton", "CunningUpgradeButton", "FavorUpgradeButton", "StatPointsLabel", "CombatStatsLabel", "FadeOverlay", "ArtisanList", "DungeonPanel", "UpgradePanel", "DungeonButton", "UpgradeButton")]
+[node name="MainGame" type="Control" unique_id=365822274 node_paths=PackedStringArray("KleosLabel", "ProductionLabel", "HeroPortrait", "HeroLevelLabel", "HeroHPBar", "HeroXPBar", "DeedButton", "DeedContextLabel", "DungeonButton", "UpgradeButton", "DungeonPanel", "UpgradePanel", "HeroPanel", "HeroPanelTitle", "HeroNameLabel", "HeroLevelDetailLabel", "HeroHPDetailBar", "HeroXPDetailBar", "StrengthValueLabel", "EnduranceValueLabel", "CunningValueLabel", "FavorValueLabel", "StrengthUpgradeButton", "EnduranceUpgradeButton", "CunningUpgradeButton", "FavorUpgradeButton", "StatPointsLabel", "CombatStatsLabel", "ArtisanList", "DungeonList", "FadeOverlay")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -21,12 +22,16 @@ grow_vertical = 2
 script = ExtResource("1_gucqa")
 KleosLabel = NodePath("RootLayout/TopBar/KleosLabel")
 ProductionLabel = NodePath("RootLayout/TopBar/ProductionLabel")
-DeedButton = NodePath("RootLayout/MainPanel/CenterPanel/DeedButton")
-DeedContextLabel = NodePath("RootLayout/MainPanel/CenterPanel/DeedContextLabel")
 HeroPortrait = NodePath("RootLayout/TopBar/HeroPortrait")
 HeroLevelLabel = NodePath("RootLayout/TopBar/HeroPortrait/VBoxContainer/HeroLevelLabel")
 HeroHPBar = NodePath("RootLayout/TopBar/HeroPortrait/VBoxContainer/HeroHPBar")
 HeroXPBar = NodePath("RootLayout/TopBar/HeroPortrait/VBoxContainer/HeroXPBar")
+DeedButton = NodePath("RootLayout/MainPanel/CenterPanel/DeedButton")
+DeedContextLabel = NodePath("RootLayout/MainPanel/CenterPanel/DeedContextLabel")
+DungeonButton = NodePath("RootLayout/MainPanel/LeftPanel/DungeonButton")
+UpgradeButton = NodePath("RootLayout/MainPanel/LeftPanel/UpgradeButton")
+DungeonPanel = NodePath("DungeonPanel")
+UpgradePanel = NodePath("UpgradePanel")
 HeroPanel = NodePath("HeroPanel")
 HeroPanelTitle = NodePath("HeroPanel/VBoxContainer/HeroPanelTitle")
 HeroNameLabel = NodePath("HeroPanel/VBoxContainer/HeroNameLabel")
@@ -43,13 +48,11 @@ CunningUpgradeButton = NodePath("HeroPanel/VBoxContainer/StatsContainer/CunningR
 FavorUpgradeButton = NodePath("HeroPanel/VBoxContainer/StatsContainer/FavorRow/FavorUpgradeButton")
 StatPointsLabel = NodePath("HeroPanel/VBoxContainer/StatPointsLabel")
 CombatStatsLabel = NodePath("HeroPanel/VBoxContainer/CombatStatsLabel")
-FadeOverlay = NodePath("FadeOverlay")
 ArtisanRowScene = ExtResource("2_88ity")
 ArtisanList = NodePath("RootLayout/MainPanel/RightPanel/ArtisanScrollContainer/ArtisanList")
-DungeonPanel = NodePath("DungeonPanel")
-UpgradePanel = NodePath("UpgradePanel")
-DungeonButton = NodePath("RootLayout/MainPanel/LeftPanel/DungeonButton")
-UpgradeButton = NodePath("RootLayout/MainPanel/LeftPanel/UpgradeButton")
+DungeonRowScene = ExtResource("3_aefse")
+DungeonList = NodePath("DungeonPanel/ScrollContainer/DungeonList")
+FadeOverlay = NodePath("FadeOverlay")
 
 [node name="Background" type="ColorRect" parent="." unique_id=1115374356]
 layout_mode = 1
@@ -292,6 +295,7 @@ layout_mode = 2
 
 [node name="DungeonList" type="VBoxContainer" parent="DungeonPanel/ScrollContainer" unique_id=1118783433]
 layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="UpgradePanel" type="PanelContainer" parent="." unique_id=1058359160]
 visible = false

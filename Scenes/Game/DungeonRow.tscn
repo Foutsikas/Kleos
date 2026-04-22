@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://ckusmx83iyvu5"]
+
+[ext_resource type="Script" uid="uid://h6coq2voan4t" path="res://Scenes/Game/DungeonRow.cs" id="1_k3lsj"]
+
+[node name="DungeonRow" type="PanelContainer" unique_id=593215 node_paths=PackedStringArray("DungeonNameLabel", "ProgressLabel", "LayerInfoLabel", "DungeonActionButton")]
+custom_minimum_size = Vector2(0, 90)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+script = ExtResource("1_k3lsj")
+DungeonNameLabel = NodePath("VBoxContainer/HeaderRow/DungeonNameLabel")
+ProgressLabel = NodePath("VBoxContainer/HeaderRow/ProgressLabel")
+LayerInfoLabel = NodePath("VBoxContainer/LayerInfoLabel")
+DungeonActionButton = NodePath("VBoxContainer/DungeonActionButton")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1084701632]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="HeaderRow" type="VBoxContainer" parent="VBoxContainer" unique_id=634786052]
+layout_mode = 2
+
+[node name="DungeonNameLabel" type="Label" parent="VBoxContainer/HeaderRow" unique_id=1603380042]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Forest of Trials"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ProgressLabel" type="Label" parent="VBoxContainer/HeaderRow" unique_id=862750171]
+layout_mode = 2
+text = "0 / 10"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LayerInfoLabel" type="Label" parent="VBoxContainer" unique_id=54624218]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Next: Wild Dog"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DungeonActionButton" type="Button" parent="VBoxContainer" unique_id=495854079]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+text = "ENTER"

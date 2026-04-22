@@ -50,6 +50,10 @@ public partial class MainGameController : Control
     [Export] public PackedScene ArtisanRowScene { get; set; }
     [Export] public VBoxContainer ArtisanList { get; set; }
 
+    // Dungeon List
+    [Export] public PackedScene DungeonRowScene { get; set; }
+    [Export] public VBoxContainer DungeonList { get; set; }
+
     // Fade
     [Export] public ColorRect FadeOverlay { get; set; }
 
@@ -77,6 +81,7 @@ public partial class MainGameController : Control
         RefreshHeroDisplay();
         RefreshDeedContext();
         PopulateArtisanList();
+        PopulateDungeonList();
     }
 
     // -------------------------------------------------------------------------
@@ -198,6 +203,28 @@ public partial class MainGameController : Control
             var row = ArtisanRowScene.Instantiate<ArtisanRow>();
             ArtisanList.AddChild(row);
             row.Setup(artisan);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Dungeon List
+    // -------------------------------------------------------------------------
+
+    private void PopulateDungeonList()
+    {
+        if (DungeonList == null || DungeonRowScene == null) return;
+
+        foreach (Node child in DungeonList.GetChildren())
+            child.QueueFree();
+
+        for (int i = 0; i < DungeonManager.Instance.DungeonConfigs.Count; i++)
+        {
+            var dungeon = DungeonManager.Instance.DungeonConfigs[i].As<DungeonData>();
+            if (dungeon == null) continue;
+
+            var row = DungeonRowScene.Instantiate<DungeonRow>();
+            DungeonList.AddChild(row);
+            row.Setup(dungeon);
         }
     }
 
