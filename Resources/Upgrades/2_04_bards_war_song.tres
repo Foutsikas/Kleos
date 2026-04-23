@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="UpgradeConfig" format=3]
+
+[ext_resource type="Script" path="res://Resources/ModifierEffect.cs" id="1_6gqw7"]
+[ext_resource type="Script" path="res://Resources/UpgradeConfig.cs" id="2_m1uit"]
+
+[sub_resource type="Resource" id="Resource_3j2x2"]
+script = ExtResource("1_6gqw7")
+Type = 3
+Value = 1.15
+Mode = 1
+TargetId = "bard"
+
+[resource]
+script = ExtResource("2_m1uit")
+UpgradeName = "Bard's War Song"
+UpgradeId = "bards_war_song"
+Description = "Bard production increased by 15%."
+Cost = 3000.0
+Tier = 2
+Effects = [SubResource("Resource_3j2x2")]

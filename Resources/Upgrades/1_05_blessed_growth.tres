@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="UpgradeConfig" format=3]
+
+[ext_resource type="Script" path="res://Resources/ModifierEffect.cs" id="1_ivdte"]
+[ext_resource type="Script" path="res://Resources/UpgradeConfig.cs" id="2_vi7nk"]
+
+[sub_resource type="Resource" id="Resource_gbne2"]
+script = ExtResource("1_ivdte")
+Type = 4
+Value = 1.25
+Mode = 1
+
+[resource]
+script = ExtResource("2_vi7nk")
+UpgradeName = "Blessed Growth"
+UpgradeId = "blessed_growth"
+Description = "XP gained increased by 25%."
+Cost = 800.0
+Effects = [SubResource("Resource_gbne2")]

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="UpgradeConfig" format=3]
+
+[ext_resource type="Script" path="res://Resources/ModifierEffect.cs" id="1_ypjw0"]
+[ext_resource type="Script" path="res://Resources/UpgradeConfig.cs" id="2_6ns57"]
+
+[sub_resource type="Resource" id="Resource_scmba"]
+script = ExtResource("1_ypjw0")
+Type = 6
+Value = 10.0
+
+[resource]
+script = ExtResource("2_6ns57")
+UpgradeName = "Road-Hardened"
+UpgradeId = "road_hardened"
+Description = "Max HP increased by 10."
+Cost = 3500.0
+Tier = 2
+Effects = [SubResource("Resource_scmba")]

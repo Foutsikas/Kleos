@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="UpgradeConfig" format=3]
+
+[ext_resource type="Script" path="res://Resources/ModifierEffect.cs" id="1_e14mx"]
+[ext_resource type="Script" path="res://Resources/UpgradeConfig.cs" id="2_47e3w"]
+
+[sub_resource type="Resource" id="Resource_tj85b"]
+script = ExtResource("1_e14mx")
+Type = 3
+Value = 1.2
+Mode = 1
+TargetId = "scribe"
+
+[resource]
+script = ExtResource("2_47e3w")
+UpgradeName = "Scribe's Discipline"
+UpgradeId = "scribes_discipline"
+Description = "Scribe production increased by 20%."
+Cost = 2500.0
+Tier = 2
+Effects = [SubResource("Resource_tj85b")]

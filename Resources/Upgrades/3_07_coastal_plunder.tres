@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="UpgradeConfig" format=3]
+
+[ext_resource type="Script" path="res://Resources/ModifierEffect.cs" id="1_0sjyr"]
+[ext_resource type="Script" path="res://Resources/UpgradeConfig.cs" id="2_bajgk"]
+
+[sub_resource type="Resource" id="Resource_mqhpb"]
+script = ExtResource("1_0sjyr")
+Type = 3
+Value = 1.3
+Mode = 1
+
+[resource]
+script = ExtResource("2_bajgk")
+UpgradeName = "Coastal Plunder"
+UpgradeId = "coastal_plunder"
+Description = "All artisan production increased by 30%."
+Cost = 20000.0
+Tier = 3
+Effects = [SubResource("Resource_mqhpb")]

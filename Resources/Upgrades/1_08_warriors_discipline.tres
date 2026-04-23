@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="UpgradeConfig" format=3]
+
+[ext_resource type="Script" path="res://Resources/ModifierEffect.cs" id="1_eij4e"]
+[ext_resource type="Script" path="res://Resources/UpgradeConfig.cs" id="2_0g4kk"]
+
+[sub_resource type="Resource" id="Resource_sd7ey"]
+script = ExtResource("1_eij4e")
+Type = 13
+Value = 1.0
+
+[resource]
+script = ExtResource("2_0g4kk")
+UpgradeName = "Warrior's Discipline"
+UpgradeId = "warriors_discipline"
+Description = "Gain 1 additional stat point per level up."
+Cost = 2000.0
+Effects = [SubResource("Resource_sd7ey")]

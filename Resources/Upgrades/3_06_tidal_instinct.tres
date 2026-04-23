@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="UpgradeConfig" format=3]
+
+[ext_resource type="Script" path="res://Resources/ModifierEffect.cs" id="1_se8wy"]
+[ext_resource type="Script" path="res://Resources/UpgradeConfig.cs" id="2_yk3a8"]
+
+[sub_resource type="Resource" id="Resource_ltvss"]
+script = ExtResource("1_se8wy")
+Type = 7
+Value = 0.08
+
+[resource]
+script = ExtResource("2_yk3a8")
+UpgradeName = "Tidal Instinct"
+UpgradeId = "tidal_instinct"
+Description = "Dodge chance increased by 8%."
+Cost = 16000.0
+Tier = 3
+Effects = [SubResource("Resource_ltvss")]

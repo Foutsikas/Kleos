@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="UpgradeConfig" format=3]
+
+[ext_resource type="Script" path="res://Resources/ModifierEffect.cs" id="1_kr0df"]
+[ext_resource type="Script" path="res://Resources/UpgradeConfig.cs" id="2_u1dfr"]
+
+[sub_resource type="Resource" id="Resource_itp6x"]
+script = ExtResource("1_kr0df")
+Type = 7
+Value = 0.03
+
+[sub_resource type="Resource" id="Resource_i7b8n"]
+script = ExtResource("1_kr0df")
+Type = 8
+Value = 0.015
+
+[resource]
+script = ExtResource("2_u1dfr")
+UpgradeName = "Brigand's Cunning"
+UpgradeId = "brigands_cunning"
+Description = "Dodge chance +3%, Crit chance +1.5%."
+Cost = 4000.0
+Tier = 2
+Effects = [SubResource("Resource_itp6x"), SubResource("Resource_i7b8n")]

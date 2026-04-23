@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="UpgradeConfig" format=3]
+
+[ext_resource type="Script" path="res://Resources/ModifierEffect.cs" id="1_bje8p"]
+[ext_resource type="Script" path="res://Resources/UpgradeConfig.cs" id="2_fn2wl"]
+
+[sub_resource type="Resource" id="Resource_eespa"]
+script = ExtResource("1_bje8p")
+Type = 1
+Value = 6.0
+
+[resource]
+script = ExtResource("2_fn2wl")
+UpgradeName = "Sailor's Fortune"
+UpgradeId = "sailors_fortune"
+Description = "Battle rewards increased by 6."
+Cost = 8000.0
+Tier = 3
+Effects = [SubResource("Resource_eespa")]

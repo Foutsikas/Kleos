@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="UpgradeConfig" format=3]
+
+[ext_resource type="Script" path="res://Resources/ModifierEffect.cs" id="1_l1iqn"]
+[ext_resource type="Script" path="res://Resources/UpgradeConfig.cs" id="2_g266y"]
+
+[sub_resource type="Resource" id="Resource_7igou"]
+script = ExtResource("1_l1iqn")
+Type = 3
+Value = 1.3
+Mode = 1
+TargetId = "potter"
+
+[resource]
+script = ExtResource("2_g266y")
+UpgradeName = "Potter's Craft"
+UpgradeId = "potters_craft"
+Description = "Potter production increased by 30%."
+Cost = 1500.0
+Effects = [SubResource("Resource_7igou")]

@@ -15,7 +15,38 @@ public partial class UpgradeManager : Node
     private void LoadConfigs()
     {
         UpgradeConfigs.Clear();
-        // Upgrade assets will be added here as they are created
+        string[] paths = new[]
+        {
+        // Tier 1
+        "res://Resources/Upgrades/1_01_scribes_quill.tres",
+        "res://Resources/Upgrades/1_02_bronze_training.tres",
+        "res://Resources/Upgrades/1_03_inspiring_presence.tres",
+        "res://Resources/Upgrades/1_04_bards_inspiration.tres",
+        "res://Resources/Upgrades/1_05_blessed_growth.tres",
+        "res://Resources/Upgrades/1_06_spartans_endurance.tres",
+        "res://Resources/Upgrades/1_07_potters_craft.tres",
+        "res://Resources/Upgrades/1_08_warriors_discipline.tres",
+        "res://Resources/Upgrades/1_09_olympian_strike.tres",
+        "res://Resources/Upgrades/1_10_echoing_deed.tres",
+        // Tier 2
+        "res://Resources/Upgrades/2_01_stolen_blade.tres",
+        "res://Resources/Upgrades/2_02_spoils_of_the_road.tres",
+        "res://Resources/Upgrades/2_03_scribes_discipline.tres",
+        "res://Resources/Upgrades/2_04_bards_war_song.tres",
+        "res://Resources/Upgrades/2_05_road_hardened.tres",
+        "res://Resources/Upgrades/2_06_brigands_cunning.tres",
+        "res://Resources/Upgrades/2_07_victors_instinct.tres",
+        // Tier 3
+        "res://Resources/Upgrades/3_01_poseidons_tide.tres",
+        "res://Resources/Upgrades/3_02_sailors_fortune.tres",
+        "res://Resources/Upgrades/3_03_potters_legacy.tres",
+        "res://Resources/Upgrades/3_04_sculptors_vision.tres",
+        "res://Resources/Upgrades/3_05_sea_hardened_body.tres",
+        "res://Resources/Upgrades/3_06_tidal_instinct.tres",
+        "res://Resources/Upgrades/3_07_coastal_plunder.tres",
+    };
+        foreach (var path in paths)
+            UpgradeConfigs.Add(GD.Load<UpgradeConfig>(path));
     }
 
     // --- State ---

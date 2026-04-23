@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="UpgradeConfig" format=3]
+
+[ext_resource type="Script" path="res://Resources/ModifierEffect.cs" id="1_ttt73"]
+[ext_resource type="Script" path="res://Resources/UpgradeConfig.cs" id="2_4va7o"]
+
+[sub_resource type="Resource" id="Resource_yjvvy"]
+script = ExtResource("1_ttt73")
+Type = 14
+Value = 1.1
+Mode = 1
+
+[resource]
+script = ExtResource("2_4va7o")
+UpgradeName = "Echoing Deed"
+UpgradeId = "echoing_deed"
+Description = "Click damage multiplied by 1.1x."
+Cost = 3500.0
+Effects = [SubResource("Resource_yjvvy")]
