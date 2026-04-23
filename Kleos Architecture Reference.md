@@ -10,6 +10,7 @@
 This is the technical architecture reference for the Godot port of Kleos.
 It documents how each system is implemented in Godot, including class
 structures, signal wiring, file paths, and Godot-specific patterns.
+Essentialy the source of truth for code structure.
 
 The Unity KAR (KAR_Updated_2026-03-20.md) remains the reference for
 Unity-specific implementation. This document is independent and does not
