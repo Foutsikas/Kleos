@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://dh3pvk0vtmwhp"]
+
+[node name="TierHeader" type="PanelContainer" unique_id=921540370]
+custom_minimum_size = Vector2(0, 36)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+
+[node name="TierLabel" type="Label" parent="." unique_id=1408811673]
+layout_mode = 2
+text = "Tier 1 -- Trials of the Forest"
+horizontal_alignment = 1
+vertical_alignment = 1

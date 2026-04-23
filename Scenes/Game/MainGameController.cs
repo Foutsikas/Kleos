@@ -50,6 +50,11 @@ public partial class MainGameController : Control
     [Export] public PackedScene ArtisanRowScene { get; set; }
     [Export] public VBoxContainer ArtisanList { get; set; }
 
+    //Upgrade List
+    [Export] public PackedScene UpgradeRowScene { get; set; }
+    [Export] public PackedScene TierHeaderScene { get; set; }
+    [Export] public VBoxContainer UpgradeList { get; set; }
+
     // Dungeon List
     [Export] public PackedScene DungeonRowScene { get; set; }
     [Export] public VBoxContainer DungeonList { get; set; }
@@ -81,6 +86,7 @@ public partial class MainGameController : Control
         RefreshHeroDisplay();
         RefreshDeedContext();
         PopulateArtisanList();
+        PopulateUpgradeList();
         PopulateDungeonList();
     }
 
@@ -203,6 +209,54 @@ public partial class MainGameController : Control
             var row = ArtisanRowScene.Instantiate<ArtisanRow>();
             ArtisanList.AddChild(row);
             row.Setup(artisan);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Upgrade List
+    // -------------------------------------------------------------------------
+
+    private void PopulateUpgradeList()
+    {
+        if (UpgradeList == null || UpgradeRowScene == null) return;
+
+        foreach (Node child in UpgradeList.GetChildren())
+            child.QueueFree();
+
+        int currentTier = -1;
+        string[] tierNames = new[]
+        {
+        "",
+        "Tier 1 -- Trials of the Forest",
+        "Tier 2 -- Trials of the Road",
+        "Tier 3 -- Trials of the Shore"
+    };
+
+        for (int i = 0; i < UpgradeManager.Instance.UpgradeConfigs.Count; i++)
+        {
+            var config = UpgradeManager.Instance.UpgradeConfigs[i].As<UpgradeConfig>();
+            if (config == null) continue;
+
+            // Insert tier header when tier changes
+            if (config.Tier != currentTier && TierHeaderScene != null)
+            {
+                currentTier = config.Tier;
+                var header = TierHeaderScene.Instantiate<PanelContainer>();
+                UpgradeList.AddChild(header);
+
+                var label = header.GetNode<Label>("TierLabel");
+                if (label != null)
+                {
+                    string title = currentTier < tierNames.Length
+                        ? tierNames[currentTier]
+                        : $"Tier {currentTier}";
+                    label.Text = title;
+                }
+            }
+
+            var row = UpgradeRowScene.Instantiate<UpgradeRow>();
+            UpgradeList.AddChild(row);
+            row.Setup(config);
         }
     }
 

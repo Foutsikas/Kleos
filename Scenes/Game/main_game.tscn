@@ -3,6 +3,8 @@
 [ext_resource type="Script" uid="uid://crok31g5yprgt" path="res://Scenes/Game/MainGameController.cs" id="1_gucqa"]
 [ext_resource type="PackedScene" uid="uid://b1lhhdy386h51" path="res://Scenes/Game/ArtisanRow.tscn" id="2_88ity"]
 [ext_resource type="PackedScene" uid="uid://ckusmx83iyvu5" path="res://Scenes/Game/DungeonRow.tscn" id="3_aefse"]
+[ext_resource type="PackedScene" uid="uid://dmgutm6ywv553" path="res://Scenes/Game/UpgradeRow.tscn" id="3_fuq2u"]
+[ext_resource type="PackedScene" uid="uid://dh3pvk0vtmwhp" path="res://Scenes/Game/TierHeader.tscn" id="4_q5o1p"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gucqa"]
 bg_color = Color(0.3133042, 0.2716998, 0.22091639, 1)
@@ -12,7 +14,7 @@ border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.6262097, 0.50638646, 0.3491902, 1)
 
-[node name="MainGame" type="Control" unique_id=365822274 node_paths=PackedStringArray("KleosLabel", "ProductionLabel", "HeroPortrait", "HeroLevelLabel", "HeroHPBar", "HeroXPBar", "DeedButton", "DeedContextLabel", "DungeonButton", "UpgradeButton", "DungeonPanel", "UpgradePanel", "HeroPanel", "HeroPanelTitle", "HeroNameLabel", "HeroLevelDetailLabel", "HeroHPDetailBar", "HeroXPDetailBar", "StrengthValueLabel", "EnduranceValueLabel", "CunningValueLabel", "FavorValueLabel", "StrengthUpgradeButton", "EnduranceUpgradeButton", "CunningUpgradeButton", "FavorUpgradeButton", "StatPointsLabel", "CombatStatsLabel", "ArtisanList", "DungeonList", "FadeOverlay")]
+[node name="MainGame" type="Control" unique_id=365822274 node_paths=PackedStringArray("KleosLabel", "ProductionLabel", "HeroPortrait", "HeroLevelLabel", "HeroHPBar", "HeroXPBar", "DeedButton", "DeedContextLabel", "DungeonButton", "UpgradeButton", "DungeonPanel", "UpgradePanel", "HeroPanel", "HeroPanelTitle", "HeroNameLabel", "HeroLevelDetailLabel", "HeroHPDetailBar", "HeroXPDetailBar", "StrengthValueLabel", "EnduranceValueLabel", "CunningValueLabel", "FavorValueLabel", "StrengthUpgradeButton", "EnduranceUpgradeButton", "CunningUpgradeButton", "FavorUpgradeButton", "StatPointsLabel", "CombatStatsLabel", "ArtisanList", "UpgradeList", "DungeonList", "FadeOverlay")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -50,6 +52,9 @@ StatPointsLabel = NodePath("HeroPanel/VBoxContainer/StatPointsLabel")
 CombatStatsLabel = NodePath("HeroPanel/VBoxContainer/CombatStatsLabel")
 ArtisanRowScene = ExtResource("2_88ity")
 ArtisanList = NodePath("RootLayout/MainPanel/RightPanel/ArtisanScrollContainer/ArtisanList")
+UpgradeRowScene = ExtResource("3_fuq2u")
+TierHeaderScene = ExtResource("4_q5o1p")
+UpgradeList = NodePath("UpgradePanel/ScrollContainer/UpgradeList")
 DungeonRowScene = ExtResource("3_aefse")
 DungeonList = NodePath("DungeonPanel/ScrollContainer/DungeonList")
 FadeOverlay = NodePath("FadeOverlay")
@@ -313,6 +318,7 @@ layout_mode = 2
 
 [node name="UpgradeList" type="VBoxContainer" parent="UpgradePanel/ScrollContainer" unique_id=603568789]
 layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="FadeOverlay" type="ColorRect" parent="." unique_id=680385733]
 visible = false
