@@ -10,7 +10,7 @@
 This is the gameplay and system reference for the Godot port of Kleos.
 It documents what has been implemented, tested, and confirmed working
 in the Godot project specifically.
-Essentialy the source of truth for game behavior.
+Essentially the source of truth for game behavior.
 
 All gameplay values (artisan costs, enemy stats, upgrade effects, hero
 formulas) are unchanged from the Unity version. Refer to the Unity KMR
@@ -195,20 +195,20 @@ ModifierMode: Flat or Multiplier.
 24 upgrade .tres assets created across 3 tiers:
 
   Tier 1 -- Trials of the Forest (no dungeon gate, 10 upgrades):
-    Scribe's Quill, Bronze Training, Inspiring Presence,
-    Bard's Inspiration, Blessed Growth, Spartan's Endurance,
-    Potter's Craft, Warrior's Discipline, Olympian Strike,
+	Scribe's Quill, Bronze Training, Inspiring Presence,
+	Bard's Inspiration, Blessed Growth, Spartan's Endurance,
+	Potter's Craft, Warrior's Discipline, Olympian Strike,
     Echoing Deed. Costs range 50 to 3,500 kleos.
 
   Tier 2 -- Trials of the Road (requires Brigands Pass, 7 upgrades):
-    Stolen Blade, Spoils of the Road, Scribe's Discipline,
-    Bard's War Song, Road-Hardened, Brigand's Cunning,
-    Victor's Instinct. Costs range 1,500 to 5,000 kleos.
+	Stolen Blade, Spoils of the Road, Scribe's Discipline,
+	Bard's War Song, Road-Hardened, Brigand's Cunning,
+	Victor's Instinct. Costs range 1,500 to 5,000 kleos.
     Dungeon gate left null until brigands.tres is created.
 
   Tier 3 -- Trials of the Shore (requires Coastal Caves, 7 upgrades):
-    Poseidon's Tide, Sailor's Fortune, Potter's Legacy,
-    Sculptor's Vision, Sea-Hardened Body, Tidal Instinct,
+	Poseidon's Tide, Sailor's Fortune, Potter's Legacy,
+	Sculptor's Vision, Sea-Hardened Body, Tidal Instinct,
     Coastal Plunder. Costs range 6,000 to 20,000 kleos.
     Dungeon gate left null until coastal.tres is created.
 

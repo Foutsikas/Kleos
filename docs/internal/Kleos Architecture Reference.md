@@ -10,7 +10,7 @@
 This is the technical architecture reference for the Godot port of Kleos.
 It documents how each system is implemented in Godot, including class
 structures, signal wiring, file paths, and Godot-specific patterns.
-Essentialy the source of truth for code structure.
+Essentially the source of truth for code structure.
 
 The Unity KAR (KAR_Updated_2026-03-20.md) remains the reference for
 Unity-specific implementation. This document is independent and does not
@@ -32,67 +32,67 @@ Target: Desktop (Windows, Linux)
 ```
 res://
   Autoloads/
-    SettingsManager.cs
-    SaveManager.cs
-    UpgradeManager.cs
-    KleosManager.cs
-    ArtisanManager.cs
-    HeroManager.cs
-    DungeonManager.cs
-    RandomEncounterManager.cs
-    ResourceScanner.cs          (static utility, not an Autoload)
+	SettingsManager.cs
+	SaveManager.cs
+	UpgradeManager.cs
+	KleosManager.cs
+	ArtisanManager.cs
+	HeroManager.cs
+	DungeonManager.cs
+	RandomEncounterManager.cs
+	ResourceScanner.cs          (static utility, not an Autoload)
   Resources/
-    ArtisanData.cs
-    EnemyData.cs
-    DungeonData.cs
-    DungeonLayer.cs
-    UpgradeConfig.cs
-    HeroData.cs
-    EncounterPool.cs
-    EncounterPoolEntry.cs
-    BattleTextLibrary.cs
-    ModifierEffect.cs
-    ModifierEnums.cs            (ModifierType and ModifierMode enums)
-    HeroStat.cs                 (enum)
-    Artisans/
-      scribe.tres
-      bard.tres
-      potter.tres
-      sculptor.tres
-      playwright.tres
-      historian.tres
-    Enemies/
-      1. Forest/
-        1.wild_dog.tres
-        2.wolf.tres
-        3.wolf_pack.tres
-        4.large_wolf.tres
-        5.large_wolf_pack.tres
-        6.nemean_lion_cub.tres
-        7.nemean_lion.tres
-    Dungeons/
-      forest.tres
-    Upgrades/
-      1_01_scribes_quill.tres
-      1_02_bronze_training.tres
-      ... (24 total, prefixed by tier and order)
-      3_07_coastal_plunder.tres
-    EncounterPools/
-      pool_forest.tres
+	ArtisanData.cs
+	EnemyData.cs
+	DungeonData.cs
+	DungeonLayer.cs
+	UpgradeConfig.cs
+	HeroData.cs
+	EncounterPool.cs
+	EncounterPoolEntry.cs
+	BattleTextLibrary.cs
+	ModifierEffect.cs
+	ModifierEnums.cs            (ModifierType and ModifierMode enums)
+	HeroStat.cs                 (enum)
+	Artisans/
+	  scribe.tres
+	  bard.tres
+	  potter.tres
+	  sculptor.tres
+	  playwright.tres
+	  historian.tres
+	Enemies/
+	  1. Forest/
+		1.wild_dog.tres
+		2.wolf.tres
+		3.wolf_pack.tres
+		4.large_wolf.tres
+		5.large_wolf_pack.tres
+		6.nemean_lion_cub.tres
+		7.nemean_lion.tres
+	Dungeons/
+	  forest.tres
+	Upgrades/
+	  1_01_scribes_quill.tres
+	  1_02_bronze_training.tres
+	  ... (24 total, prefixed by tier and order)
+	  3_07_coastal_plunder.tres
+	EncounterPools/
+	  pool_forest.tres
   Scenes/
-    MainMenu/
-      main_menu.tscn
-      MainMenuController.cs
-    Game/
-      main_game.tscn
-      MainGameController.cs
-      ArtisanRow.tscn
-      ArtisanRow.cs
-      DungeonRow.tscn
-      DungeonRow.cs
-      UpgradeRow.tscn
-      UpgradeRow.cs
-      TierHeader.tscn
+	MainMenu/
+	  main_menu.tscn
+	  MainMenuController.cs
+	Game/
+	  main_game.tscn
+	  MainGameController.cs
+	  ArtisanRow.tscn
+	  ArtisanRow.cs
+	  DungeonRow.tscn
+	  DungeonRow.cs
+	  UpgradeRow.tscn
+	  UpgradeRow.cs
+	  TierHeader.tscn
 ```
 
 ---
@@ -173,8 +173,8 @@ Click damage calculation:
 Passive income in _Process():
   passiveAccumulator += totalKleosPerSecond * (float)delta;
   while passiveAccumulator >= 1.0:
-    AddKleos(1f);
-    passiveAccumulator -= 1f;
+	AddKleos(1f);
+	passiveAccumulator -= 1f;
 
 Save/Load:
   GetSaveData() returns KleosSaveData
@@ -205,7 +205,7 @@ Config loading:
 
 Key methods:
   PurchaseArtisan(ArtisanData) -- spends kleos, increments count,
-    recalculates production, checks for new unlocks
+	recalculates production, checks for new unlocks
   IsArtisanUnlocked(ArtisanData) -- checks unlock condition
   GetOwnedCount(string artisanId) -- returns count for given artisan
   GetCurrentCost(ArtisanData) -- BaseCost * CostMultiplier ^ owned
@@ -216,9 +216,9 @@ Key methods:
 
 Production calculation:
   For each artisan:
-    baseProd = KleosPerSecond * ownedCount
-    multiplier = UpgradeManager.GetMultiplier(ArtisanProductionMultiplier)
-    totalProd += baseProd * multiplier
+	baseProd = KleosPerSecond * ownedCount
+	multiplier = UpgradeManager.GetMultiplier(ArtisanProductionMultiplier)
+	totalProd += baseProd * multiplier
   Calls KleosManager.RecalculateTotalProduction(totalProd)
 
 Save/Load:
@@ -248,9 +248,9 @@ Config loading:
 
 Key methods:
   GetFlat(ModifierType type) -- sums all flat modifiers of given type
-    across purchased upgrades
+	across purchased upgrades
   GetMultiplier(ModifierType type) -- multiplies all multiplier modifiers
-    of given type across purchased upgrades (starts at 1.0)
+	of given type across purchased upgrades (starts at 1.0)
   PurchaseUpgrade(string upgradeId) -- spends kleos, adds to purchased list
   IsUpgradePurchased(string upgradeId) -- checks purchase state
   CanPurchase(string upgradeId) -- checks tier gate, individual lock, cost
@@ -258,7 +258,7 @@ Key methods:
 Lock checks:
   IsTierUnlocked(UpgradeConfig) -- checks RequiredDungeon completion
   IsIndividualLockMet(UpgradeConfig) -- checks hero level, prerequisite
-    upgrade, and artisan count requirements
+	upgrade, and artisan count requirements
 
 Save/Load:
   GetSaveData() returns UpgradeSaveData (purchased IDs list)
@@ -320,7 +320,7 @@ Signals:
 
 State:
   dungeonProgress (Dictionary, string to int -- dungeon name to highest
-    cleared layer)
+	cleared layer)
   completedDungeons (Dictionary, string to bool)
 
 Config loading:
@@ -388,9 +388,9 @@ File paths:
 
 Key methods:
   Save(SaveData) -- serializes to JSON via BuildJson(), creates backup,
-    writes file
+	writes file
   Load() -- reads file via ParseJson(), falls back to backup, returns
-    empty SaveData if both fail
+	empty SaveData if both fail
   HasSaveData() -- checks if save file exists
   DeleteSaveData() -- deletes save and backup files
   ResetAllSaveData() -- alias for DeleteSaveData

@@ -110,4 +110,3 @@ Kleos/
 
 Visual style is currently placeholder.  
 Focus is on building solid core systems before committing to final art direction.
-
