@@ -15,18 +15,63 @@ public partial class ArtisanManager : Node
 
     private void LoadConfigs()
     {
-        ArtisanConfigs.Clear();
-        string[] paths = new[]
+        ArtisanConfigs = ResourceScanner.LoadAll<ArtisanData>("res://Resources/Artisans/");
+        SortByUnlockOrder();
+    }
+
+    private void SortByUnlockOrder()
+    {
+        // Artisans must appear in unlock chain order:
+        // Scribe (no requirement) first, then each artisan whose
+        // requirement is the previous one in the chain.
+
+        var unsorted = new System.Collections.Generic.List<ArtisanData>();
+        for (int i = 0; i < ArtisanConfigs.Count; i++)
         {
-        "res://Resources/Artisans/scribe.tres",
-        "res://Resources/Artisans/bard.tres",
-        "res://Resources/Artisans/potter.tres",
-        "res://Resources/Artisans/sculptor.tres",
-        "res://Resources/Artisans/playwright.tres",
-        "res://Resources/Artisans/historian.tres"
-    };
-        foreach (var path in paths)
-            ArtisanConfigs.Add(GD.Load<ArtisanData>(path));
+            var artisan = ArtisanConfigs[i].As<ArtisanData>();
+            if (artisan != null)
+                unsorted.Add(artisan);
+        }
+
+        var sorted = new System.Collections.Generic.List<ArtisanData>();
+        var remaining = new System.Collections.Generic.List<ArtisanData>(unsorted);
+
+        // First pass: find the artisan with no requirement (Scribe)
+        for (int i = remaining.Count - 1; i >= 0; i--)
+        {
+            if (string.IsNullOrEmpty(remaining[i].RequiredArtisanId))
+            {
+                sorted.Add(remaining[i]);
+                remaining.RemoveAt(i);
+            }
+        }
+
+        // Chain: find the artisan whose requirement is the last sorted one
+        int safety = 0;
+        while (remaining.Count > 0 && safety < 20)
+        {
+            safety++;
+            string lastId = sorted[sorted.Count - 1].ArtisanId;
+            bool found = false;
+            for (int i = 0; i < remaining.Count; i++)
+            {
+                if (remaining[i].RequiredArtisanId == lastId)
+                {
+                    sorted.Add(remaining[i]);
+                    remaining.RemoveAt(i);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) break;
+        }
+
+        // Append anything left over (should not happen with correct data)
+        sorted.AddRange(remaining);
+
+        ArtisanConfigs.Clear();
+        foreach (var artisan in sorted)
+            ArtisanConfigs.Add(artisan);
     }
 
     // --- State ---

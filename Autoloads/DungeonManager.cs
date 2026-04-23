@@ -14,8 +14,62 @@ public partial class DungeonManager : Node
 
     private void LoadConfigs()
     {
+        DungeonConfigs = ResourceScanner.LoadAll<DungeonData>("res://Resources/Dungeons/");
+        SortByProgression();
+    }
+
+    private void SortByProgression()
+    {
+        // Dungeons with no RequiredDungeon come first (Forest).
+        // Then each dungeon whose RequiredDungeon is the previous one.
+
+        var unsorted = new System.Collections.Generic.List<DungeonData>();
+        for (int i = 0; i < DungeonConfigs.Count; i++)
+        {
+            var dungeon = DungeonConfigs[i].As<DungeonData>();
+            if (dungeon != null)
+                unsorted.Add(dungeon);
+        }
+
+        var sorted = new System.Collections.Generic.List<DungeonData>();
+        var remaining = new System.Collections.Generic.List<DungeonData>(unsorted);
+
+        // First pass: find dungeons with no prerequisite
+        for (int i = remaining.Count - 1; i >= 0; i--)
+        {
+            if (remaining[i].RequiredDungeon == null)
+            {
+                sorted.Add(remaining[i]);
+                remaining.RemoveAt(i);
+            }
+        }
+
+        // Chain: find the dungeon whose RequiredDungeon is the last sorted one
+        int safety = 0;
+        while (remaining.Count > 0 && safety < 20)
+        {
+            safety++;
+            string lastId = sorted[sorted.Count - 1].DungeonId;
+            bool found = false;
+            for (int i = 0; i < remaining.Count; i++)
+            {
+                if (remaining[i].RequiredDungeon != null
+                    && remaining[i].RequiredDungeon.DungeonId == lastId)
+                {
+                    sorted.Add(remaining[i]);
+                    remaining.RemoveAt(i);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) break;
+        }
+
+        sorted.AddRange(remaining);
+
         DungeonConfigs.Clear();
-        DungeonConfigs.Add(GD.Load<DungeonData>("res://Resources/Dungeons/forest.tres"));
+        foreach (var dungeon in sorted)
+            DungeonConfigs.Add(dungeon);
     }
 
     // --- State ---
