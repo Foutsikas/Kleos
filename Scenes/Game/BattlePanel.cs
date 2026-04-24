@@ -95,6 +95,7 @@ public partial class BattlePanel : Control
 	private List<BattleLogEntry> fullBattleLog = new List<BattleLogEntry>();
 	private List<string> logLineHistory = new List<string>();
 	private List<Color> logColorHistory = new List<Color>();
+	private List<bool> logIsHeroAction = new List<bool>();
 	private int currentSpeedIndex = 0;
 	private float[] speedMultipliers = { 1.0f, 2.0f, 4.0f };
 	private BattleResult storedResult;
@@ -150,6 +151,7 @@ public partial class BattlePanel : Control
 		fullBattleLog.Clear();
 		logLineHistory.Clear();
 		logColorHistory.Clear();
+		logIsHeroAction.Clear();
 		storedResult = null;
 		isCombatActive = true;
 		currentSpeedIndex = 0;
@@ -342,7 +344,7 @@ public partial class BattlePanel : Control
 			lineColor = EnemyActionColor;
 		}
 
-		PushLogLine(line, lineColor);
+		PushLogLine(line, lineColor, false);
 	}
 
 	// -------------------------------------------------------------------------
@@ -362,10 +364,11 @@ public partial class BattlePanel : Control
 		}
 	}
 
-	private void PushLogLine(string text, Color color)
+	private void PushLogLine(string text, Color color, bool isHeroAction = true)
 	{
 		logLineHistory.Add(text);
 		logColorHistory.Add(color);
+		logIsHeroAction.Add(isHeroAction);
 
 		// Display the most recent 4 lines
 		Label[] lines = { LogLine4, LogLine3, LogLine2, LogLine1 };
@@ -385,6 +388,11 @@ public partial class BattlePanel : Control
 				Color c = logColorHistory[historyIndex];
 				// Apply alpha fade: newest = full, oldest = 40%
 				lines[i].Modulate = new Color(c.R, c.G, c.B, LogAlpha[i]);
+
+				if (historyIndex < logIsHeroAction.Count && !logIsHeroAction[historyIndex])
+					lines[i].HorizontalAlignment = HorizontalAlignment.Right;
+				else
+					lines[i].HorizontalAlignment = HorizontalAlignment.Left;
 			}
 			else
 			{
@@ -409,7 +417,7 @@ public partial class BattlePanel : Control
 			flavor = $"{enemy.EnemyName} blocks your path...";
 		}
 
-		PushLogLine(flavor, new Color(0.75f, 0.70f, 0.60f));
+		PushLogLine(flavor, new Color(0.75f, 0.70f, 0.60f), true);
 	}
 
 	// -------------------------------------------------------------------------
@@ -539,11 +547,9 @@ public partial class BattlePanel : Control
 	{
 		if (PostCombatLogList == null) return;
 
-		// Clear previous entries
 		foreach (Node child in PostCombatLogList.GetChildren())
 			child.QueueFree();
 
-		// Add all stored log lines
 		for (int i = 0; i < logLineHistory.Count; i++)
 		{
 			var label = new Label();
@@ -551,10 +557,15 @@ public partial class BattlePanel : Control
 			label.Modulate = logColorHistory[i];
 			label.AutowrapMode = TextServer.AutowrapMode.WordSmart;
 			label.AddThemeFontSizeOverride("font_size", 13);
+
+			if (i < logIsHeroAction.Count && !logIsHeroAction[i])
+				label.HorizontalAlignment = HorizontalAlignment.Right;
+			else
+				label.HorizontalAlignment = HorizontalAlignment.Left;
+
 			PostCombatLogList.AddChild(label);
 		}
 
-		// Scroll to top
 		if (PostCombatLogScroll != null)
 			PostCombatLogScroll.ScrollVertical = 0;
 	}

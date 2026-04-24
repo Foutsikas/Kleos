@@ -458,7 +458,6 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 12
 
 [node name="BattleLogContainer" type="VBoxContainer" parent="BattlePanel/CombatArea" unique_id=34781950]
-visible = false
 custom_minimum_size = Vector2(300, 100)
 layout_mode = 1
 anchors_preset = 7
