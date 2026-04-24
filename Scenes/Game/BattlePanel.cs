@@ -60,7 +60,7 @@ public partial class BattlePanel : Control
 	[Export] public Button BackToResultsButton { get; set; }
 
 	// -------------------------------------------------------------------------
-	// Exports -- Combat Area (container for hero/enemy/log during fight)
+	// Exports -- Combat Area
 	// -------------------------------------------------------------------------
 
 	[Export] public Control CombatArea { get; set; }
@@ -88,6 +88,31 @@ public partial class BattlePanel : Control
 	private static readonly float[] LogAlpha = { 1.0f, 0.80f, 0.60f, 0.40f };
 
 	// -------------------------------------------------------------------------
+	// Constants -- Animation
+	// -------------------------------------------------------------------------
+
+	// How far a portrait nudges on attack (pixels)
+	private const float AttackNudgeDistance = 20.0f;
+	// Duration of the nudge out and back (seconds each)
+	private const float NudgeDuration = 0.12f;
+
+	// How far a portrait shakes on taking damage (pixels)
+	private const float ShakeDistance = 6.0f;
+	// Duration of a single shake oscillation (seconds)
+	private const float ShakeDuration = 0.06f;
+	// Number of shake oscillations
+	private const int ShakeCount = 3;
+
+	// HP bar tween duration (seconds)
+	private const float HPBarTweenDuration = 0.3f;
+
+	// Result screen fade-in duration (seconds)
+	private const float ResultFadeDuration = 0.4f;
+
+	// Panel fade duration (seconds)
+	private const float PanelFadeDuration = 0.25f;
+
+	// -------------------------------------------------------------------------
 	// State
 	// -------------------------------------------------------------------------
 
@@ -100,6 +125,11 @@ public partial class BattlePanel : Control
 	private float[] speedMultipliers = { 1.0f, 2.0f, 4.0f };
 	private BattleResult storedResult;
 	private bool isCombatActive = false;
+
+	// Original positions for portrait animation reset
+	private Vector2 heroPortraitOrigin;
+	private Vector2 enemyPortraitOrigin;
+	private bool originsStored = false;
 
 	// -------------------------------------------------------------------------
 	// Lifecycle
@@ -156,11 +186,14 @@ public partial class BattlePanel : Control
 		isCombatActive = true;
 		currentSpeedIndex = 0;
 
-		// Show panel, hide sub-overlays
-		Visible = true;
+		// Show panel with fade
 		ShowCombatArea();
 		HideResultOverlay();
 		HidePostCombatLog();
+		FadePanelIn();
+
+		// Store portrait origins for animation
+		StorePortraitOrigins();
 
 		// Set header
 		if (EncounterHeaderLabel != null)
@@ -183,6 +216,31 @@ public partial class BattlePanel : Control
 
 		// Show encounter flavor text as first log entry
 		ShowEncounterFlavor(context.Enemy);
+	}
+
+	// -------------------------------------------------------------------------
+	// Portrait Origin Storage
+	// -------------------------------------------------------------------------
+
+	private void StorePortraitOrigins()
+	{
+		if (HeroPortrait != null && !originsStored)
+		{
+			heroPortraitOrigin = HeroPortrait.Position;
+		}
+		if (EnemyPortrait != null && !originsStored)
+		{
+			enemyPortraitOrigin = EnemyPortrait.Position;
+		}
+		originsStored = true;
+	}
+
+	private void ResetPortraitPositions()
+	{
+		if (HeroPortrait != null)
+			HeroPortrait.Position = heroPortraitOrigin;
+		if (EnemyPortrait != null)
+			EnemyPortrait.Position = enemyPortraitOrigin;
 	}
 
 	// -------------------------------------------------------------------------
@@ -250,7 +308,6 @@ public partial class BattlePanel : Control
 
 	private Color GetThemeForDungeon(string dungeonId)
 	{
-		// Match dungeon IDs to themes
 		string lower = dungeonId.ToLower();
 
 		if (lower.Contains("forest"))
@@ -283,19 +340,24 @@ public partial class BattlePanel : Control
 
 	private void OnRoundStarted(int roundNumber)
 	{
-		// Could add round separator to log if desired
+		// Reserved for future use (round separators, etc.)
 	}
 
 	private void OnHeroAttack(BattleLogEntry entry)
 	{
 		fullBattleLog.Add(entry);
 
-		// Update enemy HP display
-		if (EnemyHPBar != null)
-			EnemyHPBar.Value = entry.TargetCurrentHP;
+		// Update enemy HP with tween
+		TweenHPBar(EnemyHPBar, entry.TargetCurrentHP);
 
 		if (EnemyHPText != null)
 			EnemyHPText.Text = $"{entry.TargetCurrentHP:F0} / {entry.TargetMaxHP:F0}";
+
+		// Animate hero portrait: lunge right toward enemy
+		AnimateAttackNudge(HeroPortrait, heroPortraitOrigin, AttackNudgeDistance);
+
+		// Animate enemy portrait: shake from taking damage
+		AnimateDamageShake(EnemyPortrait, enemyPortraitOrigin);
 
 		// Build log line
 		string line;
@@ -312,39 +374,105 @@ public partial class BattlePanel : Control
 			lineColor = HeroActionColor;
 		}
 
-		PushLogLine(line, lineColor);
+		PushLogLine(line, lineColor, true);
 	}
 
 	private void OnEnemyAttack(BattleLogEntry entry)
 	{
 		fullBattleLog.Add(entry);
 
-		// Update hero HP display
-		if (!entry.IsDodge)
-		{
-			if (HeroHPBar != null)
-				HeroHPBar.Value = entry.TargetCurrentHP;
-
-			if (HeroHPText != null)
-				HeroHPText.Text = $"{entry.TargetCurrentHP:F0} / {entry.TargetMaxHP:F0}";
-		}
-
-		// Build log line
-		string line;
-		Color lineColor;
-
 		if (entry.IsDodge)
 		{
-			line = $"{entry.ActorName} lunges -- Hero evades!";
-			lineColor = DodgeColor;
+			// Animate enemy portrait: lunge left (attack attempt)
+			AnimateAttackNudge(EnemyPortrait, enemyPortraitOrigin, -AttackNudgeDistance);
+
+			// No damage, no HP update, no shake
+
+			string dodgeLine = $"{entry.ActorName} lunges -- Hero evades!";
+			PushLogLine(dodgeLine, DodgeColor, false);
 		}
 		else
 		{
-			line = $"{entry.ActorName} strikes for {entry.Damage:F0} damage.";
-			lineColor = EnemyActionColor;
+			// Update hero HP with tween
+			TweenHPBar(HeroHPBar, entry.TargetCurrentHP);
+
+			if (HeroHPText != null)
+				HeroHPText.Text = $"{entry.TargetCurrentHP:F0} / {entry.TargetMaxHP:F0}";
+
+			// Animate enemy portrait: lunge left toward hero
+			AnimateAttackNudge(EnemyPortrait, enemyPortraitOrigin, -AttackNudgeDistance);
+
+			// Animate hero portrait: shake from taking damage
+			AnimateDamageShake(HeroPortrait, heroPortraitOrigin);
+
+			string hitLine = $"{entry.ActorName} strikes for {entry.Damage:F0} damage.";
+			PushLogLine(hitLine, EnemyActionColor, false);
+		}
+	}
+
+	// -------------------------------------------------------------------------
+	// Portrait Animations
+	// -------------------------------------------------------------------------
+
+	private void AnimateAttackNudge(TextureRect portrait, Vector2 origin, float direction)
+	{
+		if (portrait == null) return;
+
+		// Kill any existing tweens on this portrait
+		portrait.Position = origin;
+
+		float speed = BattleSystem.Instance.GetCurrentSpeedMultiplier();
+		float duration = NudgeDuration / speed;
+
+		var tween = CreateTween();
+		// Nudge outward
+		tween.TweenProperty(portrait, "position:x",
+			origin.X + direction, duration)
+			.SetEase(Tween.EaseType.Out)
+			.SetTrans(Tween.TransitionType.Quad);
+		// Snap back
+		tween.TweenProperty(portrait, "position:x",
+			origin.X, duration)
+			.SetEase(Tween.EaseType.In)
+			.SetTrans(Tween.TransitionType.Quad);
+	}
+
+	private void AnimateDamageShake(TextureRect portrait, Vector2 origin)
+	{
+		if (portrait == null) return;
+
+		float speed = BattleSystem.Instance.GetCurrentSpeedMultiplier();
+		float duration = ShakeDuration / speed;
+
+		var tween = CreateTween();
+
+		for (int i = 0; i < ShakeCount; i++)
+		{
+			float dir = (i % 2 == 0) ? ShakeDistance : -ShakeDistance;
+			tween.TweenProperty(portrait, "position:x",
+				origin.X + dir, duration);
 		}
 
-		PushLogLine(line, lineColor, false);
+		// Return to origin
+		tween.TweenProperty(portrait, "position:x",
+			origin.X, duration);
+	}
+
+	// -------------------------------------------------------------------------
+	// HP Bar Tween
+	// -------------------------------------------------------------------------
+
+	private void TweenHPBar(ProgressBar bar, float targetValue)
+	{
+		if (bar == null) return;
+
+		float speed = BattleSystem.Instance.GetCurrentSpeedMultiplier();
+		float duration = HPBarTweenDuration / speed;
+
+		var tween = CreateTween();
+		tween.TweenProperty(bar, "value", (double)targetValue, duration)
+			.SetEase(Tween.EaseType.Out)
+			.SetTrans(Tween.TransitionType.Quad);
 	}
 
 	// -------------------------------------------------------------------------
@@ -386,13 +514,27 @@ public partial class BattlePanel : Control
 			{
 				lines[i].Text = logLineHistory[historyIndex];
 				Color c = logColorHistory[historyIndex];
-				// Apply alpha fade: newest = full, oldest = 40%
-				lines[i].Modulate = new Color(c.R, c.G, c.B, LogAlpha[i]);
+				float targetAlpha = LogAlpha[i];
 
+				// Alignment
 				if (historyIndex < logIsHeroAction.Count && !logIsHeroAction[historyIndex])
 					lines[i].HorizontalAlignment = HorizontalAlignment.Right;
 				else
 					lines[i].HorizontalAlignment = HorizontalAlignment.Left;
+
+				// Fade in the newest line, set others directly
+				if (i == 0)
+				{
+					// Newest line fades in
+					lines[i].Modulate = new Color(c.R, c.G, c.B, 0);
+					var tween = CreateTween();
+					tween.TweenProperty(lines[i], "modulate:a",
+						targetAlpha, 0.15f);
+				}
+				else
+				{
+					lines[i].Modulate = new Color(c.R, c.G, c.B, targetAlpha);
+				}
 			}
 			else
 			{
@@ -429,15 +571,19 @@ public partial class BattlePanel : Control
 		isCombatActive = false;
 		storedResult = result;
 
-		// Short delay before showing results (let last log line breathe)
-		var timer = GetTree().CreateTimer(0.5f);
+		// Reset portraits to their origin before hiding combat area
+		ResetPortraitPositions();
+
+		// Short delay before showing results
+		float speed = BattleSystem.Instance.GetCurrentSpeedMultiplier();
+		var timer = GetTree().CreateTimer(0.5f / speed);
 		timer.Timeout += () => ShowResultScreen(result);
 	}
 
 	private void ShowResultScreen(BattleResult result)
 	{
 		HideCombatArea();
-		ShowResultOverlay();
+		FadeInResultOverlay();
 
 		if (result.IsVictory)
 			PopulateVictoryScreen(result);
@@ -458,7 +604,6 @@ public partial class BattlePanel : Control
 
 		if (ResultFlavorLabel != null)
 		{
-			// Use BattleTextLibrary when asset exists, fallback for now
 			ResultFlavorLabel.Text = $"The {result.Context.Enemy.EnemyName} falls before your might.";
 		}
 
@@ -530,7 +675,6 @@ public partial class BattlePanel : Control
 
 		if (ResultConsolationLabel != null)
 		{
-			// Fallback consolation text. BattleTextLibrary will replace this.
 			ResultConsolationLabel.Text = "Even Herakles knew defeat before glory.";
 			ResultConsolationLabel.Visible = true;
 		}
@@ -599,7 +743,6 @@ public partial class BattlePanel : Control
 		currentSpeedIndex = (currentSpeedIndex + 1) % (maxIndex + 1);
 		UpdateSpeedLabel();
 
-		// Notify BattleSystem of speed change
 		BattleSystem.Instance.SetSpeedMultiplier(speedMultipliers[currentSpeedIndex]);
 	}
 
@@ -617,8 +760,7 @@ public partial class BattlePanel : Control
 
 	private void OnResultActionPressed()
 	{
-		// Close the battle panel entirely
-		Visible = false;
+		FadePanelOut();
 		isCombatActive = false;
 	}
 
@@ -633,6 +775,44 @@ public partial class BattlePanel : Control
 	{
 		HidePostCombatLog();
 		ShowResultOverlay();
+	}
+
+	// -------------------------------------------------------------------------
+	// Panel Fade In/Out
+	// -------------------------------------------------------------------------
+
+	private void FadePanelIn()
+	{
+		Visible = true;
+		Modulate = new Color(1, 1, 1, 0);
+
+		var tween = CreateTween();
+		tween.TweenProperty(this, "modulate:a", 1.0f, PanelFadeDuration)
+			.SetEase(Tween.EaseType.Out);
+	}
+
+	private void FadePanelOut()
+	{
+		var tween = CreateTween();
+		tween.TweenProperty(this, "modulate:a", 0.0f, PanelFadeDuration)
+			.SetEase(Tween.EaseType.In);
+		tween.TweenCallback(Callable.From(() => Visible = false));
+	}
+
+	// -------------------------------------------------------------------------
+	// Result Overlay Fade In
+	// -------------------------------------------------------------------------
+
+	private void FadeInResultOverlay()
+	{
+		if (ResultOverlay == null) return;
+
+		ResultOverlay.Visible = true;
+		ResultOverlay.Modulate = new Color(1, 1, 1, 0);
+
+		var tween = CreateTween();
+		tween.TweenProperty(ResultOverlay, "modulate:a", 1.0f, ResultFadeDuration)
+			.SetEase(Tween.EaseType.Out);
 	}
 
 	// -------------------------------------------------------------------------
@@ -675,7 +855,6 @@ public partial class BattlePanel : Control
 
 	private void SetProgressBarColor(ProgressBar bar, Color color)
 	{
-		// Godot ProgressBar fill color is set via theme override
 		var styleBox = new StyleBoxFlat();
 		styleBox.BgColor = color;
 		styleBox.ContentMarginLeft = 0;

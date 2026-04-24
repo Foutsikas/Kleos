@@ -417,6 +417,11 @@ public partial class BattleSystem : Node
     {
         return currentContext;
     }
+
+    public float GetCurrentSpeedMultiplier()
+    {
+        return speedMultiplier;
+    }
 }
 
 public class BattleLogEntry
