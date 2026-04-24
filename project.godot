@@ -24,6 +24,7 @@ ArtisanManager="*uid://nki51nmxgx2o"
 HeroManager="*uid://b4gmgsimbjrcm"
 DungeonManager="*uid://daoroywp56byu"
 RandomEncounterManager="*uid://25u2g1l7njm7"
+BattleSystem="*uid://ckkxy4lxu2dto"
 
 [dotnet]
 

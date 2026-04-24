@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://ckusmx83iyvu5" path="res://Scenes/Game/DungeonRow.tscn" id="3_aefse"]
 [ext_resource type="PackedScene" uid="uid://dmgutm6ywv553" path="res://Scenes/Game/UpgradeRow.tscn" id="3_fuq2u"]
 [ext_resource type="PackedScene" uid="uid://dh3pvk0vtmwhp" path="res://Scenes/Game/TierHeader.tscn" id="4_q5o1p"]
+[ext_resource type="Script" uid="uid://cuwb2b82uaevg" path="res://Scenes/Game/BattlePanel.cs" id="6_q5o1p"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gucqa"]
 bg_color = Color(0.3133042, 0.2716998, 0.22091639, 1)
@@ -319,6 +320,292 @@ layout_mode = 2
 [node name="UpgradeList" type="VBoxContainer" parent="UpgradePanel/ScrollContainer" unique_id=603568789]
 layout_mode = 2
 size_flags_horizontal = 3
+
+[node name="BattlePanel" type="Control" parent="." unique_id=1960193445 node_paths=PackedStringArray("EncounterHeaderLabel", "HeroNameLabel", "HeroLevelLabel", "HeroPortrait", "HeroHPBar", "HeroHPText", "EnemyNameLabel", "EnemyPortrait", "EnemyHPBar", "EnemyHPText", "LogLine1", "LogLine2", "LogLine3", "LogLine4", "SpeedToggleButton", "BattleBackground", "ResultOverlay", "ResultSubtitleLabel", "ResultTitleLabel", "ResultFlavorLabel", "ResultRewardLabel", "ResultLuckLabel", "ResultSummaryLabel", "ResultConsolationLabel", "ResultActionButton", "ViewBattleLogButton", "PostCombatLogOverlay", "PostCombatLogScroll", "PostCombatLogList", "BackToResultsButton", "CombatArea")]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("6_q5o1p")
+EncounterHeaderLabel = NodePath("CombatArea/EncounterHeaderLabel")
+HeroNameLabel = NodePath("CombatArea/HeroSection/HeroNameLabel")
+HeroLevelLabel = NodePath("CombatArea/HeroSection/HeroLevelLabel")
+HeroPortrait = NodePath("CombatArea/EnemySection/EnemyPortrait")
+HeroHPBar = NodePath("CombatArea/HeroSection/HeroHPBar")
+HeroHPText = NodePath("CombatArea/HeroSection/HeroHPText")
+EnemyNameLabel = NodePath("CombatArea/EnemySection/EnemyNameLabel")
+EnemyPortrait = NodePath("CombatArea/EnemySection/EnemyPortrait")
+EnemyHPBar = NodePath("CombatArea/EnemySection/EnemyHPBar")
+EnemyHPText = NodePath("CombatArea/EnemySection/EnemyHPText")
+LogLine1 = NodePath("CombatArea/BattleLogContainer/LogLine1")
+LogLine2 = NodePath("CombatArea/BattleLogContainer/LogLine2")
+LogLine3 = NodePath("CombatArea/BattleLogContainer/LogLine3")
+LogLine4 = NodePath("CombatArea/BattleLogContainer/LogLine4")
+SpeedToggleButton = NodePath("CombatArea/SpeedToggleButton")
+BattleBackground = NodePath("BattleBackground")
+ResultOverlay = NodePath("ResultOverlay")
+ResultSubtitleLabel = NodePath("ResultOverlay/ResultSubtitleLabel")
+ResultTitleLabel = NodePath("ResultOverlay/ResultTitleLabel")
+ResultFlavorLabel = NodePath("ResultOverlay/ResultFlavorLabel")
+ResultRewardLabel = NodePath("ResultOverlay/ResultRewardLabel")
+ResultLuckLabel = NodePath("ResultOverlay/ResultLuckLabel")
+ResultSummaryLabel = NodePath("ResultOverlay/ResultSummaryLabel")
+ResultConsolationLabel = NodePath("ResultOverlay/ResultConsolationLabel")
+ResultActionButton = NodePath("ResultOverlay/ResultActionButton")
+ViewBattleLogButton = NodePath("ResultOverlay/ViewBattleLogButton")
+PostCombatLogOverlay = NodePath("PostCombatLogOverlay")
+PostCombatLogScroll = NodePath("PostCombatLogOverlay/LogMargin/PostCombatLogScroll")
+PostCombatLogList = NodePath("PostCombatLogOverlay/LogMargin/PostCombatLogScroll/PostCombatLogList")
+BackToResultsButton = NodePath("PostCombatLogOverlay/BackToResultsButton")
+CombatArea = NodePath("CombatArea")
+
+[node name="BattleBackground" type="ColorRect" parent="BattlePanel" unique_id=1563817716]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.14901961, 0.12941177, 0.10980392, 1)
+
+[node name="CombatArea" type="Control" parent="BattlePanel" unique_id=806227220]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="EncounterHeaderLabel" type="Label" parent="BattlePanel/CombatArea" unique_id=774687957]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -151.0
+offset_right = 149.0
+offset_bottom = 30.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 18
+text = "TEST TEST"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HeroSection" type="VBoxContainer" parent="BattlePanel/CombatArea" unique_id=1527059224]
+custom_minimum_size = Vector2(140, 180)
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 50.0
+offset_top = -233.0
+offset_right = 190.0
+offset_bottom = -41.0
+grow_vertical = 0
+
+[node name="HeroHPText" type="Label" parent="BattlePanel/CombatArea/HeroSection" unique_id=1489927454]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+
+[node name="HeroHPBar" type="ProgressBar" parent="BattlePanel/CombatArea/HeroSection" unique_id=2053773614]
+custom_minimum_size = Vector2(120, 14)
+layout_mode = 2
+
+[node name="HeroPortrait" type="TextureRect" parent="BattlePanel/CombatArea/HeroSection" unique_id=60854752]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+stretch_mode = 5
+
+[node name="HeroNameLabel" type="Label" parent="BattlePanel/CombatArea/HeroSection" unique_id=1680716772]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+
+[node name="HeroLevelLabel" type="Label" parent="BattlePanel/CombatArea/HeroSection" unique_id=1441675538]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+
+[node name="EnemySection" type="VBoxContainer" parent="BattlePanel/CombatArea" unique_id=374851710]
+custom_minimum_size = Vector2(140, 180)
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -190.0
+offset_top = 41.0
+offset_right = -50.0
+offset_bottom = 221.0
+grow_horizontal = 0
+
+[node name="EnemyNameLabel" type="Label" parent="BattlePanel/CombatArea/EnemySection" unique_id=874561894]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EnemyPortrait" type="TextureRect" parent="BattlePanel/CombatArea/EnemySection" unique_id=1859029437]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+stretch_mode = 5
+
+[node name="EnemyHPBar" type="ProgressBar" parent="BattlePanel/CombatArea/EnemySection" unique_id=1327106970]
+custom_minimum_size = Vector2(120, 14)
+layout_mode = 2
+
+[node name="EnemyHPText" type="Label" parent="BattlePanel/CombatArea/EnemySection" unique_id=1963564579]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+
+[node name="BattleLogContainer" type="VBoxContainer" parent="BattlePanel/CombatArea" unique_id=34781950]
+visible = false
+custom_minimum_size = Vector2(300, 100)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -373.0
+offset_right = 150.0
+offset_bottom = -269.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="LogLine1" type="Label" parent="BattlePanel/CombatArea/BattleLogContainer" unique_id=1613867670]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+autowrap_mode = 3
+
+[node name="LogLine2" type="Label" parent="BattlePanel/CombatArea/BattleLogContainer" unique_id=858052990]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+autowrap_mode = 3
+
+[node name="LogLine3" type="Label" parent="BattlePanel/CombatArea/BattleLogContainer" unique_id=1403378885]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+autowrap_mode = 3
+
+[node name="LogLine4" type="Label" parent="BattlePanel/CombatArea/BattleLogContainer" unique_id=337185691]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+autowrap_mode = 3
+
+[node name="SpeedToggleButton" type="Button" parent="BattlePanel/CombatArea" unique_id=506565980]
+visible = false
+custom_minimum_size = Vector2(45, 30)
+layout_mode = 1
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 18.0
+offset_bottom = 18.0
+text = "x1"
+
+[node name="ResultOverlay" type="VBoxContainer" parent="BattlePanel" unique_id=1079308903]
+visible = false
+custom_minimum_size = Vector2(360, 320)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -80.0
+offset_top = -130.0
+offset_right = 80.0
+offset_bottom = 130.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ResultSubtitleLabel" type="Label" parent="BattlePanel/ResultOverlay" unique_id=1035894955]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+
+[node name="ResultTitleLabel" type="Label" parent="BattlePanel/ResultOverlay" unique_id=1164832833]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+horizontal_alignment = 1
+
+[node name="ResultFlavorLabel" type="Label" parent="BattlePanel/ResultOverlay" unique_id=1228530269]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+horizontal_alignment = 1
+
+[node name="ResultRewardLabel" type="Label" parent="BattlePanel/ResultOverlay" unique_id=676774086]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+horizontal_alignment = 1
+
+[node name="ResultLuckLabel" type="Label" parent="BattlePanel/ResultOverlay" unique_id=1918156654]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+
+[node name="ResultSummaryLabel" type="Label" parent="BattlePanel/ResultOverlay" unique_id=966551192]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+horizontal_alignment = 1
+
+[node name="ResultConsolationLabel" type="Label" parent="BattlePanel/ResultOverlay" unique_id=1940916215]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+horizontal_alignment = 1
+
+[node name="ResultActionButton" type="Button" parent="BattlePanel/ResultOverlay" unique_id=1465683542]
+custom_minimum_size = Vector2(160, 40)
+layout_mode = 2
+text = "CLAIM GLORY"
+
+[node name="ViewBattleLogButton" type="Button" parent="BattlePanel/ResultOverlay" unique_id=742228538]
+layout_mode = 2
+text = "VIEW BATTLE LOG"
+
+[node name="PostCombatLogOverlay" type="Control" parent="BattlePanel" unique_id=561339620]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LogMargin" type="MarginContainer" parent="BattlePanel/PostCombatLogOverlay" unique_id=1215766982]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 60
+
+[node name="PostCombatLogScroll" type="ScrollContainer" parent="BattlePanel/PostCombatLogOverlay/LogMargin" unique_id=1204187074]
+layout_mode = 2
+
+[node name="PostCombatLogList" type="VBoxContainer" parent="BattlePanel/PostCombatLogOverlay/LogMargin/PostCombatLogScroll" unique_id=723900022]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BackToResultsButton" type="Button" parent="BattlePanel/PostCombatLogOverlay" unique_id=636859488]
+custom_minimum_size = Vector2(160, 35)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -80.0
+offset_top = -52.0
+offset_right = 80.0
+offset_bottom = -17.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "BACK TO RESULTS"
 
 [node name="FadeOverlay" type="ColorRect" parent="." unique_id=680385733]
 visible = false

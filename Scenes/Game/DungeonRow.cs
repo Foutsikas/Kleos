@@ -149,14 +149,14 @@ public partial class DungeonRow : PanelContainer
     private void OnActionPressed()
     {
         if (dungeonData == null) return;
+        if (BattleSystem.Instance.IsBattleInProgress()) return;
+        int nextLayer = DungeonManager.Instance.GetNextLayer(dungeonData.DungeonId);
+        int totalLayers = dungeonData.Layers.Count;
 
-        string id = dungeonData.DungeonId;
-        int nextLayer = DungeonManager.Instance.GetNextLayer(id);
+        // Do not start battle if dungeon is already completed
+        if (nextLayer > totalLayers) return;
 
-        // Battle system not yet implemented.
-        // When it is, this will call something like:
-        // BattleSystem.Instance.StartDungeonBattle(dungeonData, nextLayer);
-        GD.Print($"[DungeonRow] Would start battle: {dungeonData.DungeonName}, Layer {nextLayer + 1}.");
+        BattleSystem.Instance.StartDungeonBattle(dungeonData, nextLayer);
     }
 
     private void OnLayerCleared(string dungeonId, int layerIndex)

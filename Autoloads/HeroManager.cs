@@ -117,6 +117,11 @@ public partial class HeroManager : Node
     public int GetCunning() => heroData.GetCunning();
     public int GetFavor() => heroData.GetFavor();
 
+    public void EmitStatsChanged()
+    {
+        EmitSignal(SignalName.StatsChanged);
+    }
+
     // --- HP Management ---
 
     public void TakeDamage(float amount)

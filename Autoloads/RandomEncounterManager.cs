@@ -6,7 +6,7 @@ public partial class RandomEncounterManager : Node
     public static RandomEncounterManager Instance { get; private set; }
 
     // --- Signals ---
-    [Signal] public delegate void EncounterTriggeredEventHandler(EnemyData enemy);
+    [Signal] public delegate void EncounterTriggeredEventHandler(EnemyData enemy, string poolName);
 
     // --- Config ---
     public Array EncounterPools { get; private set; } = new();
@@ -77,7 +77,7 @@ public partial class RandomEncounterManager : Node
         if (enemy == null) return;
 
         GD.Print($"[RandomEncounterManager] Encounter triggered: {enemy.EnemyName}.");
-        EmitSignal(SignalName.EncounterTriggered, enemy);
+        EmitSignal(SignalName.EncounterTriggered, enemy, pool.PoolName);
     }
 
     // --- Pool Selection ---
