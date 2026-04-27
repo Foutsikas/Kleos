@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="UpgradeConfig" format=3]
+[gd_resource type="Resource" script_class="UpgradeConfig" format=3 uid="uid://cqxm7630233rq"]
 
-[ext_resource type="Script" path="res://Resources/ModifierEffect.cs" id="1_blmqr"]
-[ext_resource type="Script" path="res://Resources/UpgradeConfig.cs" id="2_bvgfh"]
+[ext_resource type="Script" uid="uid://cl641ndk5vxp" path="res://Resources/ModifierEffect.cs" id="1_blmqr"]
+[ext_resource type="Resource" uid="uid://cn74iskpwyt6w" path="res://Resources/Dungeons/coastal.tres" id="2_3y40n"]
+[ext_resource type="Script" uid="uid://b26kdgevkwsj2" path="res://Resources/UpgradeConfig.cs" id="2_bvgfh"]
 
 [sub_resource type="Resource" id="Resource_3y40n"]
 script = ExtResource("1_blmqr")
@@ -15,4 +16,5 @@ UpgradeId = "sea_hardened_body"
 Description = "Max HP increased by 20."
 Cost = 14000.0
 Tier = 3
+RequiredDungeon = ExtResource("2_3y40n")
 Effects = [SubResource("Resource_3y40n")]

@@ -128,20 +128,20 @@ size_flags_horizontal = 3
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="DungeonButton" type="Button" parent="RootLayout/MainPanel/LeftPanel" unique_id=1458184694]
-custom_minimum_size = Vector2(50, 0)
-layout_mode = 2
-size_flags_horizontal = 0
-text = "Dungeons"
-
-[node name="MiddleSpacer" type="Control" parent="RootLayout/MainPanel/LeftPanel" unique_id=2098654664]
-layout_mode = 2
-
 [node name="UpgradeButton" type="Button" parent="RootLayout/MainPanel/LeftPanel" unique_id=2073831653]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 text = "Upgrades "
+
+[node name="MiddleSpacer" type="Control" parent="RootLayout/MainPanel/LeftPanel" unique_id=2098654664]
+layout_mode = 2
+
+[node name="DungeonButton" type="Button" parent="RootLayout/MainPanel/LeftPanel" unique_id=1458184694]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Dungeons"
 
 [node name="BottomSpacer" type="Control" parent="RootLayout/MainPanel/LeftPanel" unique_id=579639927]
 layout_mode = 2

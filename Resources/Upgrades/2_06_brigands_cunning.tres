@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="UpgradeConfig" format=3]
+[gd_resource type="Resource" script_class="UpgradeConfig" format=3 uid="uid://cnmojnnfwpkfg"]
 
-[ext_resource type="Script" path="res://Resources/ModifierEffect.cs" id="1_kr0df"]
-[ext_resource type="Script" path="res://Resources/UpgradeConfig.cs" id="2_u1dfr"]
+[ext_resource type="Script" uid="uid://cl641ndk5vxp" path="res://Resources/ModifierEffect.cs" id="1_kr0df"]
+[ext_resource type="Resource" uid="uid://uvn2ukrw5gsb" path="res://Resources/Dungeons/brigands.tres" id="2_itp6x"]
+[ext_resource type="Script" uid="uid://b26kdgevkwsj2" path="res://Resources/UpgradeConfig.cs" id="2_u1dfr"]
 
 [sub_resource type="Resource" id="Resource_itp6x"]
 script = ExtResource("1_kr0df")
@@ -20,4 +21,5 @@ UpgradeId = "brigands_cunning"
 Description = "Dodge chance +3%, Crit chance +1.5%."
 Cost = 4000.0
 Tier = 2
+RequiredDungeon = ExtResource("2_itp6x")
 Effects = [SubResource("Resource_itp6x"), SubResource("Resource_i7b8n")]

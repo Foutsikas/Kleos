@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://bq8081nfmxoo2"]
+
+[ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+EnemyName = "Siren Thrall"
+EnemyId = "siren_thrall"
+Health = 5200.0
+DamagePerSecond = 22.0
+AttackRate = 2.2
+KleosReward = 35
+EncounterFlavorTexts = PackedStringArray("A sailor who heard the song and never left.", "The thrall moves with unnatural purpose.")
+AttackLines = PackedStringArray("The thrall lunges with mindless fury.", "Enchanted muscles drive a savage blow.", "The siren's slave attacks without fear or pain.")
+metadata/_custom_type_script = "uid://b1ahgi2bsjm0e"

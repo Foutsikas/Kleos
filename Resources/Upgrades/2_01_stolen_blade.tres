@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="UpgradeConfig" format=3]
+[gd_resource type="Resource" script_class="UpgradeConfig" format=3 uid="uid://b3sfmry0rau8i"]
 
-[ext_resource type="Script" path="res://Resources/ModifierEffect.cs" id="1_esqqp"]
-[ext_resource type="Script" path="res://Resources/UpgradeConfig.cs" id="2_431r0"]
+[ext_resource type="Script" uid="uid://cl641ndk5vxp" path="res://Resources/ModifierEffect.cs" id="1_esqqp"]
+[ext_resource type="Resource" uid="uid://uvn2ukrw5gsb" path="res://Resources/Dungeons/brigands.tres" id="2_01wtn"]
+[ext_resource type="Script" uid="uid://b26kdgevkwsj2" path="res://Resources/UpgradeConfig.cs" id="2_431r0"]
 
 [sub_resource type="Resource" id="Resource_01wtn"]
 script = ExtResource("1_esqqp")
@@ -14,4 +15,5 @@ UpgradeId = "stolen_blade"
 Description = "Clicking earns 2 additional Kleos."
 Cost = 1500.0
 Tier = 2
+RequiredDungeon = ExtResource("2_01wtn")
 Effects = [SubResource("Resource_01wtn")]

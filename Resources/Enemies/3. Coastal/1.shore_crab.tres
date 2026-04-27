@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://dq8hsv1rllbqh"]
+
+[ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+EnemyName = "Shore Crab"
+EnemyId = "shore_crab"
+Health = 3000.0
+DamagePerSecond = 14.0
+AttackRate = 2.0
+KleosReward = 15
+EncounterFlavorTexts = PackedStringArray("Chitin scrapes against wet rock.", "The crab scuttles sideways, claws raised.")
+AttackLines = PackedStringArray("The crab's pincer clamps down hard.", "A claw snaps at your ankle.", "The crab scuttles forward, claws clicking.")
+metadata/_custom_type_script = "uid://b1ahgi2bsjm0e"

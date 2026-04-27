@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://cnb5lg2sxw8ko"]
+
+[ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+EnemyName = "The Pine-Bender"
+EnemyId = "pine_bender"
+Health = 3200.0
+DamagePerSecond = 14.0
+AttackRate = 2.0
+KleosReward = 0
+EncounterFlavorTexts = PackedStringArray("Sinis the Pine-Bender grips a bent tree.", "The giant bandit grins with cruel intent.")
+AttackLines = PackedStringArray("The Pine-Bender swings a trunk like a club.", "A massive arm sweeps across your guard.", "Sinis hurls you aside with terrible strength.")
+metadata/_custom_type_script = "uid://b1ahgi2bsjm0e"

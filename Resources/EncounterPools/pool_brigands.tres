@@ -1,0 +1,53 @@
+[gd_resource type="Resource" script_class="EncounterPool" format=3 uid="uid://bw2hhalmgq8de"]
+
+[ext_resource type="Script" uid="uid://s7fl6a0p44k6" path="res://Resources/EncounterPool.cs" id="ext_1"]
+[ext_resource type="Script" uid="uid://ckh8qm7xv6xp" path="res://Resources/EncounterPoolEntry.cs" id="ext_2"]
+[ext_resource type="Resource" uid="uid://uvn2ukrw5gsb" path="res://Resources/Dungeons/brigands.tres" id="ext_3"]
+[ext_resource type="Resource" path="res://Resources/Enemies/2. Brigands/1.road_thief.tres" id="ext_4"]
+[ext_resource type="Resource" path="res://Resources/Enemies/2. Brigands/2.bandit_lookout.tres" id="ext_5"]
+[ext_resource type="Resource" path="res://Resources/Enemies/2. Brigands/3.outlaw_peltast.tres" id="ext_6"]
+[ext_resource type="Resource" path="res://Resources/Enemies/2. Brigands/4.bandit_hoplite.tres" id="ext_7"]
+[ext_resource type="Resource" path="res://Resources/Enemies/2. Brigands/5.rogue_mercenary.tres" id="ext_8"]
+[ext_resource type="Resource" path="res://Resources/Enemies/2. Brigands/8.war_hounds.tres" id="ext_9"]
+
+[sub_resource type="Resource" id="Resource_00000"]
+script = ExtResource("ext_2")
+Enemy = ExtResource("ext_4")
+Weight = 3.0
+metadata/_custom_type_script = "uid://ckh8qm7xv6xp"
+
+[sub_resource type="Resource" id="Resource_00001"]
+script = ExtResource("ext_2")
+Enemy = ExtResource("ext_5")
+Weight = 2.5
+metadata/_custom_type_script = "uid://ckh8qm7xv6xp"
+
+[sub_resource type="Resource" id="Resource_00002"]
+script = ExtResource("ext_2")
+Enemy = ExtResource("ext_6")
+Weight = 2.0
+metadata/_custom_type_script = "uid://ckh8qm7xv6xp"
+
+[sub_resource type="Resource" id="Resource_00003"]
+script = ExtResource("ext_2")
+Enemy = ExtResource("ext_7")
+Weight = 1.5
+metadata/_custom_type_script = "uid://ckh8qm7xv6xp"
+
+[sub_resource type="Resource" id="Resource_00004"]
+script = ExtResource("ext_2")
+Enemy = ExtResource("ext_8")
+metadata/_custom_type_script = "uid://ckh8qm7xv6xp"
+
+[sub_resource type="Resource" id="Resource_00005"]
+script = ExtResource("ext_2")
+Enemy = ExtResource("ext_9")
+Weight = 0.5
+metadata/_custom_type_script = "uid://ckh8qm7xv6xp"
+
+[resource]
+script = ExtResource("ext_1")
+PoolName = "Brigands"
+RequiredDungeon = ExtResource("ext_3")
+Entries = [SubResource("Resource_00000"), SubResource("Resource_00001"), SubResource("Resource_00002"), SubResource("Resource_00003"), SubResource("Resource_00004"), SubResource("Resource_00005")]
+metadata/_custom_type_script = "uid://s7fl6a0p44k6"

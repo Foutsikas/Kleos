@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://c63w0j35c2bp3"]
+
+[ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+EnemyName = "Outlaw Peltast Band"
+EnemyId = "outlaw_peltast_band"
+Health = 2200.0
+DamagePerSecond = 10.5
+AttackRate = 1.8
+KleosReward = 0
+EncounterFlavorTexts = PackedStringArray("Javelins rain from multiple angles.", "The band moves as one, cutting off escape.")
+AttackLines = PackedStringArray("Javelins fly from three directions at once.", "The band surges forward in a coordinated rush.", "Spears and shields close in around you.")
+metadata/_custom_type_script = "uid://b1ahgi2bsjm0e"

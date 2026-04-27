@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="UpgradeConfig" format=3]
+[gd_resource type="Resource" script_class="UpgradeConfig" format=3 uid="uid://dcsfhtiqq8mj5"]
 
-[ext_resource type="Script" path="res://Resources/ModifierEffect.cs" id="1_k4vwp"]
-[ext_resource type="Script" path="res://Resources/UpgradeConfig.cs" id="2_6kk3i"]
+[ext_resource type="Script" uid="uid://cl641ndk5vxp" path="res://Resources/ModifierEffect.cs" id="1_k4vwp"]
+[ext_resource type="Script" uid="uid://b26kdgevkwsj2" path="res://Resources/UpgradeConfig.cs" id="2_6kk3i"]
+[ext_resource type="Resource" uid="uid://cn74iskpwyt6w" path="res://Resources/Dungeons/coastal.tres" id="2_umkes"]
 
 [sub_resource type="Resource" id="Resource_umkes"]
 script = ExtResource("1_k4vwp")
@@ -17,4 +18,5 @@ UpgradeId = "sculptors_vision"
 Description = "Sculptor production increased by 20%."
 Cost = 12000.0
 Tier = 3
+RequiredDungeon = ExtResource("2_umkes")
 Effects = [SubResource("Resource_umkes")]

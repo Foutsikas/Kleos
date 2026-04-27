@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://cbjdvjlb4k01p"]
+
+[ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+EnemyName = "Coastal Chimera"
+EnemyId = "coastal_chimera"
+Health = 6500.0
+DamagePerSecond = 27.0
+AttackRate = 2.3
+KleosReward = 0
+EncounterFlavorTexts = PackedStringArray("Three heads turn to face you as one.", "The chimera's breath reeks of salt and sulfur.")
+AttackLines = PackedStringArray("The lion head bites while the serpent tail lashes.", "Fire and fangs assault you from three angles.", "The chimera lunges with all three heads.")
+metadata/_custom_type_script = "uid://b1ahgi2bsjm0e"

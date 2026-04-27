@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://d055l2qbeforq"]
+
+[ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+EnemyName = "The Siren Queen"
+EnemyId = "siren_queen"
+Health = 9500.0
+DamagePerSecond = 32.0
+AttackRate = 2.5
+KleosReward = 0
+EncounterFlavorTexts = PackedStringArray("Her voice is beautiful. Her claws are not.", "The queen of the shore sings a killing song.")
+AttackLines = PackedStringArray("The Siren Queen's voice cuts like a blade.", "Talons rake across your guard as the song builds.", "Her melody disorients, then the claws follow.")
+metadata/_custom_type_script = "uid://b1ahgi2bsjm0e"

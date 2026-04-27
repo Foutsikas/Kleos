@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="UpgradeConfig" format=3]
+[gd_resource type="Resource" script_class="UpgradeConfig" format=3 uid="uid://h8q3vxjqbg3v"]
 
-[ext_resource type="Script" path="res://Resources/ModifierEffect.cs" id="1_vja1q"]
-[ext_resource type="Script" path="res://Resources/UpgradeConfig.cs" id="2_34hx0"]
+[ext_resource type="Script" uid="uid://cl641ndk5vxp" path="res://Resources/ModifierEffect.cs" id="1_vja1q"]
+[ext_resource type="Script" uid="uid://b26kdgevkwsj2" path="res://Resources/UpgradeConfig.cs" id="2_34hx0"]
+[ext_resource type="Resource" uid="uid://cn74iskpwyt6w" path="res://Resources/Dungeons/coastal.tres" id="2_ic5gg"]
 
 [sub_resource type="Resource" id="Resource_ic5gg"]
 script = ExtResource("1_vja1q")
@@ -17,4 +18,5 @@ UpgradeId = "potters_legacy"
 Description = "Potter production increased by 25%."
 Cost = 10000.0
 Tier = 3
+RequiredDungeon = ExtResource("2_ic5gg")
 Effects = [SubResource("Resource_ic5gg")]

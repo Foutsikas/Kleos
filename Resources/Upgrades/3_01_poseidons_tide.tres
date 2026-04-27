@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="UpgradeConfig" format=3]
+[gd_resource type="Resource" script_class="UpgradeConfig" format=3 uid="uid://cq8y3q6swmoq0"]
 
-[ext_resource type="Script" path="res://Resources/ModifierEffect.cs" id="1_7887o"]
-[ext_resource type="Script" path="res://Resources/UpgradeConfig.cs" id="2_av82q"]
+[ext_resource type="Script" uid="uid://cl641ndk5vxp" path="res://Resources/ModifierEffect.cs" id="1_7887o"]
+[ext_resource type="Resource" path="res://Resources/Dungeons/coastal.tres" id="2_5857f"]
+[ext_resource type="Script" uid="uid://b26kdgevkwsj2" path="res://Resources/UpgradeConfig.cs" id="2_av82q"]
 
 [sub_resource type="Resource" id="Resource_5857f"]
 script = ExtResource("1_7887o")
@@ -14,4 +15,5 @@ UpgradeId = "poseidons_tide"
 Description = "Clicking earns 4 additional Kleos."
 Cost = 6000.0
 Tier = 3
+RequiredDungeon = ExtResource("2_5857f")
 Effects = [SubResource("Resource_5857f")]

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://dqj8fh4i841jr"]
+
+[ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+EnemyName = "The Archilestes"
+EnemyId = "archilestes"
+Health = 3800.0
+DamagePerSecond = 15.0
+AttackRate = 2.1
+KleosReward = 0
+EncounterFlavorTexts = PackedStringArray("The king of thieves descends from his throne of stolen goods.", "Archilestes draws his blade with the confidence of a conqueror.")
+AttackLines = PackedStringArray("The Archilestes strikes with a conqueror's fury.", "A blade forged from the spoils of a hundred ambushes.", "The king of the road fights for his domain.")
+metadata/_custom_type_script = "uid://b1ahgi2bsjm0e"

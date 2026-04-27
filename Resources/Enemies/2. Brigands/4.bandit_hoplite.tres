@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://c216qns0dc5nh"]
+
+[ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+EnemyName = "Bandit Hoplite"
+EnemyId = "bandit_hoplite"
+Health = 1600.0
+DamagePerSecond = 8.5
+AttackRate = 1.7
+KleosReward = 30
+EncounterFlavorTexts = PackedStringArray("A heavily armored figure blocks the road.", "The deserter stands his ground, spear leveled.")
+AttackLines = PackedStringArray("The hoplite thrusts over his shield rim.", "A disciplined spear strike finds its mark.", "Bronze meets flesh as the hoplite advances.")
+metadata/_custom_type_script = "uid://b1ahgi2bsjm0e"

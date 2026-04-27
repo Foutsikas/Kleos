@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="UpgradeConfig" format=3]
+[gd_resource type="Resource" script_class="UpgradeConfig" format=3 uid="uid://b4xr1a5vs7si4"]
 
-[ext_resource type="Script" path="res://Resources/ModifierEffect.cs" id="1_6gqw7"]
-[ext_resource type="Script" path="res://Resources/UpgradeConfig.cs" id="2_m1uit"]
+[ext_resource type="Script" uid="uid://cl641ndk5vxp" path="res://Resources/ModifierEffect.cs" id="1_6gqw7"]
+[ext_resource type="Resource" uid="uid://uvn2ukrw5gsb" path="res://Resources/Dungeons/brigands.tres" id="2_3j2x2"]
+[ext_resource type="Script" uid="uid://b26kdgevkwsj2" path="res://Resources/UpgradeConfig.cs" id="2_m1uit"]
 
 [sub_resource type="Resource" id="Resource_3j2x2"]
 script = ExtResource("1_6gqw7")
@@ -17,4 +18,5 @@ UpgradeId = "bards_war_song"
 Description = "Bard production increased by 15%."
 Cost = 3000.0
 Tier = 2
+RequiredDungeon = ExtResource("2_3j2x2")
 Effects = [SubResource("Resource_3j2x2")]

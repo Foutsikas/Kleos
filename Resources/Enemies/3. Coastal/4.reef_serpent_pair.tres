@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://80b47156y4cl"]
+
+[ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+EnemyName = "Reef Serpent Pair"
+EnemyId = "reef_serpent_pair"
+Health = 4500.0
+DamagePerSecond = 20.0
+AttackRate = 2.2
+KleosReward = 0
+EncounterFlavorTexts = PackedStringArray("Two sets of eyes gleam from the dark water.", "The serpents move in tandem, flanking you.")
+AttackLines = PackedStringArray("Both serpents strike as one.", "Fangs from two directions find their mark.", "The pair coils and lunges in sequence.")
+metadata/_custom_type_script = "uid://b1ahgi2bsjm0e"

@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="UpgradeConfig" format=3]
+[gd_resource type="Resource" script_class="UpgradeConfig" format=3 uid="uid://n6swuhco53r3"]
 
-[ext_resource type="Script" path="res://Resources/ModifierEffect.cs" id="1_bje8p"]
-[ext_resource type="Script" path="res://Resources/UpgradeConfig.cs" id="2_fn2wl"]
+[ext_resource type="Script" uid="uid://cl641ndk5vxp" path="res://Resources/ModifierEffect.cs" id="1_bje8p"]
+[ext_resource type="Resource" uid="uid://cn74iskpwyt6w" path="res://Resources/Dungeons/coastal.tres" id="2_eespa"]
+[ext_resource type="Script" uid="uid://b26kdgevkwsj2" path="res://Resources/UpgradeConfig.cs" id="2_fn2wl"]
 
 [sub_resource type="Resource" id="Resource_eespa"]
 script = ExtResource("1_bje8p")
@@ -15,4 +16,5 @@ UpgradeId = "sailors_fortune"
 Description = "Battle rewards increased by 6."
 Cost = 8000.0
 Tier = 3
+RequiredDungeon = ExtResource("2_eespa")
 Effects = [SubResource("Resource_eespa")]

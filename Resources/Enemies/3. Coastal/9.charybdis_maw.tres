@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://d1xmkw6a4jdgl"]
+
+[ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+EnemyName = "Charybdis Maw"
+EnemyId = "charybdis_maw"
+Health = 8000.0
+DamagePerSecond = 30.0
+AttackRate = 2.4
+KleosReward = 0
+EncounterFlavorTexts = PackedStringArray("The whirlpool breathes, drawing all inward.", "A maw that swallows ships now turns to you.")
+AttackLines = PackedStringArray("The maw pulls you toward the grinding depths.", "A vortex of teeth and pressure strikes.", "The whirlpool's force batters your footing.")
+metadata/_custom_type_script = "uid://b1ahgi2bsjm0e"

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://cacglfgonwvts"]
+
+[ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+EnemyName = "War Hounds"
+EnemyId = "war_hounds"
+Health = 2800.0
+DamagePerSecond = 13.0
+AttackRate = 2.0
+KleosReward = 20
+EncounterFlavorTexts = PackedStringArray("The growling comes from everywhere at once.", "Trained beasts, loyal only to the kill.")
+AttackLines = PackedStringArray("The pack tears at you from all sides.", "Fangs find flesh before you can react.", "The hounds strike in a frenzy of teeth.")
+metadata/_custom_type_script = "uid://b1ahgi2bsjm0e"

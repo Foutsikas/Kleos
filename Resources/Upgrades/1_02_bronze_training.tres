@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="UpgradeConfig" format=3]
+[gd_resource type="Resource" script_class="UpgradeConfig" format=3 uid="uid://ds6dpy7i65j74"]
 
-[ext_resource type="Script" path="res://Resources/ModifierEffect.cs" id="1_l1f2c"]
-[ext_resource type="Script" path="res://Resources/UpgradeConfig.cs" id="2_b0mqj"]
+[ext_resource type="Script" uid="uid://cl641ndk5vxp" path="res://Resources/ModifierEffect.cs" id="1_l1f2c"]
+[ext_resource type="Script" uid="uid://b26kdgevkwsj2" path="res://Resources/UpgradeConfig.cs" id="2_b0mqj"]
 
 [sub_resource type="Resource" id="Resource_w0viu"]
 script = ExtResource("1_l1f2c")

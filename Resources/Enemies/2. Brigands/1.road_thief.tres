@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://byvyj8c3iqcur"]
+
+[ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+EnemyName = "Road Thief"
+EnemyId = "road_thief"
+Health = 900.0
+DamagePerSecond = 5.5
+AttackRate = 1.6
+KleosReward = 10
+EncounterFlavorTexts = PackedStringArray("A figure steps from the roadside brush.", "The glint of a blade catches your eye.", "A desperate man bars the path.")
+AttackLines = PackedStringArray("The thief slashes with a stolen blade.", "A wild swing from the roadside brigand.", "The thief lunges at your purse-arm.")
+metadata/_custom_type_script = "uid://b1ahgi2bsjm0e"

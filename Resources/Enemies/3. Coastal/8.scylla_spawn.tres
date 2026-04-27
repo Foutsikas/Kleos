@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://c7nko30n1lce0"]
+
+[ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+EnemyName = "Scylla Spawn"
+EnemyId = "scylla_spawn"
+Health = 7200.0
+DamagePerSecond = 28.0
+AttackRate = 2.4
+KleosReward = 100
+EncounterFlavorTexts = PackedStringArray("A lesser offspring of the great terror.", "Tentacles writhe from the cave wall.")
+AttackLines = PackedStringArray("Tentacles lash out from the darkness.", "Multiple limbs strike in rapid succession.", "The spawn drags you toward gnashing teeth.")
+metadata/_custom_type_script = "uid://b1ahgi2bsjm0e"

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://00bfctl7bbs6"]
+
+[ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+EnemyName = "Drowned Sailor"
+EnemyId = "drowned_sailor"
+Health = 4000.0
+DamagePerSecond = 18.0
+AttackRate = 2.1
+KleosReward = 20
+EncounterFlavorTexts = PackedStringArray("The dead do not rest easy by the shore.", "Waterlogged hands reach from the tide.")
+AttackLines = PackedStringArray("The drowned one swings with relentless arms.", "Salt-crusted fists batter your defense.", "The sailor strikes with the weight of the deep.")
+metadata/_custom_type_script = "uid://b1ahgi2bsjm0e"

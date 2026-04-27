@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://bntg8384v6y4m"]
+
+[ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+EnemyName = "Outlaw Peltast"
+EnemyId = "outlaw_peltast"
+Health = 1350.0
+DamagePerSecond = 7.5
+AttackRate = 1.7
+KleosReward = 20
+EncounterFlavorTexts = PackedStringArray("A javelin thuds into the dirt at your feet.", "The peltast advances with shield raised.")
+AttackLines = PackedStringArray("The peltast hurls a javelin at close range.", "A shield bash followed by a thrust.", "The outlaw skirmisher strikes and retreats.")
+metadata/_custom_type_script = "uid://b1ahgi2bsjm0e"

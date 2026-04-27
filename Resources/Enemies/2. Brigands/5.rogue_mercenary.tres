@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://imrfhr4vwm5q"]
+
+[ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+EnemyName = "Rogue Mercenary"
+EnemyId = "rogue_mercenary"
+Health = 1900.0
+DamagePerSecond = 9.5
+AttackRate = 1.8
+KleosReward = 25
+EncounterFlavorTexts = PackedStringArray("A sellsword who answers to no city.", "The mercenary sizes you up with practiced eyes.")
+AttackLines = PackedStringArray("The mercenary strikes with veteran skill.", "A feint, then the real blade follows.", "The sellsword attacks without hesitation.")
+metadata/_custom_type_script = "uid://b1ahgi2bsjm0e"

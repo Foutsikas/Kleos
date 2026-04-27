@@ -1,0 +1,87 @@
+[gd_resource type="Resource" script_class="DungeonData" format=3 uid="uid://uvn2ukrw5gsb"]
+
+[ext_resource type="Script" uid="uid://ccj4wwkg6mwva" path="res://Resources/DungeonData.cs" id="ext_1"]
+[ext_resource type="Script" uid="uid://cqbeopwqiwa7h" path="res://Resources/DungeonLayer.cs" id="ext_2"]
+[ext_resource type="Resource" uid="uid://b0e3xnavstfvg" path="res://Resources/Dungeons/forest.tres" id="ext_3"]
+[ext_resource type="Resource" path="res://Resources/Enemies/2. Brigands/1.road_thief.tres" id="ext_4"]
+[ext_resource type="Resource" path="res://Resources/Enemies/2. Brigands/2.bandit_lookout.tres" id="ext_5"]
+[ext_resource type="Resource" path="res://Resources/Enemies/2. Brigands/3.outlaw_peltast.tres" id="ext_6"]
+[ext_resource type="Resource" path="res://Resources/Enemies/2. Brigands/4.bandit_hoplite.tres" id="ext_7"]
+[ext_resource type="Resource" path="res://Resources/Enemies/2. Brigands/5.rogue_mercenary.tres" id="ext_8"]
+[ext_resource type="Resource" path="res://Resources/Enemies/2. Brigands/6.outlaw_peltast_band.tres" id="ext_9"]
+[ext_resource type="Resource" path="res://Resources/Enemies/2. Brigands/7.bandit_champion.tres" id="ext_10"]
+[ext_resource type="Resource" path="res://Resources/Enemies/2. Brigands/8.war_hounds.tres" id="ext_11"]
+[ext_resource type="Resource" path="res://Resources/Enemies/2. Brigands/9.pine_bender.tres" id="ext_12"]
+[ext_resource type="Resource" path="res://Resources/Enemies/2. Brigands/10.archilestes.tres" id="ext_13"]
+
+[sub_resource type="Resource" id="Resource_00000"]
+script = ExtResource("ext_2")
+Enemy = ExtResource("ext_4")
+BaseKleosReward = 15.0
+metadata/_custom_type_script = "uid://cqbeopwqiwa7h"
+
+[sub_resource type="Resource" id="Resource_00001"]
+script = ExtResource("ext_2")
+Enemy = ExtResource("ext_5")
+BaseKleosReward = 25.0
+metadata/_custom_type_script = "uid://cqbeopwqiwa7h"
+
+[sub_resource type="Resource" id="Resource_00002"]
+script = ExtResource("ext_2")
+Enemy = ExtResource("ext_6")
+BaseKleosReward = 40.0
+metadata/_custom_type_script = "uid://cqbeopwqiwa7h"
+
+[sub_resource type="Resource" id="Resource_00003"]
+script = ExtResource("ext_2")
+Enemy = ExtResource("ext_7")
+BaseKleosReward = 60.0
+metadata/_custom_type_script = "uid://cqbeopwqiwa7h"
+
+[sub_resource type="Resource" id="Resource_00004"]
+script = ExtResource("ext_2")
+Enemy = ExtResource("ext_8")
+BaseKleosReward = 80.0
+metadata/_custom_type_script = "uid://cqbeopwqiwa7h"
+
+[sub_resource type="Resource" id="Resource_00005"]
+script = ExtResource("ext_2")
+Enemy = ExtResource("ext_9")
+BaseKleosReward = 110.0
+metadata/_custom_type_script = "uid://cqbeopwqiwa7h"
+
+[sub_resource type="Resource" id="Resource_00006"]
+script = ExtResource("ext_2")
+Enemy = ExtResource("ext_10")
+BaseKleosReward = 150.0
+metadata/_custom_type_script = "uid://cqbeopwqiwa7h"
+
+[sub_resource type="Resource" id="Resource_00007"]
+script = ExtResource("ext_2")
+Enemy = ExtResource("ext_11")
+BaseKleosReward = 200.0
+metadata/_custom_type_script = "uid://cqbeopwqiwa7h"
+
+[sub_resource type="Resource" id="Resource_00008"]
+script = ExtResource("ext_2")
+Enemy = ExtResource("ext_12")
+BaseKleosReward = 300.0
+IsMiniBossLayer = true
+metadata/_custom_type_script = "uid://cqbeopwqiwa7h"
+
+[sub_resource type="Resource" id="Resource_00009"]
+script = ExtResource("ext_2")
+Enemy = ExtResource("ext_13")
+BaseKleosReward = 500.0
+IsBossLayer = true
+metadata/_custom_type_script = "uid://cqbeopwqiwa7h"
+
+[resource]
+script = ExtResource("ext_1")
+DungeonName = "Brigands' Pass"
+DungeonId = "brigands"
+Description = "A mountain road plagued by thieves and deserters."
+Layers = [SubResource("Resource_00000"), SubResource("Resource_00001"), SubResource("Resource_00002"), SubResource("Resource_00003"), SubResource("Resource_00004"), SubResource("Resource_00005"), SubResource("Resource_00006"), SubResource("Resource_00007"), SubResource("Resource_00008"), SubResource("Resource_00009")]
+KleosRequirement = 500.0
+RequiredDungeon = ExtResource("ext_3")
+metadata/_custom_type_script = "uid://ccj4wwkg6mwva"

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://dfanhk3olxkw4"]
+
+[ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+EnemyName = "Reef Serpent"
+EnemyId = "reef_serpent"
+Health = 3500.0
+DamagePerSecond = 16.0
+AttackRate = 2.1
+KleosReward = 25
+EncounterFlavorTexts = PackedStringArray("Scales glisten in the cave's dim light.", "A serpent coils between the tide pools.")
+AttackLines = PackedStringArray("The serpent strikes with blinding speed.", "Fangs lash out from between the rocks.", "The reef serpent coils and lunges.")
+metadata/_custom_type_script = "uid://b1ahgi2bsjm0e"

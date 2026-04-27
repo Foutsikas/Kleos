@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="UpgradeConfig" format=3]
+[gd_resource type="Resource" script_class="UpgradeConfig" format=3 uid="uid://dvlfy1frw8c5u"]
 
-[ext_resource type="Script" path="res://Resources/ModifierEffect.cs" id="1_wtrmg"]
-[ext_resource type="Script" path="res://Resources/UpgradeConfig.cs" id="2_u2ch8"]
+[ext_resource type="Script" uid="uid://cl641ndk5vxp" path="res://Resources/ModifierEffect.cs" id="1_wtrmg"]
+[ext_resource type="Resource" uid="uid://uvn2ukrw5gsb" path="res://Resources/Dungeons/brigands.tres" id="2_04g6o"]
+[ext_resource type="Script" uid="uid://b26kdgevkwsj2" path="res://Resources/UpgradeConfig.cs" id="2_u2ch8"]
 
 [sub_resource type="Resource" id="Resource_04g6o"]
 script = ExtResource("1_wtrmg")
@@ -15,4 +16,5 @@ UpgradeId = "spoils_of_the_road"
 Description = "Battle rewards increased by 3."
 Cost = 2000.0
 Tier = 2
+RequiredDungeon = ExtResource("2_04g6o")
 Effects = [SubResource("Resource_04g6o")]

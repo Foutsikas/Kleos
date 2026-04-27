@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="UpgradeConfig" format=3]
+[gd_resource type="Resource" script_class="UpgradeConfig" format=3 uid="uid://dfewlu24yyd1j"]
 
-[ext_resource type="Script" path="res://Resources/ModifierEffect.cs" id="1_se8wy"]
-[ext_resource type="Script" path="res://Resources/UpgradeConfig.cs" id="2_yk3a8"]
+[ext_resource type="Script" uid="uid://cl641ndk5vxp" path="res://Resources/ModifierEffect.cs" id="1_se8wy"]
+[ext_resource type="Resource" uid="uid://cn74iskpwyt6w" path="res://Resources/Dungeons/coastal.tres" id="2_ltvss"]
+[ext_resource type="Script" uid="uid://b26kdgevkwsj2" path="res://Resources/UpgradeConfig.cs" id="2_yk3a8"]
 
 [sub_resource type="Resource" id="Resource_ltvss"]
 script = ExtResource("1_se8wy")
@@ -15,4 +16,5 @@ UpgradeId = "tidal_instinct"
 Description = "Dodge chance increased by 8%."
 Cost = 16000.0
 Tier = 3
+RequiredDungeon = ExtResource("2_ltvss")
 Effects = [SubResource("Resource_ltvss")]
