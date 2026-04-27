@@ -17,4 +17,8 @@ public partial class EnemyData : Resource
 
     [ExportGroup("Flavor")]
     [Export] public Array<string> EncounterFlavorTexts { get; set; } = new();
+
+    [ExportGroup("Combat Text")]
+    [Export] public Array<string> AttackLines { get; set; } = new();
+
 }

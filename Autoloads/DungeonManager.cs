@@ -155,10 +155,10 @@ public partial class DungeonManager : Node
         if (layerIndex > current)
             dungeonProgress[dungeonId] = layerIndex;
 
-        EmitSignal(SignalName.LayerCleared, dungeonId, layerIndex);
         GD.Print($"[DungeonManager] Layer {layerIndex} cleared in {dungeonId}.");
 
         CheckDungeonCompletion(dungeonId);
+        EmitSignal(SignalName.LayerCleared, dungeonId, layerIndex);
     }
 
     private void CheckDungeonCompletion(string dungeonId)
@@ -205,5 +205,30 @@ public partial class DungeonManager : Node
             completedDungeons[id] = true;
 
         GD.Print($"[DungeonManager] Loaded progress for {dungeonProgress.Count} dungeons.");
+    }
+
+    /// DEV API
+    public void ForceCompleteDungeon(string dungeonId)
+    {
+        DungeonData dungeon = GetDungeonById(dungeonId);
+        if (dungeon == null)
+        {
+            GD.PrintErr($"[DungeonManager] ForceComplete failed: {dungeonId} not found.");
+            return;
+        }
+
+        int lastLayer = dungeon.Layers.Count - 1;
+
+        // Set progress directly
+        dungeonProgress[dungeonId] = lastLayer;
+
+        // Mark as completed
+        completedDungeons[dungeonId] = true;
+
+        // Emit signals in correct order
+        EmitSignal(SignalName.DungeonCompleted, dungeonId);
+        EmitSignal(SignalName.LayerCleared, dungeonId, lastLayer);
+
+        GD.Print($"[DungeonManager] Force completed: {dungeonId}");
     }
 }

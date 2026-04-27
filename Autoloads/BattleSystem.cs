@@ -7,8 +7,6 @@ public partial class BattleSystem : Node
 
     public static BattleSystem Instance { get; private set; }
 
-    private BattleTextLibrary textLibrary;
-
     // --- C# Events (not Godot signals -- plain C# classes as parameters) ---
 
     public event Action<BattleContext> BattleStarted;
@@ -46,6 +44,8 @@ public partial class BattleSystem : Node
     // Pause after final blow before result screen (seconds)
     private const float BaseFinalBlowPause = 0.6f;
 
+    private BattleTextLibrary textLibrary;
+
     // -------------------------------------------------------------------------
     // Lifecycle
     // -------------------------------------------------------------------------
@@ -58,15 +58,11 @@ public partial class BattleSystem : Node
             return;
         }
         Instance = this;
+
         textLibrary = GD.Load<BattleTextLibrary>("res://Resources/BattleText/battle_text_library.tres");
 
         // Listen for random encounters
         RandomEncounterManager.Instance.EncounterTriggered += OnRandomEncounterTriggered;
-    }
-
-    public BattleTextLibrary GetTextLibrary()
-    {
-        return textLibrary;
     }
 
     // -------------------------------------------------------------------------
@@ -82,7 +78,7 @@ public partial class BattleSystem : Node
         }
 
         DungeonLayer layer = dungeon.GetLayer(layerIndex);
-        if (layer == null)
+        if (layerIndex < 0 || layerIndex >= dungeon.Layers.Count)
         {
             GD.PrintErr($"[BattleSystem] Invalid layer index {layerIndex} for {dungeon.DungeonName}.");
             return;
@@ -429,6 +425,11 @@ public partial class BattleSystem : Node
     public float GetCurrentSpeedMultiplier()
     {
         return speedMultiplier;
+    }
+
+    public BattleTextLibrary GetTextLibrary()
+    {
+        return textLibrary;
     }
 }
 

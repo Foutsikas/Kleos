@@ -25,12 +25,14 @@ public partial class DungeonRow : PanelContainer
 
         DungeonManager.Instance.LayerCleared += OnLayerCleared;
         KleosManager.Instance.KleosChanged += OnKleosChanged;
+        DungeonManager.Instance.DungeonCompleted += OnDungeonCompleted;
     }
 
     public override void _ExitTree()
     {
         DungeonManager.Instance.LayerCleared -= OnLayerCleared;
         KleosManager.Instance.KleosChanged -= OnKleosChanged;
+        DungeonManager.Instance.DungeonCompleted -= OnDungeonCompleted;
     }
 
     // --- Setup ---
@@ -49,7 +51,10 @@ public partial class DungeonRow : PanelContainer
 
         string id = dungeonData.DungeonId;
         int totalLayers = dungeonData.Layers.Count;
-        int cleared = DungeonManager.Instance.GetHighestClearedLayer(id) + 1;
+        int cleared = Mathf.Min(
+            DungeonManager.Instance.GetHighestClearedLayer(id) + 1,
+            totalLayers
+        );
         bool unlocked = DungeonManager.Instance.IsDungeonUnlocked(id);
         bool completed = DungeonManager.Instance.IsDungeonCompleted(id);
 
@@ -154,7 +159,8 @@ public partial class DungeonRow : PanelContainer
         int totalLayers = dungeonData.Layers.Count;
 
         // Do not start battle if dungeon is already completed
-        if (nextLayer > totalLayers) return;
+        if (DungeonManager.Instance.IsDungeonCompleted(dungeonData.DungeonId))
+            return;
 
         BattleSystem.Instance.StartDungeonBattle(dungeonData, nextLayer);
     }
@@ -171,6 +177,13 @@ public partial class DungeonRow : PanelContainer
         // Refresh in case a kleos requirement was just met
         if (dungeonData == null) return;
         if (!DungeonManager.Instance.IsDungeonUnlocked(dungeonData.DungeonId))
+            RefreshDisplay();
+    }
+
+    private void OnDungeonCompleted(string dungeonId)
+    {
+        if (dungeonData == null) return;
+        if (dungeonData.DungeonId == dungeonId)
             RefreshDisplay();
     }
 }
