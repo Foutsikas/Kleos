@@ -76,9 +76,9 @@ public partial class UpgradeRow : PanelContainer
 			return;
 		}
 
-		if (!IsIndividualLockMet())
+		if (TryGetIndividualLockReason(out var reason))
 		{
-			ShowIndividualLocked();
+			ShowIndividualLocked(reason);
 			return;
 		}
 
@@ -128,10 +128,10 @@ public partial class UpgradeRow : PanelContainer
 	{
 		Modulate = TierLockedModulate;
 
-		string reason = "Locked";
+		string lockReason  = "Locked";
 		if (upgradeConfig.RequiredDungeon != null)
-			reason = $"Clear {upgradeConfig.RequiredDungeon.DungeonName} to unlock";
-		SetLockReason(reason);
+			lockReason  = $"Clear {upgradeConfig.RequiredDungeon.DungeonName} to unlock";
+		SetLockReason(lockReason );
 
 		if (UpgradeBuyButton != null)
 		{
@@ -140,11 +140,11 @@ public partial class UpgradeRow : PanelContainer
 		}
 	}
 
-	private void ShowIndividualLocked()
+	private void ShowIndividualLocked(string reason)
 	{
 		Modulate = IndividualLockedModulate;
 
-		string reason = GetIndividualLockReason();
+		string lockReason = GetIndividualLockReason();
 		SetLockReason(reason);
 
 		if (UpgradeBuyButton != null)
@@ -179,48 +179,67 @@ public partial class UpgradeRow : PanelContainer
 			upgradeConfig.RequiredDungeon.DungeonId);
 	}
 
-	private bool IsIndividualLockMet()
+	private bool TryGetIndividualLockReason(out string reason)
 	{
-		if (upgradeConfig.RequiredHeroLevel > 0)
+		var hero = HeroManager.Instance;
+		var upgrades = UpgradeManager.Instance;
+		var artisans = ArtisanManager.Instance;
+
+		if (upgradeConfig.RequiredHeroLevel > 0 &&
+			hero.GetLevel() < upgradeConfig.RequiredHeroLevel)
 		{
-			if (HeroManager.Instance.GetLevel() < upgradeConfig.RequiredHeroLevel)
-				return false;
+			reason = $"Requires Hero Level {upgradeConfig.RequiredHeroLevel}";
+			return true;
 		}
 
-		if (!string.IsNullOrEmpty(upgradeConfig.RequiredUpgradeId))
+		if (!string.IsNullOrEmpty(upgradeConfig.RequiredUpgradeId) &&
+			!upgrades.IsUpgradePurchased(upgradeConfig.RequiredUpgradeId))
 		{
-			if (!UpgradeManager.Instance.IsUpgradePurchased(upgradeConfig.RequiredUpgradeId))
-				return false;
+			reason = "Requires prerequisite upgrade";
+			return true;
 		}
 
-		if (!string.IsNullOrEmpty(upgradeConfig.RequiredArtisanId)
-			&& upgradeConfig.RequiredArtisanCount > 0)
+		if (!string.IsNullOrEmpty(upgradeConfig.RequiredArtisanId) &&
+			upgradeConfig.RequiredArtisanCount > 0)
 		{
-			if (ArtisanManager.Instance.GetOwnedCount(upgradeConfig.RequiredArtisanId)
-				< upgradeConfig.RequiredArtisanCount)
-				return false;
+			string name = upgradeConfig.RequiredArtisanId;
+			var artisan = artisans.GetArtisanById(name);
+			if (artisan != null) name = artisan.ArtisanName;
+
+			reason = $"Requires {upgradeConfig.RequiredArtisanCount} {name}s";
+			return true;
 		}
 
-		return true;
+		reason = null;
+		return false;
 	}
 
 	private string GetIndividualLockReason()
 	{
-		if (upgradeConfig.RequiredHeroLevel > 0
-			&& HeroManager.Instance.GetLevel() < upgradeConfig.RequiredHeroLevel)
-			return $"Requires Hero Level {upgradeConfig.RequiredHeroLevel}";
-
-		if (!string.IsNullOrEmpty(upgradeConfig.RequiredUpgradeId)
-			&& !UpgradeManager.Instance.IsUpgradePurchased(upgradeConfig.RequiredUpgradeId))
-			return "Requires prerequisite upgrade";
-
-		if (!string.IsNullOrEmpty(upgradeConfig.RequiredArtisanId)
-			&& upgradeConfig.RequiredArtisanCount > 0)
+		if (upgradeConfig.RequiredHeroLevel > 0 &&
+			HeroManager.Instance.GetLevel() < upgradeConfig.RequiredHeroLevel)
 		{
-			string name = upgradeConfig.RequiredArtisanId;
-			var artisan = ArtisanManager.Instance.GetArtisanById(name);
-			if (artisan != null) name = artisan.ArtisanName;
-			return $"Requires {upgradeConfig.RequiredArtisanCount} {name}s";
+			return $"Requires Hero Level {upgradeConfig.RequiredHeroLevel}";
+		}
+
+		if (!string.IsNullOrEmpty(upgradeConfig.RequiredUpgradeId) &&
+			!UpgradeManager.Instance.IsUpgradePurchased(upgradeConfig.RequiredUpgradeId))
+		{
+			return $"Requires {upgradeConfig.RequiredUpgradeId}";
+		}
+
+		if (!string.IsNullOrEmpty(upgradeConfig.RequiredArtisanId) &&
+			upgradeConfig.RequiredArtisanCount > 0)
+		{
+			int owned = ArtisanManager.Instance.GetOwnedCount(upgradeConfig.RequiredArtisanId);
+			if (owned < upgradeConfig.RequiredArtisanCount)
+			{
+				var artisan = ArtisanManager.Instance.GetArtisanById(upgradeConfig.RequiredArtisanId);
+				string name = artisan != null ? artisan.ArtisanName : upgradeConfig.RequiredArtisanId;
+
+				string suffix = upgradeConfig.RequiredArtisanCount == 1 ? "" : "s";
+				return $"Requires {upgradeConfig.RequiredArtisanCount} {name}{suffix}";
+			}
 		}
 
 		return "Locked";
@@ -233,7 +252,6 @@ public partial class UpgradeRow : PanelContainer
 		if (upgradeConfig == null) return;
 		if (UpgradeManager.Instance.PurchaseUpgrade(upgradeConfig.UpgradeId))
 		{
-			ArtisanManager.Instance.RecalculateTotalProduction();
 			RefreshDisplay();
 		}
 	}
@@ -242,13 +260,22 @@ public partial class UpgradeRow : PanelContainer
 	{
 		if (upgradeConfig == null) return;
 		if (UpgradeManager.Instance.IsUpgradePurchased(upgradeConfig.UpgradeId)) return;
-		RefreshDisplay();
+
+		// Only care if affordability could change
+		bool canAfford = KleosManager.Instance.CurrentKleos >= upgradeConfig.Cost;
+		if (UpgradeBuyButton.Disabled == canAfford) // state mismatch
+			RefreshDisplay();
 	}
 
 	private void OnAnyUpgradePurchased(string upgradeId)
 	{
 		if (upgradeConfig == null) return;
-		// Refresh in case a prerequisite was just purchased
-		RefreshDisplay();
+
+		// Only refresh if this upgrade depends on the purchased one
+		if (upgradeConfig.RequiredUpgradeId == upgradeId ||
+			upgradeConfig.UpgradeId == upgradeId)
+		{
+			RefreshDisplay();
+		}
 	}
 }
