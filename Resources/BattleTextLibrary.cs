@@ -41,19 +41,19 @@ public partial class BattleTextLibrary : Resource
         GetRandom(HeroDodgeLines, "You sidestep the attack.");
 
     public string GetRandomEnemyAttack(string enemyName) =>
-        GetRandom(EnemyAttackLines, $"{enemyName} strikes at you.");
+        string.Format(GetRandom(EnemyAttackLines, "The {0} strikes at you."), enemyName);
 
     public string GetRandomEnemyAnticipation(string enemyName) =>
-        GetRandom(EnemyAnticipationLines, $"{enemyName} prepares to attack.");
+        string.Format(GetRandom(EnemyAnticipationLines, "The {0} prepares to attack."), enemyName);
 
     public string GetRandomVictoryLine(string enemyName) =>
-        GetRandom(VictoryLines, $"You have defeated {enemyName}.");
+        string.Format(GetRandom(VictoryLines, "You have defeated the {0}."), enemyName);
 
     public string GetRandomVictorySubtitle() =>
         GetRandom(VictorySubtitles, "The deed is done.");
 
     public string GetRandomDefeatLine(string enemyName) =>
-        GetRandom(DefeatLines, $"{enemyName} has bested you.");
+        string.Format(GetRandom(DefeatLines, "The {0} has bested you."), enemyName);
 
     public string GetRandomDefeatSubtitle() =>
         GetRandom(DefeatSubtitles, "The fates are cruel.");

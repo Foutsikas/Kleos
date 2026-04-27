@@ -363,14 +363,21 @@ public partial class BattlePanel : Control
 		string line;
 		Color lineColor;
 
+		var textLib = BattleSystem.Instance.GetTextLibrary();
 		if (entry.IsCritical)
 		{
-			line = $"Hero strikes true! {entry.Damage:F0} damage!";
+			string critText = textLib != null
+				? textLib.GetRandomHeroCrit()
+				: "A devastating blow!";
+			line = $"{critText} {entry.Damage:F0} damage!";
 			lineColor = CritHighlightColor;
 		}
 		else
 		{
-			line = $"Hero strikes for {entry.Damage:F0} damage.";
+			string attackText = textLib != null
+				? textLib.GetRandomHeroAttack()
+				: "Hero strikes.";
+			line = $"{attackText} {entry.Damage:F0} damage.";
 			lineColor = HeroActionColor;
 		}
 
@@ -388,7 +395,11 @@ public partial class BattlePanel : Control
 
 			// No damage, no HP update, no shake
 
-			string dodgeLine = $"{entry.ActorName} lunges -- Hero evades!";
+			var textLib = BattleSystem.Instance.GetTextLibrary();
+			string dodgeText = textLib != null
+			? textLib.GetRandomHeroDodge()
+			: "Hero evades!";
+			string dodgeLine = $"{entry.ActorName} lunges -- {dodgeText}";
 			PushLogLine(dodgeLine, DodgeColor, false);
 		}
 		else
@@ -405,7 +416,11 @@ public partial class BattlePanel : Control
 			// Animate hero portrait: shake from taking damage
 			AnimateDamageShake(HeroPortrait, heroPortraitOrigin);
 
-			string hitLine = $"{entry.ActorName} strikes for {entry.Damage:F0} damage.";
+			var textLib2 = BattleSystem.Instance.GetTextLibrary();
+			string enemyText = textLib2 != null
+			? textLib2.GetRandomEnemyAttack(entry.ActorName)
+			: $"{entry.ActorName} strikes!";
+			string hitLine = $"{enemyText} {entry.Damage:F0} damage.";
 			PushLogLine(hitLine, EnemyActionColor, false);
 		}
 	}
@@ -594,7 +609,12 @@ public partial class BattlePanel : Control
 	private void PopulateVictoryScreen(BattleResult result)
 	{
 		if (ResultSubtitleLabel != null)
-			ResultSubtitleLabel.Text = "The deed is done";
+		{
+			var textLib = BattleSystem.Instance.GetTextLibrary();
+			ResultSubtitleLabel.Text = textLib != null
+			? textLib.GetRandomVictorySubtitle()
+			: "The deed is done";
+		}
 
 		if (ResultTitleLabel != null)
 		{
@@ -604,7 +624,10 @@ public partial class BattlePanel : Control
 
 		if (ResultFlavorLabel != null)
 		{
-			ResultFlavorLabel.Text = $"The {result.Context.Enemy.EnemyName} falls before your might.";
+			var textLib2 = BattleSystem.Instance.GetTextLibrary();
+			ResultFlavorLabel.Text = textLib2 != null
+			? textLib2.GetRandomVictoryLine(result.Context.Enemy.EnemyName)
+			: $"The {result.Context.Enemy.EnemyName} falls before your might.";
 		}
 
 		if (ResultRewardLabel != null)
@@ -645,7 +668,12 @@ public partial class BattlePanel : Control
 	private void PopulateDefeatScreen(BattleResult result)
 	{
 		if (ResultSubtitleLabel != null)
-			ResultSubtitleLabel.Text = "The fates are cruel";
+		{
+			var textLib = BattleSystem.Instance.GetTextLibrary();
+			ResultSubtitleLabel.Text = textLib != null
+			? textLib.GetRandomDefeatSubtitle()
+			: "The fates are cruel";
+		}
 
 		if (ResultTitleLabel != null)
 		{
@@ -655,7 +683,10 @@ public partial class BattlePanel : Control
 
 		if (ResultFlavorLabel != null)
 		{
-			ResultFlavorLabel.Text = $"The {result.Context.Enemy.EnemyName} proved too strong... this time.";
+			var textLib2 = BattleSystem.Instance.GetTextLibrary();
+			ResultFlavorLabel.Text = textLib2 != null
+			? textLib2.GetRandomDefeatLine(result.Context.Enemy.EnemyName)
+			: $"The {result.Context.Enemy.EnemyName} proved too strong... this time.";
 		}
 
 		if (ResultRewardLabel != null)
@@ -675,7 +706,10 @@ public partial class BattlePanel : Control
 
 		if (ResultConsolationLabel != null)
 		{
-			ResultConsolationLabel.Text = "Even Herakles knew defeat before glory.";
+			var textLib3 = BattleSystem.Instance.GetTextLibrary();
+			ResultConsolationLabel.Text = textLib3 != null
+			? textLib3.GetRandomConsolation()
+			: "Even Herakles knew defeat before glory.";
 			ResultConsolationLabel.Visible = true;
 		}
 
