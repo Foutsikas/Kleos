@@ -1,7 +1,7 @@
 # Kleos Architecture Reference -- Godot Edition
-# KAR_Godot -- Updated April 23, 2026
+# KAR_Godot -- Updated April 27, 2026
 # Engine: Godot 4.6.2 .NET (C#)
-# Status: Port in progress -- core systems and UI complete, battle system pending
+# Status: Port in progress -- core systems, UI, and battle system complete
 
 ---
 
@@ -10,7 +10,6 @@
 This is the technical architecture reference for the Godot port of Kleos.
 It documents how each system is implemented in Godot, including class
 structures, signal wiring, file paths, and Godot-specific patterns.
-Essentially the source of truth for code structure.
 
 The Unity KAR (KAR_Updated_2026-03-20.md) remains the reference for
 Unity-specific implementation. This document is independent and does not
@@ -32,67 +31,73 @@ Target: Desktop (Windows, Linux)
 ```
 res://
   Autoloads/
-	SettingsManager.cs
-	SaveManager.cs
-	UpgradeManager.cs
-	KleosManager.cs
-	ArtisanManager.cs
-	HeroManager.cs
-	DungeonManager.cs
-	RandomEncounterManager.cs
-	ResourceScanner.cs          (static utility, not an Autoload)
+    SettingsManager.cs
+    SaveManager.cs
+    UpgradeManager.cs
+    KleosManager.cs
+    ArtisanManager.cs
+    HeroManager.cs
+    DungeonManager.cs
+    RandomEncounterManager.cs
+    BattleSystem.cs
+    BattleContext.cs             (plain C# class, not an Autoload)
+    DungeonRewardCalculator.cs   (static utility, not an Autoload)
+    ResourceScanner.cs           (static utility, not an Autoload)
   Resources/
-	ArtisanData.cs
-	EnemyData.cs
-	DungeonData.cs
-	DungeonLayer.cs
-	UpgradeConfig.cs
-	HeroData.cs
-	EncounterPool.cs
-	EncounterPoolEntry.cs
-	BattleTextLibrary.cs
-	ModifierEffect.cs
-	ModifierEnums.cs            (ModifierType and ModifierMode enums)
-	HeroStat.cs                 (enum)
-	Artisans/
-	  scribe.tres
-	  bard.tres
-	  potter.tres
-	  sculptor.tres
-	  playwright.tres
-	  historian.tres
-	Enemies/
-	  1. Forest/
-		1.wild_dog.tres
-		2.wolf.tres
-		3.wolf_pack.tres
-		4.large_wolf.tres
-		5.large_wolf_pack.tres
-		6.nemean_lion_cub.tres
-		7.nemean_lion.tres
-	Dungeons/
-	  forest.tres
-	Upgrades/
-	  1_01_scribes_quill.tres
-	  1_02_bronze_training.tres
-	  ... (24 total, prefixed by tier and order)
-	  3_07_coastal_plunder.tres
-	EncounterPools/
-	  pool_forest.tres
+    ArtisanData.cs
+    EnemyData.cs
+    DungeonData.cs
+    DungeonLayer.cs
+    UpgradeConfig.cs
+    HeroData.cs
+    EncounterPool.cs
+    EncounterPoolEntry.cs
+    BattleTextLibrary.cs
+    ModifierEffect.cs
+    ModifierEnums.cs            (ModifierType and ModifierMode enums)
+    HeroStat.cs                 (enum)
+    Artisans/
+      scribe.tres
+      bard.tres
+      potter.tres
+      sculptor.tres
+      playwright.tres
+      historian.tres
+    Enemies/
+      1. Forest/
+        1.wild_dog.tres
+        2.wolf.tres
+        3.wolf_pack.tres
+        4.large_wolf.tres
+        5.large_wolf_pack.tres
+        6.nemean_lion_cub.tres
+        7.nemean_lion.tres
+    Dungeons/
+      forest.tres
+    Upgrades/
+      1_01_scribes_quill.tres
+      1_02_bronze_training.tres
+      ... (24 total, prefixed by tier and order)
+      3_07_coastal_plunder.tres
+    EncounterPools/
+      pool_forest.tres
+    BattleText/
+      battle_text_library.tres
   Scenes/
-	MainMenu/
-	  main_menu.tscn
-	  MainMenuController.cs
-	Game/
-	  main_game.tscn
-	  MainGameController.cs
-	  ArtisanRow.tscn
-	  ArtisanRow.cs
-	  DungeonRow.tscn
-	  DungeonRow.cs
-	  UpgradeRow.tscn
-	  UpgradeRow.cs
-	  TierHeader.tscn
+    MainMenu/
+      main_menu.tscn
+      MainMenuController.cs
+    Game/
+      main_game.tscn
+      MainGameController.cs
+      ArtisanRow.tscn
+      ArtisanRow.cs
+      DungeonRow.tscn
+      DungeonRow.cs
+      UpgradeRow.tscn
+      UpgradeRow.cs
+      BattlePanel.cs
+      TierHeader.tscn
 ```
 
 ---
@@ -111,10 +116,14 @@ their _Ready() methods.
   6. HeroManager
   7. DungeonManager
   8. RandomEncounterManager
+  9. BattleSystem
 
 Each uses a static Instance property with a guard in _Ready() that
 calls QueueFree() if Instance is already set. This prevents duplicate
 instantiation if the autoload node somehow appears twice.
+
+BattleSystem must come after RandomEncounterManager because it
+subscribes to the EncounterTriggered signal in _Ready().
 
 ---
 
@@ -173,8 +182,8 @@ Click damage calculation:
 Passive income in _Process():
   passiveAccumulator += totalKleosPerSecond * (float)delta;
   while passiveAccumulator >= 1.0:
-	AddKleos(1f);
-	passiveAccumulator -= 1f;
+    AddKleos(1f);
+    passiveAccumulator -= 1f;
 
 Save/Load:
   GetSaveData() returns KleosSaveData
@@ -205,7 +214,7 @@ Config loading:
 
 Key methods:
   PurchaseArtisan(ArtisanData) -- spends kleos, increments count,
-	recalculates production, checks for new unlocks
+    recalculates production, checks for new unlocks
   IsArtisanUnlocked(ArtisanData) -- checks unlock condition
   GetOwnedCount(string artisanId) -- returns count for given artisan
   GetCurrentCost(ArtisanData) -- BaseCost * CostMultiplier ^ owned
@@ -216,9 +225,9 @@ Key methods:
 
 Production calculation:
   For each artisan:
-	baseProd = KleosPerSecond * ownedCount
-	multiplier = UpgradeManager.GetMultiplier(ArtisanProductionMultiplier)
-	totalProd += baseProd * multiplier
+    baseProd = KleosPerSecond * ownedCount
+    multiplier = UpgradeManager.GetMultiplier(ArtisanProductionMultiplier)
+    totalProd += baseProd * multiplier
   Calls KleosManager.RecalculateTotalProduction(totalProd)
 
 Save/Load:
@@ -248,9 +257,9 @@ Config loading:
 
 Key methods:
   GetFlat(ModifierType type) -- sums all flat modifiers of given type
-	across purchased upgrades
+    across purchased upgrades
   GetMultiplier(ModifierType type) -- multiplies all multiplier modifiers
-	of given type across purchased upgrades (starts at 1.0)
+    of given type across purchased upgrades (starts at 1.0)
   PurchaseUpgrade(string upgradeId) -- spends kleos, adds to purchased list
   IsUpgradePurchased(string upgradeId) -- checks purchase state
   CanPurchase(string upgradeId) -- checks tier gate, individual lock, cost
@@ -258,7 +267,7 @@ Key methods:
 Lock checks:
   IsTierUnlocked(UpgradeConfig) -- checks RequiredDungeon completion
   IsIndividualLockMet(UpgradeConfig) -- checks hero level, prerequisite
-	upgrade, and artisan count requirements
+    upgrade, and artisan count requirements
 
 Save/Load:
   GetSaveData() returns UpgradeSaveData (purchased IDs list)
@@ -320,7 +329,7 @@ Signals:
 
 State:
   dungeonProgress (Dictionary, string to int -- dungeon name to highest
-	cleared layer)
+    cleared layer)
   completedDungeons (Dictionary, string to bool)
 
 Config loading:
@@ -352,7 +361,7 @@ Save/Load:
 Singleton autoload. Multi-pool random encounter system.
 
 Signals:
-  EncounterTriggered(EnemyData enemy)
+  EncounterTriggered(EnemyData enemy, string poolName)
 
 State:
   clickAccumulator (int)
@@ -378,6 +387,135 @@ Subscribes to DungeonManager.DungeonCompleted to mark pools dirty.
 
 ---
 
+### BattleSystem
+
+Singleton autoload (position 9). Core combat engine. Async timed
+turn-based combat with C# events for UI communication.
+
+C# Events (not Godot signals -- plain C# classes as parameters):
+  BattleStarted (Action<BattleContext>)
+  RoundStarted (Action<int>)
+  HeroAttackOccurred (Action<BattleLogEntry>)
+  EnemyAttackOccurred (Action<BattleLogEntry>)
+  BattleEnded (Action<BattleResult>)
+
+C# events are used instead of Godot signals because BattleContext,
+BattleLogEntry, and BattleResult are plain C# classes that are not
+Variant-compatible. C# events have no such restriction and work for
+C#-to-C# communication.
+
+State:
+  currentContext (BattleContext)
+  enemyCurrentHP, enemyMaxHP (float)
+  currentRound (int)
+  isBattleActive (bool)
+  speedMultiplier (float, default 1.0)
+  Tracking: totalRounds, heroCritsLanded, heroDodgesPerformed,
+    heroHPAtEnd, enemyHPAtEnd
+
+Timing constants:
+  BaseSetupPause: 0.8s before first round
+  BaseAttackDelay: 0.4s between hero and enemy attack
+  BaseRoundDelay: 0.4s between rounds
+  BaseFinalBlowPause: 0.6s after killing blow
+  All divided by speedMultiplier.
+
+Key methods:
+  StartDungeonBattle(DungeonData, int layerIndex)
+  StartRandomEncounterBattle(EnemyData, string poolName)
+  SetSpeedMultiplier(float)
+  GetCurrentSpeedMultiplier() -- returns current speed
+  IsBattleInProgress() -- returns isBattleActive
+  GetCurrentContext() -- returns current BattleContext
+  GetTextLibrary() -- returns loaded BattleTextLibrary
+
+Combat flow (async):
+  BeginBattle() -- creates context, resets state, invokes
+    BattleStarted, awaits setup pause, calls RunCombatAsync().
+  RunCombatAsync() -- while loop with await between each attack
+    and round. Each await checks isBattleActive before continuing.
+    Hero attacks first (ExecuteHeroAttack), checks enemy death,
+    awaits attack delay, enemy retaliates (ExecuteEnemyAttack),
+    checks hero death, awaits round delay.
+  ExecuteHeroAttack() -- calculates damage, rolls crit, applies
+    damage to enemy, returns BattleLogEntry.
+  ExecuteEnemyAttack() -- rolls dodge, calculates damage per hit
+    (DPS / AttackRate), applies via HeroManager.TakeDamage(),
+    returns BattleLogEntry.
+  OnHeroVictory() -- calculates reward, grants kleos, applies
+    post-victory heal, advances dungeon layer, invokes BattleEnded.
+  OnHeroDefeat() -- restores hero HP to full, invokes BattleEnded.
+
+Text library:
+  Loaded in _Ready() via GD.Load<BattleTextLibrary>(path).
+  Accessible to BattlePanel via GetTextLibrary().
+
+Signal subscription:
+  _Ready() subscribes to RandomEncounterManager.EncounterTriggered
+  to auto-start random encounter battles.
+
+---
+
+### BattleContext (Plain C# class)
+
+File: res://Autoloads/BattleContext.cs
+Not a Node or Resource. Data packet created at battle start.
+
+Fields:
+  Source (BattleSource enum: Dungeon or RandomEncounter)
+  Enemy (EnemyData)
+  Dungeon (DungeonData, null for random encounters)
+  LayerIndex (int, -1 for random encounters)
+  IsBossLayer, IsMiniBossLayer (bool)
+  BaseReward (float)
+  HeaderText (string)
+  PoolName (string, empty for dungeon battles)
+
+Factory methods:
+  CreateDungeonBattle(DungeonData, int, DungeonLayer)
+  CreateRandomEncounter(EnemyData, string poolName)
+
+---
+
+### DungeonRewardCalculator (Static Utility)
+
+File: res://Autoloads/DungeonRewardCalculator.cs
+Static class (not an Autoload). Pure calculation, no state.
+
+Methods:
+  CalculateReward(BattleContext) -- dispatches to correct path
+  CalculateDungeonReward(BattleContext) -- deterministic
+  CalculateRandomEncounterReward(BattleContext) -- RNG variance
+
+Returns BattleRewardResult with FinalReward, BaseReward,
+LuckMultiplier, and WasLucky fields.
+
+---
+
+### BattleLogEntry (Plain C# class, in BattleSystem.cs)
+
+Fields:
+  IsHeroAction (bool), Damage (float), IsCritical (bool),
+  IsDodge (bool), ActorName (string), TargetName (string),
+  TargetCurrentHP (float), TargetMaxHP (float)
+
+### BattleResult (Plain C# class, in BattleSystem.cs)
+
+Fields:
+  IsVictory (bool), Context (BattleContext),
+  Reward (BattleRewardResult), TotalRounds (int),
+  HeroCritsLanded (int), HeroDodgesPerformed (int),
+  HeroHPRemaining (float), HeroMaxHP (float),
+  EnemyHPRemaining (float)
+
+### BattleRewardResult (Plain C# class, in DungeonRewardCalculator.cs)
+
+Fields:
+  FinalReward (int), BaseReward (int),
+  LuckMultiplier (int), WasLucky (bool)
+
+---
+
 ### SaveManager
 
 Singleton autoload. JSON file persistence.
@@ -388,9 +526,9 @@ File paths:
 
 Key methods:
   Save(SaveData) -- serializes to JSON via BuildJson(), creates backup,
-	writes file
+    writes file
   Load() -- reads file via ParseJson(), falls back to backup, returns
-	empty SaveData if both fail
+    empty SaveData if both fail
   HasSaveData() -- checks if save file exists
   DeleteSaveData() -- deletes save and backup files
   ResetAllSaveData() -- alias for DeleteSaveData
@@ -461,6 +599,7 @@ Fields:
   AttackRate (float)
   KleosReward (int)
   EncounterFlavorTexts (Array of string)
+  AttackLines (Array of string, enemy-specific combat text)
 
 ### DungeonData (Resource)
 
@@ -570,7 +709,12 @@ Nine string arrays for combat text pools:
   DefeatLines, DefeatSubtitles, DefeatConsolations
 
 Public getter methods with fallback strings if arrays are empty.
-Script exists. Asset .tres file not yet created.
+Enemy name methods (GetRandomEnemyAttack, GetRandomVictoryLine,
+GetRandomDefeatLine, GetRandomEnemyAnticipation) use string.Format()
+to replace {0} placeholders with the enemy name.
+
+Asset: res://Resources/BattleText/battle_text_library.tres
+Loaded by BattleSystem in _Ready() via GD.Load().
 
 ### SaveData (Plain C# classes extending RefCounted)
 
@@ -644,6 +788,27 @@ Node tree:
       ScrollContainer > DungeonList (VBoxContainer)
     UpgradePanel (PanelContainer, overlay, hidden)
       ScrollContainer > UpgradeList (VBoxContainer)
+    BattlePanel (Control, overlay, hidden)
+      BattleBackground (ColorRect, Full Rect)
+      CombatArea (Control, Full Rect)
+        EncounterHeaderLabel (Label, Center Top)
+        HeroSection (VBoxContainer, Bottom Left)
+          HeroHPText, HeroHPBar, HeroPortrait, HeroNameLabel, HeroLevelLabel
+        EnemySection (VBoxContainer, Top Right)
+          EnemyNameLabel, EnemyPortrait, EnemyHPBar, EnemyHPText
+        BattleLogContainer (VBoxContainer, Center Bottom)
+          LogLine1, LogLine2, LogLine3, LogLine4
+        SpeedToggleButton (Button, Top Left, hidden)
+      ResultOverlay (Control, Full Rect, hidden)
+        ResultContent (VBoxContainer, Center)
+          ResultSubtitleLabel, ResultTitleLabel, ResultFlavorLabel,
+          ResultRewardLabel, ResultLuckLabel, ResultSummaryLabel,
+          ResultConsolationLabel, ResultActionButton, ViewBattleLogButton
+      PostCombatLogOverlay (Control, Full Rect, hidden)
+        LogMargin (MarginContainer, Full Rect, margins 20/20/20/60)
+          PostCombatLogScroll (ScrollContainer)
+            PostCombatLogList (VBoxContainer)
+        BackToResultsButton (Button, Center Bottom)
     FadeOverlay (ColorRect)
 
 MainGameController responsibilities:
@@ -743,8 +908,9 @@ Signal subscriptions:
   DungeonManager.LayerCleared -- refreshes display for this dungeon.
   KleosManager.KleosChanged -- refreshes if dungeon has kleos requirement.
 
-OnActionPressed() currently prints to console. Will call BattleSystem
-when implemented.
+OnActionPressed() calls BattleSystem.Instance.StartDungeonBattle()
+with the dungeon data and next layer index. Guards against battles
+already in progress and completed dungeons.
 
 PopulateDungeonList() in MainGameController spawns one row per dungeon.
 
@@ -808,6 +974,57 @@ Tier names:
   Tier 2: "Tier 2 -- Trials of the Road"
   Tier 3: "Tier 3 -- Trials of the Shore"
 
+### BattlePanel (in main_game.tscn)
+
+Script: BattlePanel.cs (extends Control, not PanelContainer)
+Root node: Control with Full Rect anchors.
+Not a separate .tscn -- built directly in the game scene tree.
+
+BattlePanel is a special overlay: not toggled by a sidebar button
+like Dungeon/Upgrade panels. Opened automatically by BattleSystem
+when combat starts, closed by the player pressing a result button.
+
+Uses Control as root instead of PanelContainer to avoid container
+layout restrictions on children. All child positioning uses anchors.
+
+Three sub-areas managed by visibility toggling:
+  CombatArea: visible during active combat.
+  ResultOverlay: visible after combat ends.
+  PostCombatLogOverlay: visible when viewing full battle history.
+  Only one is visible at a time.
+
+Event subscriptions (C# events, connected in _Ready()):
+  BattleSystem.BattleStarted -- opens panel, sets up displays.
+  BattleSystem.HeroAttackOccurred -- updates enemy HP, pushes log.
+  BattleSystem.EnemyAttackOccurred -- updates hero HP, pushes log.
+  BattleSystem.RoundStarted -- reserved for future use.
+  BattleSystem.BattleEnded -- shows result screen after delay.
+
+Disconnects all events in _ExitTree().
+
+Log system:
+  Three parallel lists: logLineHistory (strings), logColorHistory
+  (colors), logIsHeroAction (bools). PushLogLine() appends to all
+  three and updates the 4 visible Label nodes with newest-at-bottom
+  ordering and alpha fading.
+
+Animation methods:
+  AnimateAttackNudge() -- tweens portrait position toward opponent.
+  AnimateDamageShake() -- tweens portrait with horizontal oscillation.
+  TweenHPBar() -- tweens ProgressBar value smoothly.
+  FadePanelIn/Out() -- tweens panel Modulate alpha.
+  FadeInResultOverlay() -- tweens result overlay Modulate alpha.
+
+Helper methods:
+  GetEnemyAttackLine(string) -- priority chain: enemy-specific
+    AttackLines array, then BattleTextLibrary generic pool,
+    then hardcoded fallback.
+  SetProgressBarColor() -- creates StyleBoxFlat and applies as
+    theme override for ProgressBar fill color.
+
+Export properties: 30 node references wired in the editor Inspector.
+All exports use null checks before access for safety.
+
 ---
 
 ## Signal Wiring Summary
@@ -844,6 +1061,24 @@ HeroManager.StatsChanged:
 
 HeroManager.LevelUp:
   MainGameController.OnHeroLevelUp
+
+BattleSystem.BattleStarted (C# event):
+  BattlePanel.OnBattleStarted
+
+BattleSystem.HeroAttackOccurred (C# event):
+  BattlePanel.OnHeroAttack
+
+BattleSystem.EnemyAttackOccurred (C# event):
+  BattlePanel.OnEnemyAttack
+
+BattleSystem.RoundStarted (C# event):
+  BattlePanel.OnRoundStarted
+
+BattleSystem.BattleEnded (C# event):
+  BattlePanel.OnBattleEnded
+
+RandomEncounterManager.EncounterTriggered:
+  BattleSystem.OnRandomEncounterTriggered
 
 ---
 
@@ -886,16 +1121,14 @@ Directory-based resource loading:
 
 ## What Is Not Yet Implemented
 
-Battle system (BattleSystem.cs equivalent -- the most complex piece)
-Combat UI (battle panel, log, result overlay, speed toggle)
 Brigands Pass and Coastal Caves .tres data files
 Deed button visual evolution (tier-based appearance changes)
 Flavor text floating notifications
 Omen system
 Object pooling for flavor text
 Number formatting utility (NumberFormatter equivalent)
-Battle text library .tres asset (script exists, asset not created)
 Status effect and ability system (implemented in Unity, not ported)
+Prestige/meta-progression (Echo/Arete mechanics)
 
 ---
 

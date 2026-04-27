@@ -1,7 +1,7 @@
 # Kleos Master Reference -- Godot Edition
-# KMR_Godot -- Updated April 23, 2026
+# KMR_Godot -- Updated April 27, 2026
 # Engine: Godot 4.6.2 .NET (C#)
-# Status: Port in progress -- core systems and UI complete, battle system pending
+# Status: Port in progress -- core systems, UI, and battle system complete
 
 ---
 
@@ -10,7 +10,6 @@
 This is the gameplay and system reference for the Godot port of Kleos.
 It documents what has been implemented, tested, and confirmed working
 in the Godot project specifically.
-Essentially the source of truth for game behavior.
 
 All gameplay values (artisan costs, enemy stats, upgrade effects, hero
 formulas) are unchanged from the Unity version. Refer to the Unity KMR
@@ -22,10 +21,11 @@ what has been confirmed functional.
 
 ## Port Status Overview
 
-Autoload managers: All eight complete and tested.
+Autoload managers: All nine complete and tested (BattleSystem added).
 Resource classes: All seven ported and functional.
 Asset data (.tres files): Artisans complete, Forest dungeon complete,
-  Forest encounter pool complete, 24 upgrade assets complete.
+  Forest encounter pool complete, 24 upgrade assets complete,
+  BattleTextLibrary asset complete.
   Brigands and Coastal dungeon/encounter data pending.
 Main Menu scene: Complete -- fade, prompt text, settings panel.
 Game scene: Complete -- core layout with three-panel structure.
@@ -33,7 +33,8 @@ Artisan UI: Complete -- rows with locked/unlocked states, hire flow.
 Hero portrait and panel: Complete -- compact display, full stat panel.
 Dungeon UI: Complete -- DungeonRow with progress display and layer info.
 Upgrade UI: Complete -- UpgradeRow with five visual states and tier headers.
-Battle panel: Not started.
+Battle panel: Complete -- combat display, battle log, result screens,
+  post-combat log, animations, text variety.
 
 ---
 
@@ -171,14 +172,154 @@ Layer info shows enemy name with prefix based on layer type:
   Boss layers: "BOSS: Enemy Name"
 
 DungeonRow refreshes on LayerCleared and KleosChanged signals.
-Action button prints to console until BattleSystem is implemented.
+Action button calls BattleSystem.StartDungeonBattle() with the
+dungeon data and next layer index. Guards against battles already
+in progress and completed dungeons.
 
 PopulateDungeonList() in MainGameController spawns a DungeonRow for
 each dungeon config. Rows fill the full width of the DungeonPanel.
 
 ---
 
-## Section 5 -- Upgrade System
+## Section 5 -- Battle System (April 2026)
+
+Battles triggered by entering dungeon layers via the DungeonRow
+action button or by random encounter deed clicks. Turn-based combat
+with hero attacking first each round (Greek tradition).
+
+Battle Flow:
+1. Setup: BattleContext created (dungeon or random encounter).
+   Hero HP restored to full. BattlePanel opens with fade-in.
+   Encounter flavor text shown in battle log.
+2. Combat Loop: Alternating hero/enemy attacks with timed delays.
+   Hero attacks first, then enemy retaliates after 0.4s delay.
+   0.4s delay between rounds. Dodge and crit rolls each attack.
+3. Resolution: Victory or defeat detected when HP reaches zero.
+   0.6s final blow pause before result screen fade-in.
+4. Rewards: Victory grants kleos. Defeat restores hero to full HP.
+   Dungeon victories advance layer progress.
+5. Dismissal: Player presses CLAIM GLORY or RETREAT to close panel.
+
+Battle Context:
+Two factory methods create the appropriate context:
+  CreateDungeonBattle(dungeon, layerIndex, layer) -- sets dungeon
+    metadata, layer reward, boss flags, header text as
+    "{Dungeon Name} - Layer {N}".
+  CreateRandomEncounter(enemy, poolName) -- sets enemy reward,
+    header text as "Random Encounter", pool name for theming.
+
+Battle Sources:
+  Dungeon: DungeonRow action button triggers
+    BattleSystem.StartDungeonBattle().
+  Random Encounter: RandomEncounterManager.EncounterTriggered
+    signal triggers BattleSystem.StartRandomEncounterBattle().
+    Signal now passes pool name alongside enemy data for theming.
+
+Reward Calculation (DungeonRewardCalculator):
+  Dungeon rewards (deterministic):
+    Total = (BaseReward + LayerBonus + UpgradeBonus) * BossMultiplier
+    LayerBonus = BaseReward * (LayerIndex * 0.10)
+    BossMultiplier = 2.0 for boss layers, 1.0 otherwise
+    UpgradeBonus = GetFlat(ModifierType.BattleRewardFlat)
+  Random encounter rewards (RNG variance table):
+    Total = (BaseReward + UpgradeBonus) * LuckMultiplier
+    Luck roll: 40% = 1x, 20% = 2x, 15% = 3x, 10% = 4x,
+      5% = 6x, 5% = 10x, 5% = 20x.
+    WasLucky flag and LuckMultiplier stored for result screen.
+
+Enemy Damage Calculation:
+  Damage per hit = DamagePerSecond / AttackRate.
+  Preserves intended damage output from the original enemy
+  balance tables in the turn-based system.
+
+Post-Victory Healing:
+  If PostVictoryHealPercent upgrade modifier is purchased,
+  hero heals that percentage of max HP after winning.
+
+Post-Defeat:
+  Hero HP restored to full. No reward. No dungeon advancement.
+
+Battle Panel UI:
+  Full-screen overlay (Control node, not PanelContainer).
+  Sits after UpgradePanel and before FadeOverlay in scene tree.
+
+  Layout (asymmetric):
+    Hero (bottom-left): HP text, HP bar, Portrait, Name, Level.
+    Enemy (top-right): Name, Portrait, HP bar, HP text.
+    Battle log (center-bottom): 4 visible lines.
+    Encounter header (top-center): dungeon name or "RANDOM ENCOUNTER".
+    Speed toggle (top-left): hidden until upgrade purchased.
+
+  Background Theming:
+    ColorRect background tint changes per dungeon or encounter pool.
+    Forest: dark green (0.12, 0.18, 0.10).
+    Road/Brigands: warm brown (0.20, 0.17, 0.12).
+    Coast/Caves: dark blue (0.10, 0.15, 0.22).
+    Default: dark brown (0.15, 0.13, 0.11).
+    Theme resolved by string matching on dungeon ID or pool name.
+
+  Battle Log:
+    4 visible lines during combat, scrolling as new entries appear.
+    Hero actions left-aligned in copper (C87840).
+    Enemy actions right-aligned in red (C84030).
+    Critical hits highlighted in gold (FFD700).
+    Dodge lines displayed in steel grey (8A9AAA).
+    Older visible lines fade via alpha (newest 100%, oldest 40%).
+    Newest line fades in from transparent (0.15s tween).
+    Full history stored for post-combat log.
+
+  Result Screen:
+    Victory: subtitle (random from pool), VICTORY title in gold,
+      flavor text (random from pool with enemy name), formatted
+      reward with N0 number formatting, luck bonus display for
+      RNG multiplier > 1x, battle summary (rounds, HP remaining,
+      crits, dodges), CLAIM GLORY button.
+    Defeat: subtitle (random from pool), DEFEAT title in dark red,
+      flavor text (random from pool with enemy name), battle summary
+      (rounds, enemy HP remaining), consolation quote (random from
+      pool), RETREAT button.
+    VIEW BATTLE LOG button: opens scrollable full combat history
+      with left/right alignment matching the live log.
+    BACK TO RESULTS button: returns to result screen.
+    Result overlay fades in over 0.4s.
+
+  Animations:
+    Portrait attack nudge: attacker slides 20px toward opponent
+      then snaps back (0.12s each direction, Quad easing).
+    Portrait damage shake: defender shakes horizontally 6px,
+      3 oscillations (0.06s each).
+    HP bar tween: smooth transition to new value (0.3s, Quad Out).
+    Panel open/close: fade in/out over 0.25s.
+    All animation durations scale with battle speed multiplier.
+
+  Battle Speed Toggle:
+    Button cycles x1, x2, x4.
+    Only visible when BattleSpeedX2Unlocked upgrade purchased.
+    x4 requires BattleSpeedX4Unlocked upgrade.
+    All timer delays and animation durations divided by multiplier.
+
+  Combat Text (BattleTextLibrary):
+    9 hero attack lines, 7 crit lines, 7 dodge lines.
+    7 generic enemy attack lines (with {0} for enemy name).
+    5 enemy anticipation lines (reserved for future use).
+    6 victory lines, 4 victory subtitles.
+    5 defeat lines, 4 defeat subtitles, 6 consolation quotes.
+    All Greek-themed, editable in Inspector.
+    Fallback strings if library not loaded.
+
+  Enemy-Specific Attack Lines:
+    EnemyData has AttackLines array for per-enemy combat text.
+    Priority: enemy-specific line, then generic pool, then fallback.
+    Allows unique flavor per creature (dog bites, crab pincers, etc).
+
+  Encounter Flavor Text:
+    EnemyData.EncounterFlavorTexts array.
+    Random line shown when combat begins.
+    Falls back to "{EnemyName} blocks your path..." if empty.
+
+---
+
+## Section 6 -- Upgrade System
 
 Centralized modifier system using ModifierType enum and ModifierEffect
 resources. UpgradeManager provides GetFlat() and GetMultiplier() methods
@@ -195,20 +336,20 @@ ModifierMode: Flat or Multiplier.
 24 upgrade .tres assets created across 3 tiers:
 
   Tier 1 -- Trials of the Forest (no dungeon gate, 10 upgrades):
-	Scribe's Quill, Bronze Training, Inspiring Presence,
-	Bard's Inspiration, Blessed Growth, Spartan's Endurance,
-	Potter's Craft, Warrior's Discipline, Olympian Strike,
+    Scribe's Quill, Bronze Training, Inspiring Presence,
+    Bard's Inspiration, Blessed Growth, Spartan's Endurance,
+    Potter's Craft, Warrior's Discipline, Olympian Strike,
     Echoing Deed. Costs range 50 to 3,500 kleos.
 
   Tier 2 -- Trials of the Road (requires Brigands Pass, 7 upgrades):
-	Stolen Blade, Spoils of the Road, Scribe's Discipline,
-	Bard's War Song, Road-Hardened, Brigand's Cunning,
-	Victor's Instinct. Costs range 1,500 to 5,000 kleos.
+    Stolen Blade, Spoils of the Road, Scribe's Discipline,
+    Bard's War Song, Road-Hardened, Brigand's Cunning,
+    Victor's Instinct. Costs range 1,500 to 5,000 kleos.
     Dungeon gate left null until brigands.tres is created.
 
   Tier 3 -- Trials of the Shore (requires Coastal Caves, 7 upgrades):
-	Poseidon's Tide, Sailor's Fortune, Potter's Legacy,
-	Sculptor's Vision, Sea-Hardened Body, Tidal Instinct,
+    Poseidon's Tide, Sailor's Fortune, Potter's Legacy,
+    Sculptor's Vision, Sea-Hardened Body, Tidal Instinct,
     Coastal Plunder. Costs range 6,000 to 20,000 kleos.
     Dungeon gate left null until coastal.tres is created.
 
@@ -233,7 +374,7 @@ upgrade rows sorted by tier then cost.
 
 ---
 
-## Section 6 -- Random Encounters
+## Section 7 -- Random Encounters
 
 Triggered by deed clicks. RandomEncounterManager tracks a click counter
 and rolls against a threshold (configurable range, default 10-30).
@@ -251,7 +392,7 @@ Brigands and Coastal pools: not yet created as .tres assets.
 
 ---
 
-## Section 7 -- Save System
+## Section 8 -- Save System
 
 JSON file-based persistence using Godot FileAccess and user:// path.
 
@@ -278,7 +419,7 @@ Tested: save/load round-trip confirmed via console output.
 
 ---
 
-## Section 8 -- Settings System
+## Section 9 -- Settings System
 
 SettingsManager is a persistent Autoload (does not use DontDestroyOnLoad
 since Godot autoloads persist automatically across scenes).
@@ -296,7 +437,7 @@ dropdown, and a delete save button with confirmation dialog.
 
 ---
 
-## Section 9 -- Main Menu
+## Section 10 -- Main Menu
 
 Separate scene (res://Scenes/MainMenu/main_menu.tscn), set as the main
 scene in Project Settings.
@@ -319,7 +460,7 @@ clicks do not trigger game start.
 
 ---
 
-## Section 10 -- Game Scene Layout
+## Section 11 -- Game Scene Layout
 
 Scene file: res://Scenes/Game/main_game.tscn
 Controller script: MainGameController.cs
@@ -350,6 +491,17 @@ Layout structure:
       ScrollContainer > DungeonList
     UpgradePanel (PanelContainer, overlay, starts hidden)
       ScrollContainer > UpgradeList
+    BattlePanel (Control, overlay, starts hidden)
+      BattleBackground (ColorRect)
+      CombatArea (Control)
+        EncounterHeaderLabel, HeroSection, EnemySection,
+        BattleLogContainer (4 Labels), SpeedToggleButton
+      ResultOverlay (Control, hidden)
+        ResultContent (VBoxContainer with result labels and buttons)
+      PostCombatLogOverlay (Control, hidden)
+        LogMargin (MarginContainer)
+          PostCombatLogScroll > PostCombatLogList
+        BackToResultsButton
     FadeOverlay (ColorRect)
 
 Dungeon and Upgrade panels are mutually exclusive -- opening one closes
@@ -369,7 +521,7 @@ Fade overlay handles scene-in transition (black to transparent).
 
 ---
 
-## Section 11 -- Resource Loading
+## Section 12 -- Resource Loading
 
 All managers use ResourceScanner.LoadAll<T>() to scan directories for
 .tres and .res files instead of hardcoding paths. This means adding
@@ -434,13 +586,12 @@ HeroManager.LevelUp signal drives:
 
 ## What Is Not Yet Implemented
 
-Battle panel and combat UI (the most complex UI piece).
 Brigands Pass and Coastal Caves .tres data files.
 Deed button visual evolution (Bronze/Silver/Gold/Divine tiers).
 Flavor text floating notifications.
 Omen system pre-battle warnings.
-Battle text library .tres asset (script exists, asset not created).
 Status effect and ability system (implemented in Unity, not ported).
+Prestige/meta-progression (Echo/Arete mechanics).
 
 ---
 
