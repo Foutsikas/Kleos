@@ -13,8 +13,7 @@ public partial class RandomEncounterManager : Node
 
     private void LoadConfigs()
     {
-        EncounterPools.Clear();
-        EncounterPools.Add(GD.Load<EncounterPool>("res://Resources/EncounterPools/pool_forest.tres"));
+        EncounterPools = ResourceScanner.LoadAll<EncounterPool>("res://Resources/EncounterPools/");
     }
 
     // --- State ---

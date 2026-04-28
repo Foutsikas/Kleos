@@ -223,15 +223,13 @@ public partial class DevConsole : CanvasLayer
         int current = HeroManager.Instance.GetLevel();
         if (target <= current) return $"Already level {current}.";
 
-        // Grant enough XP to reach target level
+        // Grant massive XP to reach target
+        // XP threshold grows exponentially, so overshoot is fine
+        float totalXPNeeded = 0;
         for (int i = current; i < target; i++)
-        {
-            float xpNeeded = HeroManager.Instance.GetXPToNextLevel();
-            float currentXP = HeroManager.Instance.GetCurrentXP();
-            float deficit = xpNeeded - currentXP + 1;
-            if (deficit > 0)
-                HeroManager.Instance.AddExperience(deficit);
-        }
+            totalXPNeeded += 1000f * Mathf.Pow(1.5f, i - 1);
+
+        HeroManager.Instance.AddExperience(totalXPNeeded + 1);
 
         return $"Hero set to level {HeroManager.Instance.GetLevel()}. " +
                $"Stat points: {HeroManager.Instance.GetAvailableStatPoints()}";
@@ -252,10 +250,16 @@ public partial class DevConsole : CanvasLayer
             default: return "Unknown stat. Use: str, end, cun, fav";
         }
 
+        int applied = 0;
         for (int i = 0; i < amount; i++)
-            HeroManager.Instance.UpgradeStat(stat);
+        {
+            if (HeroManager.Instance.UpgradeStat(stat))
+                applied++;
+            else
+                break;
+        }
 
-        return $"Upgraded {parts[1]} by {amount}. " +
+        return $"Upgraded {parts[1]} by {applied} (requested {amount}). " +
                $"HP: {HeroManager.Instance.GetMaxHP():F0}, " +
                $"DMG: {HeroManager.Instance.GetDamage():F1}";
     }

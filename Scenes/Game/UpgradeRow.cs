@@ -28,12 +28,14 @@ public partial class UpgradeRow : PanelContainer
 
 		KleosManager.Instance.KleosChanged += OnKleosChanged;
 		UpgradeManager.Instance.UpgradePurchased += OnAnyUpgradePurchased;
+		DungeonManager.Instance.DungeonCompleted += OnDungeonCompleted;
 	}
 
 	public override void _ExitTree()
 	{
 		KleosManager.Instance.KleosChanged -= OnKleosChanged;
 		UpgradeManager.Instance.UpgradePurchased -= OnAnyUpgradePurchased;
+		DungeonManager.Instance.DungeonCompleted += OnDungeonCompleted;
 	}
 
 	// --- Setup ---
@@ -128,10 +130,10 @@ public partial class UpgradeRow : PanelContainer
 	{
 		Modulate = TierLockedModulate;
 
-		string lockReason  = "Locked";
+		string lockReason = "Locked";
 		if (upgradeConfig.RequiredDungeon != null)
-			lockReason  = $"Clear {upgradeConfig.RequiredDungeon.DungeonName} to unlock";
-		SetLockReason(lockReason );
+			lockReason = $"Clear {upgradeConfig.RequiredDungeon.DungeonName} to unlock";
+		SetLockReason(lockReason);
 
 		if (UpgradeBuyButton != null)
 		{
@@ -277,5 +279,13 @@ public partial class UpgradeRow : PanelContainer
 		{
 			RefreshDisplay();
 		}
+	}
+
+	private void OnDungeonCompleted(string dungeonId)
+	{
+		if (upgradeConfig == null) return;
+		if (upgradeConfig.RequiredDungeon != null
+			&& upgradeConfig.RequiredDungeon.DungeonId == dungeonId)
+			RefreshDisplay();
 	}
 }

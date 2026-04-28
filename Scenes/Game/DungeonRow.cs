@@ -185,5 +185,8 @@ public partial class DungeonRow : PanelContainer
         if (dungeonData == null) return;
         if (dungeonData.DungeonId == dungeonId)
             RefreshDisplay();
+        else if (dungeonData.RequiredDungeon != null
+                 && dungeonData.RequiredDungeon.DungeonId == dungeonId)
+            RefreshDisplay();
     }
 }
