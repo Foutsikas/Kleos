@@ -150,7 +150,6 @@ size_flags_vertical = 3
 [node name="CenterPanel" type="VBoxContainer" parent="RootLayout/MainPanel" unique_id=636368352]
 custom_minimum_size = Vector2(350, 0)
 layout_mode = 2
-size_flags_horizontal = 3
 
 [node name="DeedButton" type="Button" parent="RootLayout/MainPanel/CenterPanel" unique_id=2121452232]
 custom_minimum_size = Vector2(0, 80)
@@ -185,8 +184,8 @@ custom_minimum_size = Vector2(300, 0)
 layout_mode = 1
 anchors_preset = 9
 anchor_bottom = 1.0
-offset_left = 84.145
-offset_right = 384.145
+offset_left = 215.0
+offset_right = 715.0
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_gucqa")
 
@@ -195,20 +194,27 @@ layout_mode = 2
 
 [node name="HeroPanelTitle" type="Label" parent="HeroPanel/VBoxContainer" unique_id=789750424]
 layout_mode = 2
+text = "TEST TEST"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="HeroNameLabel" type="Label" parent="HeroPanel/VBoxContainer" unique_id=1485738283]
 layout_mode = 2
+text = "TEST TEST"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="HeroLevelDetailLabel" type="Label" parent="HeroPanel/VBoxContainer" unique_id=1540001889]
 layout_mode = 2
+text = "TEST TEST"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="HeroHPDetailBar" type="ProgressBar" parent="HeroPanel/VBoxContainer" unique_id=1551877966]
 layout_mode = 2
-show_percentage = false
 
 [node name="HeroXPDetailBar" type="ProgressBar" parent="HeroPanel/VBoxContainer" unique_id=981476515]
 layout_mode = 2
-show_percentage = false
 
 [node name="StatsContainer" type="VBoxContainer" parent="HeroPanel/VBoxContainer" unique_id=454431303]
 layout_mode = 2
@@ -218,72 +224,115 @@ layout_mode = 2
 
 [node name="StrengthLabel" type="Label" parent="HeroPanel/VBoxContainer/StatsContainer/StrengthRow" unique_id=1487955218]
 layout_mode = 2
+size_flags_horizontal = 7
 text = "Strength"
+horizontal_alignment = 1
 
 [node name="StrengthValueLabel" type="Label" parent="HeroPanel/VBoxContainer/StatsContainer/StrengthRow" unique_id=74288502]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "10"
+vertical_alignment = 1
 
 [node name="StrengthUpgradeButton" type="Button" parent="HeroPanel/VBoxContainer/StatsContainer/StrengthRow" unique_id=833748729]
 custom_minimum_size = Vector2(30, 0)
 layout_mode = 2
 text = "+"
 
+[node name="Control3" type="Control" parent="HeroPanel/VBoxContainer/StatsContainer" unique_id=416284694]
+layout_mode = 2
+size_flags_vertical = 0
+size_flags_stretch_ratio = 0.01
+
 [node name="EnduranceRow" type="HBoxContainer" parent="HeroPanel/VBoxContainer/StatsContainer" unique_id=1977336200]
 layout_mode = 2
 
 [node name="EnduranceLabel" type="Label" parent="HeroPanel/VBoxContainer/StatsContainer/EnduranceRow" unique_id=2130024909]
 layout_mode = 2
+size_flags_horizontal = 7
 text = "Endurance"
+horizontal_alignment = 1
 
 [node name="EnduranceValueLabel" type="Label" parent="HeroPanel/VBoxContainer/StatsContainer/EnduranceRow" unique_id=2074300803]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "10"
+vertical_alignment = 1
 
 [node name="EnduranceUpgradeButton" type="Button" parent="HeroPanel/VBoxContainer/StatsContainer/EnduranceRow" unique_id=211471987]
 custom_minimum_size = Vector2(30, 0)
 layout_mode = 2
 text = "+"
 
+[node name="Control4" type="Control" parent="HeroPanel/VBoxContainer/StatsContainer" unique_id=892518832]
+layout_mode = 2
+size_flags_vertical = 0
+size_flags_stretch_ratio = 0.01
+
 [node name="CunningRow" type="HBoxContainer" parent="HeroPanel/VBoxContainer/StatsContainer" unique_id=475058959]
 layout_mode = 2
 
 [node name="CunningLabel" type="Label" parent="HeroPanel/VBoxContainer/StatsContainer/CunningRow" unique_id=131872072]
 layout_mode = 2
+size_flags_horizontal = 7
 text = "Cunning"
+horizontal_alignment = 1
 
 [node name="CunningValueLabel" type="Label" parent="HeroPanel/VBoxContainer/StatsContainer/CunningRow" unique_id=122208947]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "10"
+vertical_alignment = 1
 
 [node name="CunningUpgradeButton" type="Button" parent="HeroPanel/VBoxContainer/StatsContainer/CunningRow" unique_id=1326911538]
 custom_minimum_size = Vector2(30, 0)
 layout_mode = 2
 text = "+"
 
+[node name="Control5" type="Control" parent="HeroPanel/VBoxContainer/StatsContainer" unique_id=127360415]
+layout_mode = 2
+size_flags_vertical = 0
+size_flags_stretch_ratio = 0.01
+
 [node name="FavorRow" type="HBoxContainer" parent="HeroPanel/VBoxContainer/StatsContainer" unique_id=273443935]
 layout_mode = 2
 
 [node name="FavorLabel" type="Label" parent="HeroPanel/VBoxContainer/StatsContainer/FavorRow" unique_id=1412049601]
 layout_mode = 2
+size_flags_horizontal = 7
 text = "Favor"
+horizontal_alignment = 1
 
 [node name="FavorValueLabel" type="Label" parent="HeroPanel/VBoxContainer/StatsContainer/FavorRow" unique_id=1984207798]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "10"
+vertical_alignment = 1
 
 [node name="FavorUpgradeButton" type="Button" parent="HeroPanel/VBoxContainer/StatsContainer/FavorRow" unique_id=919085318]
 custom_minimum_size = Vector2(30, 0)
 layout_mode = 2
 text = "+"
 
+[node name="Control" type="Control" parent="HeroPanel/VBoxContainer" unique_id=524430188]
+layout_mode = 2
+size_flags_vertical = 0
+size_flags_stretch_ratio = 0.01
+
 [node name="StatPointsLabel" type="Label" parent="HeroPanel/VBoxContainer" unique_id=42998247]
 layout_mode = 2
 text = "Stat Points: 0"
+horizontal_alignment = 1
+
+[node name="Control2" type="Control" parent="HeroPanel/VBoxContainer" unique_id=2066375373]
+layout_mode = 2
+size_flags_vertical = 0
+size_flags_stretch_ratio = 0.01
 
 [node name="CombatStatsLabel" type="Label" parent="HeroPanel/VBoxContainer" unique_id=292492263]
 layout_mode = 2
 text = "DMG: 13  DODGE: 5%  CRIT: 2.5%"
+horizontal_alignment = 1
 
 [node name="DungeonPanel" type="PanelContainer" parent="." unique_id=267715734]
 visible = false
