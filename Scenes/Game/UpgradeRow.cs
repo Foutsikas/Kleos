@@ -35,7 +35,7 @@ public partial class UpgradeRow : PanelContainer
 	{
 		KleosManager.Instance.KleosChanged -= OnKleosChanged;
 		UpgradeManager.Instance.UpgradePurchased -= OnAnyUpgradePurchased;
-		DungeonManager.Instance.DungeonCompleted += OnDungeonCompleted;
+		DungeonManager.Instance.DungeonCompleted -= OnDungeonCompleted;
 	}
 
 	// --- Setup ---
