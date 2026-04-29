@@ -9,11 +9,19 @@ public partial class RandomEncounterManager : Node
     [Signal] public delegate void EncounterTriggeredEventHandler(EnemyData enemy, string poolName);
 
     // --- Config ---
-    public Array EncounterPools { get; private set; } = new();
+    public Array EncounterPoolsConfig { get; private set; } = new();
 
     private void LoadConfigs()
     {
-        EncounterPools = ResourceScanner.LoadAll<EncounterPool>("res://Resources/EncounterPools/");
+        var db = GD.Load<EncounterPoolDatabase>("res://Resources/EncounterPools/encounter_database.tres");
+
+        if (db == null)
+        {
+            GD.PrintErr("Encounter DB failed to load");
+            return;
+        }
+
+        EncounterPoolsConfig = (Array)db.Pools;
     }
 
     // --- State ---
@@ -87,9 +95,9 @@ public partial class RandomEncounterManager : Node
 
         activePools.Clear();
 
-        for (int i = 0; i < EncounterPools.Count; i++)
+        for (int i = 0; i < EncounterPoolsConfig.Count; i++)
         {
-            var pool = EncounterPools[i].As<EncounterPool>();
+            var pool = EncounterPoolsConfig[i].As<EncounterPool>();
             if (pool == null) continue;
 
             bool active = pool.RequiredDungeon == null

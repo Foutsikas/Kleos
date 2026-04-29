@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="UpgradesDatabase" format=3 uid="uid://cyxnxasaajrn8"]
+
+[ext_resource type="Script" uid="uid://b26kdgevkwsj2" path="res://Resources/UpgradeConfig.cs" id="1_4rdcp"]
+[ext_resource type="Resource" uid="uid://cv2kyqmtmepe5" path="res://Resources/Upgrades/1_01_scribes_quill.tres" id="2_5jyu6"]
+[ext_resource type="Script" uid="uid://bh4i1kbr6keux" path="res://Resources/Upgrades/UpgradesDatabase.cs" id="2_fopvk"]
+[ext_resource type="Resource" uid="uid://ds6dpy7i65j74" path="res://Resources/Upgrades/1_02_bronze_training.tres" id="3_t6v5v"]
+[ext_resource type="Resource" uid="uid://hchb36v83bw5" path="res://Resources/Upgrades/1_03_inspiring_presence.tres" id="4_5nyhb"]
+[ext_resource type="Resource" uid="uid://b30gc4bkfcx40" path="res://Resources/Upgrades/1_04_bards_inspiration.tres" id="5_ocbcg"]
+[ext_resource type="Resource" uid="uid://b7pwuunjna1bo" path="res://Resources/Upgrades/1_05_blessed_growth.tres" id="6_1g14m"]
+[ext_resource type="Resource" uid="uid://drd8avp12mjkn" path="res://Resources/Upgrades/1_06_spartans_endurance.tres" id="7_amolv"]
+[ext_resource type="Resource" uid="uid://xlv4c7138mmk" path="res://Resources/Upgrades/1_07_potters_craft.tres" id="8_5h3jh"]
+[ext_resource type="Resource" uid="uid://ctqr5m758155u" path="res://Resources/Upgrades/1_08_warriors_discipline.tres" id="9_0hd43"]
+[ext_resource type="Resource" uid="uid://y0h3yss3wcs6" path="res://Resources/Upgrades/1_09_olympian_strike.tres" id="10_nkg58"]
+[ext_resource type="Resource" uid="uid://blbj2nk6mqcav" path="res://Resources/Upgrades/1_10_echoing_deed.tres" id="11_x4u1t"]
+[ext_resource type="Resource" uid="uid://b3sfmry0rau8i" path="res://Resources/Upgrades/2_01_stolen_blade.tres" id="12_ml7fa"]
+[ext_resource type="Resource" uid="uid://dvlfy1frw8c5u" path="res://Resources/Upgrades/2_02_spoils_of_the_road.tres" id="13_jme5w"]
+[ext_resource type="Resource" uid="uid://odqc72d44ne8" path="res://Resources/Upgrades/2_03_scribes_discipline.tres" id="14_ab6xk"]
+[ext_resource type="Resource" uid="uid://b4xr1a5vs7si4" path="res://Resources/Upgrades/2_04_bards_war_song.tres" id="15_4yqmc"]
+[ext_resource type="Resource" uid="uid://b455r21t7hjmr" path="res://Resources/Upgrades/2_05_road_hardened.tres" id="16_4llls"]
+[ext_resource type="Resource" uid="uid://cnmojnnfwpkfg" path="res://Resources/Upgrades/2_06_brigands_cunning.tres" id="17_l41sp"]
+[ext_resource type="Resource" uid="uid://d25c1ywie6p1f" path="res://Resources/Upgrades/2_07_victors_instinct.tres" id="18_iymmp"]
+[ext_resource type="Resource" uid="uid://cq8y3q6swmoq0" path="res://Resources/Upgrades/3_01_poseidons_tide.tres" id="19_t5nh1"]
+[ext_resource type="Resource" uid="uid://n6swuhco53r3" path="res://Resources/Upgrades/3_02_sailors_fortune.tres" id="20_xq6qc"]
+[ext_resource type="Resource" uid="uid://h8q3vxjqbg3v" path="res://Resources/Upgrades/3_03_potters_legacy.tres" id="21_xyemb"]
+[ext_resource type="Resource" uid="uid://dcsfhtiqq8mj5" path="res://Resources/Upgrades/3_04_sculptors_vision.tres" id="22_n0mp8"]
+[ext_resource type="Resource" uid="uid://cqxm7630233rq" path="res://Resources/Upgrades/3_05_sea_hardened_body.tres" id="23_e4qjt"]
+[ext_resource type="Resource" uid="uid://dfewlu24yyd1j" path="res://Resources/Upgrades/3_06_tidal_instinct.tres" id="24_my31m"]
+[ext_resource type="Resource" uid="uid://cfwgtd5sjbxn5" path="res://Resources/Upgrades/3_07_coastal_plunder.tres" id="25_a7m8m"]
+
+[resource]
+script = ExtResource("2_fopvk")
+Upgrades = Array[ExtResource("1_4rdcp")]([ExtResource("2_5jyu6"), ExtResource("3_t6v5v"), ExtResource("4_5nyhb"), ExtResource("5_ocbcg"), ExtResource("6_1g14m"), ExtResource("7_amolv"), ExtResource("8_5h3jh"), ExtResource("9_0hd43"), ExtResource("10_nkg58"), ExtResource("11_x4u1t"), ExtResource("12_ml7fa"), ExtResource("13_jme5w"), ExtResource("14_ab6xk"), ExtResource("15_4yqmc"), ExtResource("16_4llls"), ExtResource("17_l41sp"), ExtResource("18_iymmp"), ExtResource("19_t5nh1"), ExtResource("20_xq6qc"), ExtResource("21_xyemb"), ExtResource("22_n0mp8"), ExtResource("23_e4qjt"), ExtResource("24_my31m"), ExtResource("25_a7m8m")])
+metadata/_custom_type_script = "uid://bh4i1kbr6keux"

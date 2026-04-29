@@ -129,7 +129,7 @@ layout_mode = 2
 size_flags_vertical = 3
 
 [node name="UpgradeButton" type="Button" parent="RootLayout/MainPanel/LeftPanel" unique_id=2073831653]
-custom_minimum_size = Vector2(50, 0)
+custom_minimum_size = Vector2(50, 3.525)
 layout_mode = 2
 size_flags_horizontal = 0
 text = "Upgrades "
@@ -371,7 +371,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="BattlePanel" type="Control" parent="." unique_id=1960193445 node_paths=PackedStringArray("EncounterHeaderLabel", "HeroNameLabel", "HeroLevelLabel", "HeroPortrait", "HeroHPBar", "HeroHPText", "EnemyNameLabel", "EnemyPortrait", "EnemyHPBar", "EnemyHPText", "LogLine1", "LogLine2", "LogLine3", "LogLine4", "SpeedToggleButton", "BattleBackground", "ResultOverlay", "ResultSubtitleLabel", "ResultTitleLabel", "ResultFlavorLabel", "ResultRewardLabel", "ResultLuckLabel", "ResultSummaryLabel", "ResultConsolationLabel", "ResultActionButton", "ViewBattleLogButton", "PostCombatLogOverlay", "PostCombatLogScroll", "PostCombatLogList", "BackToResultsButton", "CombatArea")]
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -454,17 +453,10 @@ offset_right = 190.0
 offset_bottom = -41.0
 grow_vertical = 0
 
-[node name="HeroHPText" type="Label" parent="BattlePanel/CombatArea/HeroSection" unique_id=1489927454]
-layout_mode = 2
-theme_override_font_sizes/font_size = 12
-
-[node name="HeroHPBar" type="ProgressBar" parent="BattlePanel/CombatArea/HeroSection" unique_id=2053773614]
-custom_minimum_size = Vector2(120, 14)
-layout_mode = 2
-
 [node name="HeroPortrait" type="TextureRect" parent="BattlePanel/CombatArea/HeroSection" unique_id=60854752]
-custom_minimum_size = Vector2(80, 80)
+custom_minimum_size = Vector2(500, 500)
 layout_mode = 2
+expand_mode = 1
 stretch_mode = 5
 
 [node name="HeroNameLabel" type="Label" parent="BattlePanel/CombatArea/HeroSection" unique_id=1680716772]
@@ -474,6 +466,14 @@ theme_override_font_sizes/font_size = 14
 [node name="HeroLevelLabel" type="Label" parent="BattlePanel/CombatArea/HeroSection" unique_id=1441675538]
 layout_mode = 2
 theme_override_font_sizes/font_size = 11
+
+[node name="HeroHPText" type="Label" parent="BattlePanel/CombatArea/HeroSection" unique_id=1489927454]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+
+[node name="HeroHPBar" type="ProgressBar" parent="BattlePanel/CombatArea/HeroSection" unique_id=2053773614]
+custom_minimum_size = Vector2(120, 14)
+layout_mode = 2
 
 [node name="EnemySection" type="VBoxContainer" parent="BattlePanel/CombatArea" unique_id=374851710]
 custom_minimum_size = Vector2(140, 180)
@@ -487,16 +487,19 @@ offset_right = -50.0
 offset_bottom = 221.0
 grow_horizontal = 0
 
+[node name="EnemyPortrait" type="TextureRect" parent="BattlePanel/CombatArea/EnemySection" unique_id=1859029437]
+clip_contents = true
+custom_minimum_size = Vector2(500, 500)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
 [node name="EnemyNameLabel" type="Label" parent="BattlePanel/CombatArea/EnemySection" unique_id=874561894]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
+text = "TEST TEST TEST"
 horizontal_alignment = 1
 vertical_alignment = 1
-
-[node name="EnemyPortrait" type="TextureRect" parent="BattlePanel/CombatArea/EnemySection" unique_id=1859029437]
-custom_minimum_size = Vector2(80, 80)
-layout_mode = 2
-stretch_mode = 5
 
 [node name="EnemyHPBar" type="ProgressBar" parent="BattlePanel/CombatArea/EnemySection" unique_id=1327106970]
 custom_minimum_size = Vector2(120, 14)

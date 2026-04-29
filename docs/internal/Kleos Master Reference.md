@@ -1,7 +1,7 @@
 # Kleos Master Reference -- Godot Edition
-# KMR_Godot -- Updated April 27, 2026
+# KMR_Godot -- Updated April 29, 2026
 # Engine: Godot 4.6.2 .NET (C#)
-# Status: Port in progress -- core systems, UI, and battle system complete
+# Status: Core gameplay complete -- battle system, three dungeons, DevConsole
 
 ---
 
@@ -21,12 +21,13 @@ what has been confirmed functional.
 
 ## Port Status Overview
 
-Autoload managers: All nine complete and tested (BattleSystem added).
+Autoload managers: All ten complete and tested (BattleSystem and
+  DevConsole added April 2026).
 Resource classes: All seven ported and functional.
-Asset data (.tres files): Artisans complete, Forest dungeon complete,
-  Forest encounter pool complete, 24 upgrade assets complete,
-  BattleTextLibrary asset complete.
-  Brigands and Coastal dungeon/encounter data pending.
+Asset data (.tres files): Artisans complete, all three dungeons complete,
+  all three encounter pools complete, 24 upgrade assets complete,
+  BattleTextLibrary asset complete. Tier 2 and Tier 3 upgrade dungeon
+  gates wired to brigands.tres and coastal.tres.
 Main Menu scene: Complete -- fade, prompt text, settings panel.
 Game scene: Complete -- core layout with three-panel structure.
 Artisan UI: Complete -- rows with locked/unlocked states, hire flow.
@@ -35,6 +36,7 @@ Dungeon UI: Complete -- DungeonRow with progress display and layer info.
 Upgrade UI: Complete -- UpgradeRow with five visual states and tier headers.
 Battle panel: Complete -- combat display, battle log, result screens,
   post-combat log, animations, text variety.
+DevConsole: Complete -- backtick toggle, 11 commands, command history.
 
 ---
 
@@ -144,17 +146,46 @@ containing an array of DungeonLayer entries. Each layer references an
 EnemyData asset and defines a base kleos reward, boss flags, and flavor
 text.
 
-Forest of Trials: 10 layers, Wild Dog through Nemean Lion.
-  Layer 9: Nemean Lion Cub (mini-boss).
-  Layer 10: Nemean Lion (boss).
-  All enemy stats configured in .tres files.
+Three dungeons implemented, each with 10 layers:
 
-Brigands Pass and Coastal Caves: Enemy data defined in Unity KMR.
-Godot .tres assets not yet created.
+Forest of Trials (forest.tres):
+  Unlocked from start. No requirements.
+  Layers: Wild Dog, Wild Dog, Wolf, Wolf Pack, Wolf Pack,
+    Large Wolf, Large Wolf, Large Wolf Pack,
+    Nemean Lion Cub (mini-boss), Nemean Lion (boss).
+  Enemy stats: HP 135-800, DPS 4-10, AttackRate 1.5-1.9.
+
+Brigands' Pass (brigands.tres):
+  Requires: Forest completed, 500 kleos.
+  Layers: Road Thief, Bandit Lookout, Outlaw Peltast,
+    Bandit Hoplite, Rogue Mercenary, Outlaw Peltast Band,
+    Bandit Champion, War Hounds,
+    The Pine-Bender (mini-boss), The Archilestes (boss).
+  Enemy stats: HP 900-3800, DPS 5.5-15, AttackRate 1.6-2.1.
+
+Coastal Caves (coastal.tres):
+  Requires: Brigands' Pass completed, 2000 kleos.
+  Layers: Shore Crab, Reef Serpent, Drowned Sailor,
+    Reef Serpent Pair, Siren Thrall, Sea Hag,
+    Coastal Chimera, Scylla Spawn,
+    Charybdis Maw (mini-boss), The Siren Queen (boss).
+  Enemy stats: HP 3000-9500, DPS 14-32, AttackRate 2.0-2.5.
+
+HP scaling is steeper than DPS scaling within each dungeon. This
+encourages Endurance investment and makes fights feel long when
+underleveled but manageable once the hero has grown.
 
 DungeonManager tracks progress as a dictionary of dungeon name to
 highest cleared layer. Sequential access enforced. Progress persists
 via save system.
+
+Signal ordering: CheckDungeonCompletion runs BEFORE LayerCleared
+signal emission in OnLayerCleared(). This ensures the completed flag
+is set before any UI responds to the layer change.
+
+ForceCompleteDungeon(string dungeonId) is a DEV API that sets
+progress to the final layer and emits DungeonCompleted then
+LayerCleared. Used by DevConsole.
 
 Dungeon UI (DungeonRow):
 Each dungeon displays as a row with dungeon name, progress (cleared
@@ -171,10 +202,16 @@ Layer info shows enemy name with prefix based on layer type:
   Mini-boss layers: "Mini-Boss: Enemy Name"
   Boss layers: "BOSS: Enemy Name"
 
-DungeonRow refreshes on LayerCleared and KleosChanged signals.
-Action button calls BattleSystem.StartDungeonBattle() with the
+DungeonRow refreshes on LayerCleared, DungeonCompleted, and
+KleosChanged signals. OnDungeonCompleted also checks if the completed
+dungeon is this row's RequiredDungeon, so downstream dungeons unlock
+immediately.
+
+OnActionPressed() calls BattleSystem.StartDungeonBattle() with the
 dungeon data and next layer index. Guards against battles already
-in progress and completed dungeons.
+in progress and completed dungeons. Uses IsDungeonCompleted() check
+instead of bounds comparison. Progress display clamped with
+Mathf.Min() to prevent exceeding total layers.
 
 PopulateDungeonList() in MainGameController spawns a DungeonRow for
 each dungeon config. Rows fill the full width of the DungeonPanel.
@@ -213,7 +250,7 @@ Battle Sources:
     BattleSystem.StartDungeonBattle().
   Random Encounter: RandomEncounterManager.EncounterTriggered
     signal triggers BattleSystem.StartRandomEncounterBattle().
-    Signal now passes pool name alongside enemy data for theming.
+    Signal passes pool name alongside enemy data for theming.
 
 Reward Calculation (DungeonRewardCalculator):
   Dungeon rewards (deterministic):
@@ -345,13 +382,13 @@ ModifierMode: Flat or Multiplier.
     Stolen Blade, Spoils of the Road, Scribe's Discipline,
     Bard's War Song, Road-Hardened, Brigand's Cunning,
     Victor's Instinct. Costs range 1,500 to 5,000 kleos.
-    Dungeon gate left null until brigands.tres is created.
+    Dungeon gate wired to brigands.tres.
 
   Tier 3 -- Trials of the Shore (requires Coastal Caves, 7 upgrades):
     Poseidon's Tide, Sailor's Fortune, Potter's Legacy,
     Sculptor's Vision, Sea-Hardened Body, Tidal Instinct,
     Coastal Plunder. Costs range 6,000 to 20,000 kleos.
-    Dungeon gate left null until coastal.tres is created.
+    Dungeon gate wired to coastal.tres.
 
 Upgrade UI (UpgradeRow):
 Each upgrade displays as a row with name, cost, description, lock
@@ -365,7 +402,10 @@ Five visual states:
   Individual Locked -- warm brown, shows specific reason, text "Locked".
 
 Tier headers (TierHeader scene) inserted between upgrade groups.
-UpgradeRow refreshes on KleosChanged and UpgradePurchased signals.
+UpgradeRow refreshes on KleosChanged, UpgradePurchased, and
+DungeonCompleted signals. The DungeonCompleted subscription ensures
+tier gates update immediately when a dungeon is cleared (fixed April
+2026 -- previously tier gates only refreshed on kleos changes).
 Purchasing an upgrade triggers ArtisanManager.RecalculateTotalProduction()
 to immediately apply production modifiers.
 
@@ -384,11 +424,24 @@ dungeon completion requirement. Forest pool is always active (no gate).
 When an encounter triggers, a random active pool is selected, then a
 random enemy from that pool using weighted selection.
 
-Forest encounter pool configured:
+Pool loading uses ResourceScanner.LoadAll<EncounterPool>() to scan the
+EncounterPools directory (fixed April 2026 -- was previously hardcoded
+to only load the Forest pool).
+
+Forest encounter pool:
   Wild Dog (weight 3.0), Wild Boar (3.0), Wolf (2.5),
   Wolf Pack (1.5), Large Wolf (1.0).
 
-Brigands and Coastal pools: not yet created as .tres assets.
+Brigands encounter pool (unlocks when Brigands' Pass completed):
+  Road Thief (3.0), Bandit Lookout (2.5), Outlaw Peltast (2.0),
+  Bandit Hoplite (1.5), Rogue Mercenary (1.0), War Hounds (0.5).
+
+Coastal encounter pool (unlocks when Coastal Caves completed):
+  Shore Crab (3.0), Reef Serpent (2.5), Drowned Sailor (2.0),
+  Siren Thrall (1.5), Sea Hag (1.0), Scylla Spawn (0.5).
+
+Bosses and mini-bosses excluded from all encounter pools. They are
+dungeon-exclusive.
 
 ---
 
@@ -469,23 +522,24 @@ Layout structure:
 
   MainGame (Control, full screen)
     Background (ColorRect)
-    TopBar (HBoxContainer)
-      HeroPortrait -- compact, top left
-      KleosLabel
-      ProductionLabel
-    MainPanel (HBoxContainer)
-      LeftPanel (VBoxContainer, fixed width)
-        TopSpacer
-        DungeonButton
-        MiddleSpacer
-        UpgradeButton
-        BottomSpacer
-      CenterPanel (VBoxContainer, expands)
-        DeedButton
-        DeedContextLabel
-      RightPanel (VBoxContainer, fixed width)
-        ArtisanScrollContainer
-          ArtisanList (VBoxContainer, artisan rows spawned here)
+    RootLayout (VBoxContainer)
+      TopBar (HBoxContainer)
+        HeroPortrait -- compact, top left
+        KleosLabel
+        ProductionLabel
+      MainPanel (HBoxContainer)
+        LeftPanel (VBoxContainer, fixed width)
+          TopSpacer
+          DungeonButton
+          MiddleSpacer
+          UpgradeButton
+          BottomSpacer
+        CenterPanel (VBoxContainer, expands)
+          DeedButton
+          DeedContextLabel
+        RightPanel (VBoxContainer, fixed width)
+          ArtisanScrollContainer
+            ArtisanList (VBoxContainer, artisan rows spawned here)
     HeroPanel (PanelContainer, overlay, starts hidden)
     DungeonPanel (PanelContainer, overlay, starts hidden)
       ScrollContainer > DungeonList
@@ -538,13 +592,43 @@ Each manager applies its own sort after scanning:
   DungeonManager -- sorts by progression chain (dungeons with no
     RequiredDungeon first, then chained by RequiredDungeon reference).
   UpgradeManager -- sorts by tier first, then by cost within each tier.
+  RandomEncounterManager -- loads all pools via ResourceScanner
+    (fixed April 2026).
 
 Resource directories:
-  res://Resources/Artisans/   -- 6 artisan .tres files
-  res://Resources/Dungeons/   -- dungeon .tres files (currently: forest)
-  res://Resources/Enemies/    -- enemy .tres files organized by dungeon
-  res://Resources/Upgrades/   -- 24 upgrade .tres files
-  res://Resources/EncounterPools/ -- encounter pool .tres files
+  res://Resources/Artisans/       -- 6 artisan .tres files
+  res://Resources/Dungeons/       -- 3 dungeon .tres files
+  res://Resources/Enemies/        -- enemy .tres files organized by dungeon
+    1. Forest/ (7 enemies), 2. Brigands/ (10 enemies), 3. Coastal/ (10 enemies)
+  res://Resources/Upgrades/       -- 24 upgrade .tres files
+  res://Resources/EncounterPools/ -- 3 encounter pool .tres files
+  res://Resources/BattleText/     -- battle_text_library.tres
+
+---
+
+## Section 13 -- DevConsole (April 2026)
+
+Developer tool for testing. Registered as Autoload position 10.
+CanvasLayer with Layer 100 so it renders above everything.
+
+Toggle: backtick (`) key. Opens a top-of-screen panel with input
+field and output label.
+
+Commands:
+  kleos <amount>            -- adds kleos
+  level <target>            -- sets hero to target level via XP grant
+  stat <str/end/cun/fav> <n>-- upgrades stat N times (tracks actual applied)
+  clear <dungeonId>         -- completes a dungeon (calls ForceCompleteDungeon)
+  layer <dungeonId> <count> -- clears next N layers
+  hp <amount>               -- sets hero HP to specific value
+  pools                     -- shows active encounter pool count
+  save                      -- saves game state
+  load                      -- loads game state
+  reset                     -- deletes save data
+  status                    -- shows kleos, KpS, hero level, stats
+
+Command history via up/down arrow keys. All input lowercased before
+parsing. UI built entirely in code (no scene file needed).
 
 ---
 
@@ -574,7 +658,9 @@ DungeonManager.LayerCleared signal drives:
   DungeonRow progress and state refresh.
 
 DungeonManager.DungeonCompleted signal drives:
-  RandomEncounterManager (marks pools dirty).
+  RandomEncounterManager (marks pools dirty),
+  DungeonRow (refreshes rows whose RequiredDungeon just completed),
+  UpgradeRow (refreshes tier-gated rows for the completed dungeon).
 
 HeroManager.StatsChanged signal drives:
   Hero panel stat display refresh, hero portrait bar updates.
@@ -582,16 +668,34 @@ HeroManager.StatsChanged signal drives:
 HeroManager.LevelUp signal drives:
   Stat point notification, hero panel refresh.
 
+BattleSystem.BattleStarted (C# event):
+  BattlePanel.OnBattleStarted
+
+BattleSystem.HeroAttackOccurred (C# event):
+  BattlePanel.OnHeroAttack
+
+BattleSystem.EnemyAttackOccurred (C# event):
+  BattlePanel.OnEnemyAttack
+
+BattleSystem.RoundStarted (C# event):
+  BattlePanel.OnRoundStarted
+
+BattleSystem.BattleEnded (C# event):
+  BattlePanel.OnBattleEnded
+
+RandomEncounterManager.EncounterTriggered:
+  BattleSystem.OnRandomEncounterTriggered
+
 ---
 
 ## What Is Not Yet Implemented
 
-Brigands Pass and Coastal Caves .tres data files.
+Status effect and ability system (implemented in Unity, not ported).
 Deed button visual evolution (Bronze/Silver/Gold/Divine tiers).
 Flavor text floating notifications.
 Omen system pre-battle warnings.
-Status effect and ability system (implemented in Unity, not ported).
-Prestige/meta-progression (Echo/Arete mechanics).
+Number formatting utility (NumberFormatter equivalent).
+Prestige/meta-progression system (Echo/Arete mechanics).
 
 ---
 

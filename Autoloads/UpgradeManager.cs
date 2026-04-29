@@ -14,7 +14,8 @@ public partial class UpgradeManager : Node
 
     private void LoadConfigs()
     {
-        UpgradeConfigs = ResourceScanner.LoadAll<UpgradeConfig>("res://Resources/Upgrades/");
+        var db = GD.Load<UpgradesDatabase>("res://Resources/Upgrades/upgrade_database.tres");
+        UpgradeConfigs = (Array)db.Upgrades;
         SortByTierAndCost();
     }
 

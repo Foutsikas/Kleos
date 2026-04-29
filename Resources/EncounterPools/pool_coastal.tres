@@ -3,12 +3,12 @@
 [ext_resource type="Script" uid="uid://s7fl6a0p44k6" path="res://Resources/EncounterPool.cs" id="ext_1"]
 [ext_resource type="Script" uid="uid://ckh8qm7xv6xp" path="res://Resources/EncounterPoolEntry.cs" id="ext_2"]
 [ext_resource type="Resource" uid="uid://cn74iskpwyt6w" path="res://Resources/Dungeons/coastal.tres" id="ext_3"]
-[ext_resource type="Resource" path="res://Resources/Enemies/3. Coastal/1.shore_crab.tres" id="ext_4"]
-[ext_resource type="Resource" path="res://Resources/Enemies/3. Coastal/2.reef_serpent.tres" id="ext_5"]
-[ext_resource type="Resource" path="res://Resources/Enemies/3. Coastal/3.drowned_sailor.tres" id="ext_6"]
-[ext_resource type="Resource" path="res://Resources/Enemies/3. Coastal/5.siren_thrall.tres" id="ext_7"]
-[ext_resource type="Resource" path="res://Resources/Enemies/3. Coastal/6.sea_hag.tres" id="ext_8"]
-[ext_resource type="Resource" path="res://Resources/Enemies/3. Coastal/8.scylla_spawn.tres" id="ext_9"]
+[ext_resource type="Resource" uid="uid://dq8hsv1rllbqh" path="res://Resources/Enemies/3. Coastal/1.shore_crab.tres" id="ext_4"]
+[ext_resource type="Resource" uid="uid://dfanhk3olxkw4" path="res://Resources/Enemies/3. Coastal/2.reef_serpent.tres" id="ext_5"]
+[ext_resource type="Resource" uid="uid://00bfctl7bbs6" path="res://Resources/Enemies/3. Coastal/3.drowned_sailor.tres" id="ext_6"]
+[ext_resource type="Resource" uid="uid://bq8081nfmxoo2" path="res://Resources/Enemies/3. Coastal/5.siren_thrall.tres" id="ext_7"]
+[ext_resource type="Resource" uid="uid://dlam6qusc2c4a" path="res://Resources/Enemies/3. Coastal/6.sea_hag.tres" id="ext_8"]
+[ext_resource type="Resource" uid="uid://c7nko30n1lce0" path="res://Resources/Enemies/3. Coastal/8.scylla_spawn.tres" id="ext_9"]
 
 [sub_resource type="Resource" id="Resource_00000"]
 script = ExtResource("ext_2")

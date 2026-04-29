@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="DungeonDatabase" format=3 uid="uid://bakoprwwkpe74"]
+
+[ext_resource type="Script" uid="uid://ccj4wwkg6mwva" path="res://Resources/DungeonData.cs" id="1_3gse7"]
+[ext_resource type="Resource" uid="uid://b0e3xnavstfvg" path="res://Resources/Dungeons/forest.tres" id="2_036el"]
+[ext_resource type="Script" uid="uid://b5qdohs82bwhg" path="res://Resources/Dungeons/DungeonDatabase.cs" id="2_aw28w"]
+[ext_resource type="Resource" uid="uid://uvn2ukrw5gsb" path="res://Resources/Dungeons/brigands.tres" id="3_h138p"]
+[ext_resource type="Resource" uid="uid://cn74iskpwyt6w" path="res://Resources/Dungeons/coastal.tres" id="4_mpfgh"]
+
+[resource]
+script = ExtResource("2_aw28w")
+Dungeons = Array[ExtResource("1_3gse7")]([ExtResource("2_036el"), ExtResource("3_h138p"), ExtResource("4_mpfgh")])
+metadata/_custom_type_script = "uid://b5qdohs82bwhg"

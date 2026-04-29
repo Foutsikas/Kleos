@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="EncounterPoolDatabase" format=3 uid="uid://cnk3pw8wxbxn5"]
+
+[ext_resource type="Script" uid="uid://s7fl6a0p44k6" path="res://Resources/EncounterPool.cs" id="1_ceyxd"]
+[ext_resource type="Script" uid="uid://k24yh7velva8" path="res://Resources/EncounterPools/EncounterPoolDatabase.cs" id="2_luban"]
+[ext_resource type="Resource" uid="uid://dl5qx7561221f" path="res://Resources/EncounterPools/pool_forest.tres" id="2_yrq8s"]
+[ext_resource type="Resource" uid="uid://bw2hhalmgq8de" path="res://Resources/EncounterPools/pool_brigands.tres" id="3_21qqy"]
+[ext_resource type="Resource" uid="uid://b6l5qdm852qif" path="res://Resources/EncounterPools/pool_coastal.tres" id="4_di8to"]
+
+[resource]
+script = ExtResource("2_luban")
+Pools = Array[ExtResource("1_ceyxd")]([ExtResource("2_yrq8s"), ExtResource("3_21qqy"), ExtResource("4_di8to")])
+metadata/_custom_type_script = "uid://k24yh7velva8"

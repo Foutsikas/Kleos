@@ -14,7 +14,15 @@ public partial class DungeonManager : Node
 
     private void LoadConfigs()
     {
-        DungeonConfigs = ResourceScanner.LoadAll<DungeonData>("res://Resources/Dungeons/");
+        var db = GD.Load<DungeonDatabase>("res://Resources/Dungeons/dungeon_database.tres");
+
+        if (db == null)
+        {
+            GD.PrintErr("Dungeon DB failed to load");
+            return;
+        }
+
+        DungeonConfigs = (Array)db.Dungeons;
         SortByProgression();
     }
 

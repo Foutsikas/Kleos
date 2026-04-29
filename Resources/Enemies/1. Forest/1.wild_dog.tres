@@ -1,11 +1,13 @@
 [gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://dhy6iyri13k12"]
 
 [ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_38awp"]
+[ext_resource type="Texture2D" uid="uid://biu7vcyr7pm5t" path="res://Sprites/Wild Dog.png" id="1_epafp"]
 
 [resource]
 script = ExtResource("1_38awp")
 EnemyName = "Wild Dog"
 EnemyId = "wild_dog"
+EnemySprite = ExtResource("1_epafp")
 Health = 135.0
 DamagePerSecond = 4.0
 KleosReward = 5

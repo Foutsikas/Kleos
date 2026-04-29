@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ArtisanDatabase" format=3 uid="uid://ccj4y1g6vkp2f"]
+
+[ext_resource type="Script" uid="uid://m8ou3y8lx4kt" path="res://Resources/ArtisanData.cs" id="1_x1tui"]
+[ext_resource type="Resource" uid="uid://bjsb3m2cr3mxi" path="res://Resources/Artisans/bard.tres" id="2_kor7s"]
+[ext_resource type="Script" uid="uid://le6fvngapj6b" path="res://Resources/Artisans/ArtisanDatabase.cs" id="2_us2rv"]
+[ext_resource type="Resource" uid="uid://bxbmlqyq254nu" path="res://Resources/Artisans/potter.tres" id="3_iaksh"]
+[ext_resource type="Resource" uid="uid://bb6hqi2usqndr" path="res://Resources/Artisans/scribe.tres" id="4_tv7gq"]
+[ext_resource type="Resource" uid="uid://bsqapc5yhe2k3" path="res://Resources/Artisans/sculptor.tres" id="5_uxwnb"]
+[ext_resource type="Resource" uid="uid://c7d4yb02i0lt0" path="res://Resources/Artisans/historian.tres" id="6_2ohy8"]
+[ext_resource type="Resource" uid="uid://dl7h04u2lgsml" path="res://Resources/Artisans/playwright.tres" id="7_kt2k5"]
+
+[resource]
+script = ExtResource("2_us2rv")
+Artisans = Array[ExtResource("1_x1tui")]([ExtResource("4_tv7gq"), ExtResource("2_kor7s"), ExtResource("3_iaksh"), ExtResource("5_uxwnb"), ExtResource("7_kt2k5"), ExtResource("6_2ohy8")])
+metadata/_custom_type_script = "uid://le6fvngapj6b"

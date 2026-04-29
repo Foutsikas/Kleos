@@ -1,7 +1,7 @@
 # Kleos Architecture Reference -- Godot Edition
-# KAR_Godot -- Updated April 27, 2026
+# KAR_Godot -- Updated April 29, 2026
 # Engine: Godot 4.6.2 .NET (C#)
-# Status: Port in progress -- core systems, UI, and battle system complete
+# Status: Core gameplay complete -- battle system, three dungeons, DevConsole
 
 ---
 
@@ -42,6 +42,7 @@ res://
     BattleSystem.cs
     BattleContext.cs             (plain C# class, not an Autoload)
     DungeonRewardCalculator.cs   (static utility, not an Autoload)
+    DevConsole.cs
     ResourceScanner.cs           (static utility, not an Autoload)
   Resources/
     ArtisanData.cs
@@ -72,8 +73,32 @@ res://
         5.large_wolf_pack.tres
         6.nemean_lion_cub.tres
         7.nemean_lion.tres
+      2. Brigands/
+        1.road_thief.tres
+        2.bandit_lookout.tres
+        3.outlaw_peltast.tres
+        4.bandit_hoplite.tres
+        5.rogue_mercenary.tres
+        6.outlaw_peltast_band.tres
+        7.bandit_champion.tres
+        8.war_hounds.tres
+        9.pine_bender.tres
+        10.archilestes.tres
+      3. Coastal/
+        1.shore_crab.tres
+        2.reef_serpent.tres
+        3.drowned_sailor.tres
+        4.reef_serpent_pair.tres
+        5.siren_thrall.tres
+        6.sea_hag.tres
+        7.coastal_chimera.tres
+        8.scylla_spawn.tres
+        9.charybdis_maw.tres
+        10.siren_queen.tres
     Dungeons/
       forest.tres
+      brigands.tres
+      coastal.tres
     Upgrades/
       1_01_scribes_quill.tres
       1_02_bronze_training.tres
@@ -81,6 +106,8 @@ res://
       3_07_coastal_plunder.tres
     EncounterPools/
       pool_forest.tres
+      pool_brigands.tres
+      pool_coastal.tres
     BattleText/
       battle_text_library.tres
   Scenes/
@@ -117,6 +144,7 @@ their _Ready() methods.
   7. DungeonManager
   8. RandomEncounterManager
   9. BattleSystem
+  10. DevConsole
 
 Each uses a static Instance property with a guard in _Ready() that
 calls QueueFree() if Instance is already set. This prevents duplicate
@@ -125,13 +153,18 @@ instantiation if the autoload node somehow appears twice.
 BattleSystem must come after RandomEncounterManager because it
 subscribes to the EncounterTriggered signal in _Ready().
 
+DevConsole is a CanvasLayer with Layer 100, so it renders above all
+game UI. It has no dependencies on init order beyond needing all
+managers to exist.
+
 ---
 
 ## ResourceScanner (Static Utility)
 
 Purpose: Shared directory scanner for loading all Resource files of a
-given type from a folder. Used by ArtisanManager, DungeonManager, and
-UpgradeManager to eliminate hardcoded resource paths.
+given type from a folder. Used by ArtisanManager, DungeonManager,
+UpgradeManager, and RandomEncounterManager to eliminate hardcoded
+resource paths.
 
 File: res://Autoloads/ResourceScanner.cs (static class, not an Autoload)
 
@@ -345,7 +378,18 @@ Key methods:
   GetNextLayer(string dungeonId) -- highest cleared + 1
   CanAccessLayer(string dungeonId, int layerIndex) -- sequential enforcement
   GetDungeonById(string dungeonId) -- returns DungeonData by ID
+  GetLayer(string dungeonId, int index) -- returns DungeonLayer with null check
   OnLayerCleared(string dungeonId, int layerIndex) -- updates progress
+  ForceCompleteDungeon(string dungeonId) -- DEV API, sets progress to
+    final layer, emits DungeonCompleted then LayerCleared
+
+Signal ordering in OnLayerCleared():
+  1. Update dungeonProgress dictionary
+  2. CheckDungeonCompletion() -- sets completed flag, emits DungeonCompleted
+  3. Emit LayerCleared signal
+  This order ensures the completed flag is set BEFORE any UI responds
+  to LayerCleared. Fixed April 2026 (was previously emitting LayerCleared
+  before checking completion, causing UI desync).
 
 Progress validation:
   Players must complete layers sequentially. Cannot skip ahead.
@@ -369,7 +413,10 @@ State:
   activePools (list, rebuilt when dirty flag is set)
 
 Config loading:
-  Encounter pools loaded via GD.Load from res://Resources/EncounterPools/.
+  Uses ResourceScanner.LoadAll<EncounterPool>("res://Resources/EncounterPools/").
+  Fixed April 2026 -- was previously hardcoded to only load pool_forest.tres
+  via GD.Load(). Now uses ResourceScanner so all pool .tres files in the
+  directory are loaded automatically.
 
 Key methods:
   OnDeedClicked() -- increments counter, checks threshold
@@ -421,7 +468,8 @@ Timing constants:
   All divided by speedMultiplier.
 
 Key methods:
-  StartDungeonBattle(DungeonData, int layerIndex)
+  StartDungeonBattle(DungeonData, int layerIndex) -- null check on
+    GetLayer instead of bounds check after call (fixed April 2026)
   StartRandomEncounterBattle(EnemyData, string poolName)
   SetSpeedMultiplier(float)
   GetCurrentSpeedMultiplier() -- returns current speed
@@ -513,6 +561,50 @@ Fields:
 Fields:
   FinalReward (int), BaseReward (int),
   LuckMultiplier (int), WasLucky (bool)
+
+---
+
+### DevConsole
+
+CanvasLayer autoload (position 10). Developer tool for testing.
+Builds its entire UI in code -- no .tscn file needed.
+
+File: res://Autoloads/DevConsole.cs
+
+Layer: 100 (renders above all game UI).
+Toggle: backtick (`) key via _UnhandledKeyInput().
+Command history: up/down arrow keys.
+
+UI structure (built in _Ready()):
+  PanelContainer (dark background, top of screen, 160px tall)
+    VBoxContainer
+      Label ("DEV CONSOLE" title)
+      Label (output display, autowrap)
+      LineEdit (command input, TextSubmitted signal)
+
+Command processing:
+  OnCommandSubmitted() adds to history, calls ExecuteCommand().
+  ExecuteCommand() lowercases entire input, splits on spaces,
+  dispatches by first token.
+
+Commands:
+  help -- lists all commands
+  kleos <amount> -- calls KleosManager.AddKleos()
+  level <target> -- grants XP to reach target level (single large grant)
+  stat <str/end/cun/fav> <n> -- calls HeroManager.UpgradeStat() N times,
+    tracks actual applied count vs requested
+  clear <dungeonId> -- calls DungeonManager.ForceCompleteDungeon()
+  layer <dungeonId> <count> -- calls OnLayerCleared() for next N layers
+  hp <amount> -- RestoreFullHP then TakeDamage to set exact value
+  pools -- prints active pool info
+  save -- builds SaveData from all managers, calls SaveManager.Save()
+  load -- calls SaveManager.Load(), distributes to all managers
+  reset -- calls SaveManager.ResetAllSaveData()
+  status -- displays kleos, KpS, hero level, HP, damage, dodge, crit
+
+Known limitation: ExecuteCommand lowercases entire input including
+arguments. Currently safe because all dungeon IDs are lowercase.
+Would need adjustment if mixed-case IDs are added later.
 
 ---
 
@@ -906,11 +998,18 @@ Completed state:
 
 Signal subscriptions:
   DungeonManager.LayerCleared -- refreshes display for this dungeon.
+  DungeonManager.DungeonCompleted -- refreshes when this dungeon completes
+    OR when the completed dungeon is this row's RequiredDungeon
+    (so downstream dungeons unlock immediately).
   KleosManager.KleosChanged -- refreshes if dungeon has kleos requirement.
 
 OnActionPressed() calls BattleSystem.Instance.StartDungeonBattle()
 with the dungeon data and next layer index. Guards against battles
-already in progress and completed dungeons.
+already in progress and completed dungeons. Uses IsDungeonCompleted()
+check instead of bounds comparison. Progress display clamped with
+Mathf.Min() to prevent exceeding total layers.
+
+_ExitTree() unsubscribes from all signals with -= operators.
 
 PopulateDungeonList() in MainGameController spawns one row per dungeon.
 
@@ -949,15 +1048,22 @@ Individual Locked:
   reason (hero level, prerequisite upgrade, artisan count). Button
   disabled, text "Locked".
 
-Lock checks mirror UpgradeManager logic:
+Lock checks:
   IsTierUnlocked() checks RequiredDungeon completion.
-  IsIndividualLockMet() checks hero level, prerequisite upgrade,
-    and artisan count.
+  TryGetIndividualLockReason() checks hero level, prerequisite upgrade,
+    and artisan count. Returns lock reason string if locked.
+  Dead GetIndividualLockReason() method removed (April 2026 cleanup).
 
 Signal subscriptions:
   KleosManager.KleosChanged -- refreshes affordability.
   UpgradeManager.UpgradePurchased -- refreshes all rows (prerequisite
     checks may have changed).
+  DungeonManager.DungeonCompleted -- refreshes tier-gated rows when
+    their RequiredDungeon is completed (added April 2026).
+
+_ExitTree() unsubscribes from all signals with -= operators.
+Fixed April 2026: was previously using += instead of -= for
+DungeonCompleted, causing a memory leak on scene reload.
 
 OnBuyPressed() calls UpgradeManager.PurchaseUpgrade() then
 ArtisanManager.RecalculateTotalProduction() to apply production
@@ -1055,6 +1161,9 @@ DungeonManager.LayerCleared:
 
 DungeonManager.DungeonCompleted:
   RandomEncounterManager.OnDungeonCompleted (marks pools dirty)
+  DungeonRow.OnDungeonCompleted (per row, refreshes self and
+    rows whose RequiredDungeon matches)
+  UpgradeRow.OnDungeonCompleted (per row, refreshes tier gate)
 
 HeroManager.StatsChanged:
   MainGameController.RefreshHeroDisplay
@@ -1089,6 +1198,12 @@ Signals vs Unity Events:
   from the delegate name minus "EventHandler". Emitted via EmitSignal().
   Connected via += operator on the signal property. Disconnected via -=.
 
+C# Events for non-Variant types:
+  BattleSystem uses plain C# events (Action<T>) instead of Godot signals
+  because BattleContext, BattleLogEntry, and BattleResult are plain C#
+  classes that are not Variant-compatible. Godot signals can only carry
+  Variant types. C# events work for C#-to-C# communication.
+
 Resource vs ScriptableObject:
   Godot Resource classes replace Unity ScriptableObjects. Saved as .tres
   files. Created in editor via right-click > New Resource. Referenced by
@@ -1117,18 +1232,60 @@ Directory-based resource loading:
   folder. Each manager applies its own sort after scanning to guarantee
   correct display order.
 
+Signal ordering:
+  When state must be set before UI responds to a signal, run the state
+  update before emitting the signal. Example: DungeonManager runs
+  CheckDungeonCompletion() before emitting LayerCleared. This prevents
+  UI from reading stale state during signal handlers.
+
+Autoload registration:
+  Build the C# project before registering new autoloads in Project
+  Settings. If you add the autoload entry before building, Godot
+  generates a UID for a script that does not exist yet, and the UID
+  becomes permanently invalid.
+
+Control vs PanelContainer for overlays:
+  BattlePanel uses Control (not PanelContainer) as its root node.
+  PanelContainer enforces layout constraints on children that prevent
+  anchor-based positioning. Control with Full Rect anchors allows free
+  child positioning.
+
+---
+
+## Bug Fixes Applied (April 2026)
+
+1. RandomEncounterManager.LoadConfigs() -- changed from hardcoded
+   forest pool path to ResourceScanner.LoadAll<EncounterPool>().
+2. main_game.tscn -- HeroPortrait export fixed (was pointing to
+   EnemySection/EnemyPortrait).
+3. DungeonRow.OnDungeonCompleted -- also refreshes when completed
+   dungeon is this row's RequiredDungeon.
+4. UpgradeRow -- added DungeonCompleted subscription for tier-gate
+   refresh.
+5. UpgradeRow._ExitTree() -- fixed += to -= for DungeonCompleted
+   (was causing memory leak on scene reload).
+6. DungeonManager.OnLayerCleared -- CheckDungeonCompletion runs
+   BEFORE LayerCleared signal emission (was causing UI desync).
+7. BattleSystem.StartDungeonBattle -- null check on GetLayer
+   instead of bounds check after call.
+8. battle_text_library.tres -- filled 5 empty EnemyAttackLines.
+9. UpgradeRow -- removed dead GetIndividualLockReason() method,
+   cleaned ShowIndividualLocked.
+10. DungeonRow cleared count -- clamped with Mathf.Min() to
+    prevent exceeding totalLayers.
+11. DungeonRow.OnActionPressed -- uses IsDungeonCompleted() check
+    instead of bounds comparison.
+
 ---
 
 ## What Is Not Yet Implemented
 
-Brigands Pass and Coastal Caves .tres data files
+Status effect and ability system (implemented in Unity, not ported)
 Deed button visual evolution (tier-based appearance changes)
 Flavor text floating notifications
 Omen system
-Object pooling for flavor text
 Number formatting utility (NumberFormatter equivalent)
-Status effect and ability system (implemented in Unity, not ported)
-Prestige/meta-progression (Echo/Arete mechanics)
+Prestige/meta-progression system (Echo/Arete mechanics)
 
 ---
 

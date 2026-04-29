@@ -15,7 +15,15 @@ public partial class ArtisanManager : Node
 
     private void LoadConfigs()
     {
-        ArtisanConfigs = ResourceScanner.LoadAll<ArtisanData>("res://Resources/Artisans/");
+        var db = GD.Load<ArtisanDatabase>("res://Resources/Artisans/artisan_database.tres");
+
+        if (db == null)
+        {
+            GD.PrintErr("Artisan DB failed to load");
+            return;
+        }
+
+        ArtisanConfigs = (Array)db.Artisans;
         SortByUnlockOrder();
     }
 
