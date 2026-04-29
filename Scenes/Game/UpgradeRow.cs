@@ -146,7 +146,6 @@ public partial class UpgradeRow : PanelContainer
 	{
 		Modulate = IndividualLockedModulate;
 
-		string lockReason = GetIndividualLockReason();
 		SetLockReason(reason);
 
 		if (UpgradeBuyButton != null)
@@ -214,37 +213,6 @@ public partial class UpgradeRow : PanelContainer
 
 		reason = null;
 		return false;
-	}
-
-	private string GetIndividualLockReason()
-	{
-		if (upgradeConfig.RequiredHeroLevel > 0 &&
-			HeroManager.Instance.GetLevel() < upgradeConfig.RequiredHeroLevel)
-		{
-			return $"Requires Hero Level {upgradeConfig.RequiredHeroLevel}";
-		}
-
-		if (!string.IsNullOrEmpty(upgradeConfig.RequiredUpgradeId) &&
-			!UpgradeManager.Instance.IsUpgradePurchased(upgradeConfig.RequiredUpgradeId))
-		{
-			return $"Requires {upgradeConfig.RequiredUpgradeId}";
-		}
-
-		if (!string.IsNullOrEmpty(upgradeConfig.RequiredArtisanId) &&
-			upgradeConfig.RequiredArtisanCount > 0)
-		{
-			int owned = ArtisanManager.Instance.GetOwnedCount(upgradeConfig.RequiredArtisanId);
-			if (owned < upgradeConfig.RequiredArtisanCount)
-			{
-				var artisan = ArtisanManager.Instance.GetArtisanById(upgradeConfig.RequiredArtisanId);
-				string name = artisan != null ? artisan.ArtisanName : upgradeConfig.RequiredArtisanId;
-
-				string suffix = upgradeConfig.RequiredArtisanCount == 1 ? "" : "s";
-				return $"Requires {upgradeConfig.RequiredArtisanCount} {name}{suffix}";
-			}
-		}
-
-		return "Locked";
 	}
 
 	// --- Handlers ---
