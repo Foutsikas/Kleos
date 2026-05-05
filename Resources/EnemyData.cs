@@ -15,6 +15,9 @@ public partial class EnemyData : Resource
     [Export] public float AttackRate { get; set; } = 1.5f;
     [Export] public int KleosReward { get; set; } = 0;
 
+    [ExportGroup("Abilities")]
+    [Export] public Array<CombatAbility> Abilities { get; set; } = new();
+
     [ExportGroup("Flavor")]
     [Export] public Array<string> EncounterFlavorTexts { get; set; } = new();
 

@@ -121,6 +121,7 @@ public partial class BattlePanel : Control
 	private List<string> logLineHistory = new List<string>();
 	private List<Color> logColorHistory = new List<Color>();
 	private List<bool> logIsHeroAction = new List<bool>();
+	private List<bool> logCenterAlign = new List<bool>();
 	private int currentSpeedIndex = 0;
 	private float[] speedMultipliers = { 1.0f, 2.0f, 4.0f };
 	private BattleResult storedResult;
@@ -182,6 +183,7 @@ public partial class BattlePanel : Control
 		logLineHistory.Clear();
 		logColorHistory.Clear();
 		logIsHeroAction.Clear();
+		logCenterAlign.Clear();
 		storedResult = null;
 		isCombatActive = true;
 		currentSpeedIndex = 0;
@@ -347,6 +349,27 @@ public partial class BattlePanel : Control
 	{
 		fullBattleLog.Add(entry);
 
+		// Ability override: display pre-formatted text and skip normal formatting
+		if (!string.IsNullOrEmpty(entry.RichTextOverride))
+		{
+			// Update HP display (ability may have dealt damage)
+			TweenHPBar(EnemyHPBar, entry.TargetCurrentHP);
+			if (EnemyHPText != null)
+				EnemyHPText.Text = $"{entry.TargetCurrentHP:F0} / {entry.TargetMaxHP:F0}";
+
+			if (entry.AlignCenter)
+			{
+				// Ability name lines and status messages: centered, use ability color
+				PushLogLineCentered(entry.RichTextOverride, new Color("9A7ABF"));
+			}
+			else
+			{
+				// Cast flavor text: hero-aligned
+				PushLogLine(entry.RichTextOverride, HeroActionColor, true);
+			}
+			return;
+		}
+
 		// Update enemy HP with tween
 		TweenHPBar(EnemyHPBar, entry.TargetCurrentHP);
 
@@ -387,6 +410,25 @@ public partial class BattlePanel : Control
 	private void OnEnemyAttack(BattleLogEntry entry)
 	{
 		fullBattleLog.Add(entry);
+
+		// Ability override: display pre-formatted text and skip normal formatting
+		if (!string.IsNullOrEmpty(entry.RichTextOverride))
+		{
+			// Update HP display
+			TweenHPBar(HeroHPBar, entry.TargetCurrentHP);
+			if (HeroHPText != null)
+				HeroHPText.Text = $"{entry.TargetCurrentHP:F0} / {entry.TargetMaxHP:F0}";
+
+			if (entry.AlignCenter)
+			{
+				PushLogLineCentered(entry.RichTextOverride, new Color("9A7ABF"));
+			}
+			else
+			{
+				PushLogLine(entry.RichTextOverride, EnemyActionColor, false);
+			}
+			return;
+		}
 
 		if (entry.IsDodge)
 		{
@@ -512,6 +554,7 @@ public partial class BattlePanel : Control
 		logLineHistory.Add(text);
 		logColorHistory.Add(color);
 		logIsHeroAction.Add(isHeroAction);
+		logCenterAlign.Add(false);
 
 		// Display the most recent 4 lines
 		Label[] lines = { LogLine4, LogLine3, LogLine2, LogLine1 };
@@ -532,7 +575,9 @@ public partial class BattlePanel : Control
 				float targetAlpha = LogAlpha[i];
 
 				// Alignment
-				if (historyIndex < logIsHeroAction.Count && !logIsHeroAction[historyIndex])
+				if (historyIndex < logCenterAlign.Count && logCenterAlign[historyIndex])
+					lines[i].HorizontalAlignment = HorizontalAlignment.Center;
+				else if (historyIndex < logIsHeroAction.Count && !logIsHeroAction[historyIndex])
 					lines[i].HorizontalAlignment = HorizontalAlignment.Right;
 				else
 					lines[i].HorizontalAlignment = HorizontalAlignment.Left;
@@ -545,6 +590,55 @@ public partial class BattlePanel : Control
 					var tween = CreateTween();
 					tween.TweenProperty(lines[i], "modulate:a",
 						targetAlpha, 0.15f);
+				}
+				else
+				{
+					lines[i].Modulate = new Color(c.R, c.G, c.B, targetAlpha);
+				}
+			}
+			else
+			{
+				lines[i].Text = "";
+				lines[i].Modulate = new Color(1, 1, 1, 0);
+			}
+		}
+	}
+
+	private void PushLogLineCentered(string text, Color color)
+	{
+		logLineHistory.Add(text);
+		logColorHistory.Add(color);
+		logIsHeroAction.Add(true);
+		logCenterAlign.Add(true);
+
+		// Same display logic as PushLogLine -- copy the Label[] block
+		Label[] lines = { LogLine4, LogLine3, LogLine2, LogLine1 };
+		int historyCount = logLineHistory.Count;
+
+		for (int i = 0; i < 4; i++)
+		{
+			if (lines[i] == null) continue;
+
+			int historyIndex = historyCount - 1 - i;
+
+			if (historyIndex >= 0)
+			{
+				lines[i].Text = logLineHistory[historyIndex];
+				Color c = logColorHistory[historyIndex];
+				float targetAlpha = LogAlpha[i];
+
+				if (historyIndex < logCenterAlign.Count && logCenterAlign[historyIndex])
+					lines[i].HorizontalAlignment = HorizontalAlignment.Center;
+				else if (historyIndex < logIsHeroAction.Count && !logIsHeroAction[historyIndex])
+					lines[i].HorizontalAlignment = HorizontalAlignment.Right;
+				else
+					lines[i].HorizontalAlignment = HorizontalAlignment.Left;
+
+				if (i == 0)
+				{
+					lines[i].Modulate = new Color(c.R, c.G, c.B, 0);
+					var tween = CreateTween();
+					tween.TweenProperty(lines[i], "modulate:a", targetAlpha, 0.15f);
 				}
 				else
 				{
@@ -736,7 +830,9 @@ public partial class BattlePanel : Control
 			label.AutowrapMode = TextServer.AutowrapMode.WordSmart;
 			label.AddThemeFontSizeOverride("font_size", 13);
 
-			if (i < logIsHeroAction.Count && !logIsHeroAction[i])
+			if (i < logCenterAlign.Count && logCenterAlign[i])
+				label.HorizontalAlignment = HorizontalAlignment.Center;
+			else if (i < logIsHeroAction.Count && !logIsHeroAction[i])
 				label.HorizontalAlignment = HorizontalAlignment.Right;
 			else
 				label.HorizontalAlignment = HorizontalAlignment.Left;

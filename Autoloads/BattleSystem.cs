@@ -24,6 +24,8 @@ public partial class BattleSystem : Node
     private bool isBattleActive;
     private StatusEffectManager heroEffects;
     private StatusEffectManager enemyEffects;
+    private AbilityResolver heroAbilityResolver;
+    private AbilityResolver enemyAbilityResolver;
 
     // --- Battle Stats (tracked for result screen) ---
 
@@ -187,6 +189,10 @@ public partial class BattleSystem : Node
         {
             enemyCurrentHP = Mathf.Min(enemyCurrentHP + heal, enemyMaxHP);
         };
+
+        // Ability Resolvers
+        heroAbilityResolver = new AbilityResolver();
+        enemyAbilityResolver = new AbilityResolver();
     }
 
     private async System.Threading.Tasks.Task RunCombatAsync()
@@ -223,7 +229,11 @@ public partial class BattleSystem : Node
                 return;
             }
 
-            // Hero turn: stun check
+            // Advance ability cooldowns
+            heroAbilityResolver.AdvanceRound();
+            enemyAbilityResolver.AdvanceRound();
+
+            // Hero turn
             if (heroEffects.IsStunned())
             {
                 var stunEntry = new BattleLogEntry
@@ -240,10 +250,32 @@ public partial class BattleSystem : Node
                 GD.Print("  Hero is stunned and cannot act!");
                 HeroAttackOccurred?.Invoke(stunEntry);
             }
-            else //Hero attacks
+            else
             {
-                var heroEntry = ExecuteHeroAttack();
-                HeroAttackOccurred?.Invoke(heroEntry);
+                // Resolve hero ability (no hero abilities yet in Phase 2,
+                // but the plumbing is ready for Phase 4)
+                float heroHPPercent = HeroManager.Instance.GetCurrentHP()
+                    / HeroManager.Instance.GetMaxHP();
+                float enemyHPPercent = enemyCurrentHP / enemyMaxHP;
+
+                CombatAbility heroAbility = heroAbilityResolver.ResolveAbility(
+                    null, heroHPPercent, enemyHPPercent,
+                    heroEffects, enemyEffects);
+
+                if (heroAbility != null)
+                {
+                    ExecuteAbility(heroAbility, true);
+                    if (!heroAbility.ReplacesAttack)
+                    {
+                        var heroEntry = ExecuteHeroAttack();
+                        HeroAttackOccurred?.Invoke(heroEntry);
+                    }
+                }
+                else
+                {
+                    var heroEntry = ExecuteHeroAttack();
+                    HeroAttackOccurred?.Invoke(heroEntry);
+                }
             }
 
             // Check if enemy is dead
@@ -265,7 +297,7 @@ public partial class BattleSystem : Node
 
             if (!isBattleActive) return;
 
-            // Enemy turn: stun check
+            // Enemy turn
             if (enemyEffects.IsStunned())
             {
                 var stunEntry = new BattleLogEntry
@@ -284,8 +316,30 @@ public partial class BattleSystem : Node
             }
             else
             {
-                var enemyEntry = ExecuteEnemyAttack();
-                EnemyAttackOccurred?.Invoke(enemyEntry);
+                // Resolve enemy ability
+                float heroHPPercent = HeroManager.Instance.GetCurrentHP()
+                    / HeroManager.Instance.GetMaxHP();
+                float enemyHPPercent = enemyCurrentHP / enemyMaxHP;
+
+                CombatAbility enemyAbility = enemyAbilityResolver.ResolveAbility(
+                    currentContext.Enemy.Abilities,
+                    enemyHPPercent, heroHPPercent,
+                    enemyEffects, heroEffects);
+
+                if (enemyAbility != null)
+                {
+                    ExecuteAbility(enemyAbility, false);
+                    if (!enemyAbility.ReplacesAttack)
+                    {
+                        var enemyEntry = ExecuteEnemyAttack();
+                        EnemyAttackOccurred?.Invoke(enemyEntry);
+                    }
+                }
+                else
+                {
+                    var enemyEntry = ExecuteEnemyAttack();
+                    EnemyAttackOccurred?.Invoke(enemyEntry);
+                }
             }
 
             // Check if hero is dead
@@ -319,6 +373,10 @@ public partial class BattleSystem : Node
         if (enemyEffects != null) enemyEffects.ClearAll();
         heroEffects = null;
         enemyEffects = null;
+        if (heroAbilityResolver != null) heroAbilityResolver.Reset();
+        if (enemyAbilityResolver != null) enemyAbilityResolver.Reset();
+        heroAbilityResolver = null;
+        enemyAbilityResolver = null;
     }
 
     // -------------------------------------------------------------------------
@@ -454,6 +512,164 @@ public partial class BattleSystem : Node
                  $"({HeroManager.Instance.GetCurrentHP():F0}/{HeroManager.Instance.GetMaxHP():F0} HP)");
 
         return entry;
+    }
+
+    private void ExecuteAbility(CombatAbility ability, bool isHeroAbility)
+    {
+        string casterName = isHeroAbility ? "Hero" : currentContext.Enemy.EnemyName;
+
+        // Log ability name (centered, ability color)
+        string colorHex = ability.AbilityColor.ToHtml(false);
+        string abilityNameLine = $"[color=#{colorHex}]{ability.AbilityName.ToUpper()}[/color]";
+        var nameEntry = new BattleLogEntry
+        {
+            IsHeroAction = isHeroAbility,
+            Damage = 0,
+            IsCritical = false,
+            IsDodge = false,
+            ActorName = casterName,
+            TargetName = isHeroAbility ? currentContext.Enemy.EnemyName : "Hero",
+            TargetCurrentHP = isHeroAbility ? enemyCurrentHP : HeroManager.Instance.GetCurrentHP(),
+            TargetMaxHP = isHeroAbility ? enemyMaxHP : HeroManager.Instance.GetMaxHP(),
+            RichTextOverride = abilityNameLine,
+            AlignCenter = true
+        };
+        if (isHeroAbility)
+            HeroAttackOccurred?.Invoke(nameEntry);
+        else
+            EnemyAttackOccurred?.Invoke(nameEntry);
+
+        GD.Print($"  {casterName} uses {ability.AbilityName}!");
+
+        // Log cast flavor text
+        if (!string.IsNullOrEmpty(ability.CastFlavorText))
+        {
+            var flavorEntry = new BattleLogEntry
+            {
+                IsHeroAction = isHeroAbility,
+                Damage = 0,
+                IsCritical = false,
+                IsDodge = false,
+                ActorName = casterName,
+                TargetName = isHeroAbility ? currentContext.Enemy.EnemyName : "Hero",
+                TargetCurrentHP = isHeroAbility ? enemyCurrentHP : HeroManager.Instance.GetCurrentHP(),
+                TargetMaxHP = isHeroAbility ? enemyMaxHP : HeroManager.Instance.GetMaxHP(),
+                RichTextOverride = ability.CastFlavorText
+            };
+            if (isHeroAbility)
+                HeroAttackOccurred?.Invoke(flavorEntry);
+            else
+                EnemyAttackOccurred?.Invoke(flavorEntry);
+
+            GD.Print($"    \"{ability.CastFlavorText}\"");
+        }
+
+        // Process each effect
+        for (int i = 0; i < ability.Effects.Count; i++)
+        {
+            ProcessAbilityEffect(ability.Effects[i], isHeroAbility);
+        }
+    }
+
+    private void ProcessAbilityEffect(AbilityEffect effect, bool isHeroAbility)
+    {
+        // Determine caster and target managers
+        StatusEffectManager casterEffects = isHeroAbility ? heroEffects : enemyEffects;
+        StatusEffectManager targetEffects = isHeroAbility ? enemyEffects : heroEffects;
+        string casterName = isHeroAbility ? "Hero" : currentContext.Enemy.EnemyName;
+        string targetName = isHeroAbility ? currentContext.Enemy.EnemyName : "Hero";
+
+        switch (effect.EffectType)
+        {
+            case AbilityEffectType.DealDamage:
+                ApplyAbilityDamage(effect.Value, isHeroAbility);
+                break;
+
+            case AbilityEffectType.ApplyStatus:
+                ApplyStatusFromAbility(effect, targetEffects, casterName);
+                break;
+
+            case AbilityEffectType.ApplySelfStatus:
+                ApplyStatusFromAbility(effect, casterEffects, casterName);
+                break;
+
+            case AbilityEffectType.HealSelf:
+                ApplyAbilityHeal(effect.Value, isHeroAbility, toSelf: true);
+                break;
+
+            case AbilityEffectType.HealTarget:
+                ApplyAbilityHeal(effect.Value, isHeroAbility, toSelf: false);
+                break;
+
+            case AbilityEffectType.RemoveDebuff:
+                targetEffects.RemoveEffect(effect.StatusType);
+                GD.Print($"    Removed {effect.StatusType} from target.");
+                break;
+
+            case AbilityEffectType.RemoveBuff:
+                targetEffects.RemoveEffect(effect.StatusType);
+                GD.Print($"    Removed {effect.StatusType} from target.");
+                break;
+        }
+    }
+
+    private void ApplyAbilityDamage(float damage, bool isHeroAbility)
+    {
+        if (isHeroAbility)
+        {
+            // Hero ability damages enemy
+            float finalDamage = enemyEffects.AbsorbDamage(damage);
+            enemyCurrentHP -= finalDamage;
+            if (enemyCurrentHP < 0f) enemyCurrentHP = 0f;
+            GD.Print($"    Ability deals {finalDamage:F1} damage to {currentContext.Enemy.EnemyName}.");
+        }
+        else
+        {
+            // Enemy ability damages hero
+            float finalDamage = heroEffects.AbsorbDamage(damage);
+            HeroManager.Instance.TakeDamage(finalDamage);
+            GD.Print($"    Ability deals {finalDamage:F1} damage to Hero.");
+        }
+    }
+
+    private void ApplyAbilityHeal(float healValue, bool isHeroAbility, bool toSelf)
+    {
+        // Determine who gets healed
+        bool healHero = (isHeroAbility && toSelf) || (!isHeroAbility && !toSelf);
+
+        if (healHero)
+        {
+            HeroManager.Instance.RestoreHP(healValue);
+            GD.Print($"    Hero healed for {healValue:F1}.");
+        }
+        else
+        {
+            enemyCurrentHP = Mathf.Min(enemyCurrentHP + healValue, enemyMaxHP);
+            GD.Print($"    {currentContext.Enemy.EnemyName} healed for {healValue:F1}.");
+        }
+    }
+
+    private void ApplyStatusFromAbility(
+    AbilityEffect effect,
+    StatusEffectManager targetManager,
+    string sourceId)
+    {
+        var status = new StatusEffect(
+            effect.StatusType,
+            effect.StatusName,
+            effect.StatusValue,
+            effect.StatusDuration,
+            effect.StatusIsDebuff,
+            effect.StatusMode,
+            effect.StatusMaxStacks
+        );
+        status.ApplyFlavorText = effect.StatusApplyText;
+        status.TickFlavorText = effect.StatusTickText;
+        status.ExpireFlavorText = effect.StatusExpireText;
+
+        targetManager.ApplyEffect(status, sourceId);
+        GD.Print($"    Applied {effect.StatusName} ({effect.StatusValue}, " +
+                 $"{effect.StatusDuration} rounds).");
     }
 
     // -------------------------------------------------------------------------
@@ -603,6 +819,8 @@ public class BattleLogEntry
     public string TargetName { get; set; }
     public float TargetCurrentHP { get; set; }
     public float TargetMaxHP { get; set; }
+    public string RichTextOverride { get; set; } = null;
+    public bool AlignCenter { get; set; } = false;
 }
 
 public class BattleResult

@@ -202,6 +202,10 @@ public partial class DevConsole : CanvasLayer
                 HandleBuffCommand(parts);
                 return "";
 
+            case "testability":
+                HandleTestAbilityCommand(parts);
+                return "";
+
 
             default:
                 return $"Unknown command: {cmd}. Type 'help'.";
@@ -446,5 +450,57 @@ public partial class DevConsole : CanvasLayer
 
         manager.ApplyEffect(effect, "devconsole");
         outputLabel.Text = $"Applied {displayName} ({value}, {duration} rounds) to {target}.";
+    }
+
+    private void HandleTestAbilityCommand(string[] parts)
+    {
+        if (!BattleSystem.Instance.IsBattleInProgress())
+        {
+            outputLabel.Text = "No active battle.";
+            return;
+        }
+
+        // Creates a temporary test ability on the current enemy
+        // Usage: testability
+        // This adds a one-time "Test Strike" to the enemy that
+        // deals 10 damage and applies a 3-round AttackDamageDown.
+        // The enemy will use it on their next available turn.
+
+        var dmgEffect = new AbilityEffect();
+        dmgEffect.EffectType = AbilityEffectType.DealDamage;
+        dmgEffect.Target = AbilityTargetType.Enemy;
+        dmgEffect.Value = 10f;
+
+        var debuffEffect = new AbilityEffect();
+        debuffEffect.EffectType = AbilityEffectType.ApplyStatus;
+        debuffEffect.Target = AbilityTargetType.Enemy;
+        debuffEffect.StatusType = StatusEffectType.AttackDamageDown;
+        debuffEffect.StatusName = "Test Weaken";
+        debuffEffect.StatusValue = 3f;
+        debuffEffect.StatusDuration = 3;
+        debuffEffect.StatusIsDebuff = true;
+        debuffEffect.StatusMode = StatusEffectMode.Flat;
+        debuffEffect.StatusMaxStacks = 1;
+        debuffEffect.StatusApplyText = "A test weakness takes hold...";
+        debuffEffect.StatusExpireText = "The test weakness fades.";
+
+        var testAbility = new CombatAbility();
+        testAbility.AbilityId = "test_strike";
+        testAbility.AbilityName = "Test Strike";
+        testAbility.AbilityColor = new Color("9A7ABF");
+        testAbility.Trigger = AbilityTrigger.OnCooldown;
+        testAbility.ReplacesAttack = true;
+        testAbility.OneTimeUse = true;
+        testAbility.Priority = 100;
+        testAbility.UseChance = 1.0f;
+        testAbility.CastFlavorText = "The creature channels a mysterious force!";
+        testAbility.Effects = new Godot.Collections.Array<AbilityEffect>
+    {
+        dmgEffect, debuffEffect
+    };
+
+        // Add to current enemy's ability list
+        BattleSystem.Instance.GetCurrentContext().Enemy.Abilities.Add(testAbility);
+        outputLabel.Text = "Added Test Strike to enemy. It will use it next turn.";
     }
 }
