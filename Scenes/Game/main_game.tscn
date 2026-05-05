@@ -82,12 +82,16 @@ custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 theme_override_constants/separation = 20
 
+[node name="Devider" type="Control" parent="RootLayout/TopBar" unique_id=742815801]
+layout_mode = 2
+
 [node name="HeroPortrait" type="PanelContainer" parent="RootLayout/TopBar" unique_id=1794417106]
-custom_minimum_size = Vector2(100, 50)
+custom_minimum_size = Vector2(150, 100)
 layout_mode = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="RootLayout/TopBar/HeroPortrait" unique_id=1680266025]
 layout_mode = 2
+size_flags_vertical = 4
 
 [node name="HeroLevelLabel" type="Label" parent="RootLayout/TopBar/HeroPortrait/VBoxContainer" unique_id=177388205]
 layout_mode = 2
@@ -106,14 +110,22 @@ size_flags_vertical = 2
 
 [node name="KleosLabel" type="Label" parent="RootLayout/TopBar" unique_id=2089950162]
 layout_mode = 2
-size_flags_horizontal = 3
+size_flags_horizontal = 10
 text = "Kleos: 0"
+horizontal_alignment = 1
+
+[node name="Devider2" type="Control" parent="RootLayout/TopBar" unique_id=1378420201]
+custom_minimum_size = Vector2(55, 0)
+layout_mode = 2
 
 [node name="ProductionLabel" type="Label" parent="RootLayout/TopBar" unique_id=321792533]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "0.0 K/s"
 horizontal_alignment = 2
+
+[node name="Devider3" type="Control" parent="RootLayout/TopBar" unique_id=224611629]
+layout_mode = 2
 
 [node name="MainPanel" type="HBoxContainer" parent="RootLayout" unique_id=158759040]
 layout_mode = 2
@@ -379,8 +391,8 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("6_q5o1p")
 EncounterHeaderLabel = NodePath("CombatArea/EncounterHeaderLabel")
-HeroNameLabel = NodePath("CombatArea/HeroSection/HeroNameLabel")
-HeroLevelLabel = NodePath("CombatArea/HeroSection/HeroLevelLabel")
+HeroNameLabel = NodePath("CombatArea/HeroSection/HBoxContainer/HeroNameLabel")
+HeroLevelLabel = NodePath("CombatArea/HeroSection/HBoxContainer/HeroLevelLabel")
 HeroPortrait = NodePath("CombatArea/HeroSection/HeroPortrait")
 HeroHPBar = NodePath("CombatArea/HeroSection/HeroHPBar")
 HeroHPText = NodePath("CombatArea/HeroSection/HeroHPText")
@@ -448,24 +460,28 @@ anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_left = 50.0
-offset_top = -233.0
-offset_right = 190.0
-offset_bottom = -41.0
+offset_top = -680.0
+offset_right = 550.0
+offset_bottom = -80.0
 grow_vertical = 0
 
-[node name="HeroPortrait" type="TextureRect" parent="BattlePanel/CombatArea/HeroSection" unique_id=60854752]
-custom_minimum_size = Vector2(500, 500)
+[node name="HBoxContainer" type="HBoxContainer" parent="BattlePanel/CombatArea/HeroSection" unique_id=907308245]
 layout_mode = 2
-expand_mode = 1
-stretch_mode = 5
 
-[node name="HeroNameLabel" type="Label" parent="BattlePanel/CombatArea/HeroSection" unique_id=1680716772]
+[node name="HeroNameLabel" type="Label" parent="BattlePanel/CombatArea/HeroSection/HBoxContainer" unique_id=1680716772]
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 14
+text = "HeroName"
+vertical_alignment = 1
 
-[node name="HeroLevelLabel" type="Label" parent="BattlePanel/CombatArea/HeroSection" unique_id=1441675538]
+[node name="HeroLevelLabel" type="Label" parent="BattlePanel/CombatArea/HeroSection/HBoxContainer" unique_id=1441675538]
 layout_mode = 2
+size_flags_horizontal = 10
 theme_override_font_sizes/font_size = 11
+text = "Lv ?"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="HeroHPText" type="Label" parent="BattlePanel/CombatArea/HeroSection" unique_id=1489927454]
 layout_mode = 2
@@ -474,6 +490,12 @@ theme_override_font_sizes/font_size = 12
 [node name="HeroHPBar" type="ProgressBar" parent="BattlePanel/CombatArea/HeroSection" unique_id=2053773614]
 custom_minimum_size = Vector2(120, 14)
 layout_mode = 2
+
+[node name="HeroPortrait" type="TextureRect" parent="BattlePanel/CombatArea/HeroSection" unique_id=60854752]
+custom_minimum_size = Vector2(500, 500)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
 
 [node name="EnemySection" type="VBoxContainer" parent="BattlePanel/CombatArea" unique_id=374851710]
 custom_minimum_size = Vector2(140, 180)

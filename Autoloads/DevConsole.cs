@@ -162,7 +162,8 @@ public partial class DevConsole : CanvasLayer
                        "  hp <amount> -- Set hero HP\n" +
                        "  pools -- Show active encounter pools\n" +
                        "  save / load / reset -- Save system\n" +
-                       "  status -- Show game state";
+                       "  status -- Show game state\n" +
+                       " ";
 
             case "kleos":
                 return CmdKleos(parts);
@@ -196,6 +197,11 @@ public partial class DevConsole : CanvasLayer
 
             case "status":
                 return CmdStatus();
+
+            case "buff":
+                HandleBuffCommand(parts);
+                return "";
+
 
             default:
                 return $"Unknown command: {cmd}. Type 'help'.";
@@ -365,5 +371,80 @@ public partial class DevConsole : CanvasLayer
                $"DMG: {HeroManager.Instance.GetDamage():F1} | " +
                $"Dodge: {HeroManager.Instance.GetDodgeChance() * 100:F1}% | " +
                $"Crit: {HeroManager.Instance.GetCritChance() * 100:F1}%";
+    }
+
+    private void HandleBuffCommand(string[] parts)
+    {
+        if (parts.Length < 5)
+        {
+            outputLabel.Text = "Usage: buff <hero|enemy> <type> <value> <duration>\n" +
+                "Types: attackup, attackdown, dodgeup, dodgedown, critup, critimmune, stun";
+            return;
+        }
+
+        if (!BattleSystem.Instance.IsBattleInProgress())
+        {
+            outputLabel.Text = "No active battle.";
+            return;
+        }
+
+        string target = parts[1];
+        string typeName = parts[2];
+
+        if (!float.TryParse(parts[3], out float value))
+        {
+            outputLabel.Text = "Invalid value.";
+            return;
+        }
+        if (!int.TryParse(parts[4], out int duration))
+        {
+            outputLabel.Text = "Invalid duration.";
+            return;
+        }
+
+        StatusEffectType? effectType = typeName switch
+        {
+            "attackup" => StatusEffectType.AttackDamageUp,
+            "attackdown" => StatusEffectType.AttackDamageDown,
+            "dodgeup" => StatusEffectType.DodgeUp,
+            "dodgedown" => StatusEffectType.DodgeDown,
+            "critup" => StatusEffectType.CritChanceUp,
+            "critimmune" => StatusEffectType.CritImmunity,
+            "stun" => StatusEffectType.Stun,
+            _ => null
+        };
+
+        if (effectType == null)
+        {
+            outputLabel.Text = $"Unknown effect type: {typeName}";
+            return;
+        }
+
+        bool isDebuff = typeName.Contains("down") || typeName == "stun";
+        string displayName = $"Debug {typeName}";
+
+        var effect = new StatusEffect(
+            effectType.Value,
+            displayName,
+            value,
+            duration,
+            isDebuff,
+            StatusEffectMode.Flat
+        );
+        effect.ApplyFlavorText = $"Debug: {displayName} applied.";
+        effect.ExpireFlavorText = $"Debug: {displayName} fades.";
+
+        StatusEffectManager manager = target == "hero"
+            ? BattleSystem.Instance.GetHeroEffects()
+            : BattleSystem.Instance.GetEnemyEffects();
+
+        if (manager == null)
+        {
+            outputLabel.Text = "Effect manager not available.";
+            return;
+        }
+
+        manager.ApplyEffect(effect, "devconsole");
+        outputLabel.Text = $"Applied {displayName} ({value}, {duration} rounds) to {target}.";
     }
 }

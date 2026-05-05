@@ -22,6 +22,8 @@ public partial class BattleSystem : Node
     private float enemyMaxHP;
     private int currentRound;
     private bool isBattleActive;
+    private StatusEffectManager heroEffects;
+    private StatusEffectManager enemyEffects;
 
     // --- Battle Stats (tracked for result screen) ---
 
@@ -132,6 +134,8 @@ public partial class BattleSystem : Node
         heroDodgesPerformed = 0;
         speedMultiplier = 1.0f;
 
+        InitializeStatusEffects();
+
         GD.Print("===========================================");
         GD.Print($"[BattleSystem] BATTLE START: {context.HeaderText}");
         GD.Print($"  Hero: HP {HeroManager.Instance.GetCurrentHP()}/{HeroManager.Instance.GetMaxHP()} | " +
@@ -156,6 +160,35 @@ public partial class BattleSystem : Node
         await RunCombatAsync();
     }
 
+    private void InitializeStatusEffects()
+    {
+        heroEffects = new StatusEffectManager();
+        enemyEffects = new StatusEffectManager();
+
+        // Hero DoT/HoT callbacks
+        heroEffects.OnDamageTaken += (dmg) =>
+        {
+            HeroManager.Instance.TakeDamage(dmg);
+        };
+
+        heroEffects.OnHealingReceived += (heal) =>
+        {
+            HeroManager.Instance.RestoreHP(heal);
+        };
+
+        // Enemy DoT/HoT callbacks
+        enemyEffects.OnDamageTaken += (dmg) =>
+        {
+            enemyCurrentHP -= dmg;
+            if (enemyCurrentHP < 0f) enemyCurrentHP = 0f;
+        };
+
+        enemyEffects.OnHealingReceived += (heal) =>
+        {
+            enemyCurrentHP = Mathf.Min(enemyCurrentHP + heal, enemyMaxHP);
+        };
+    }
+
     private async System.Threading.Tasks.Task RunCombatAsync()
     {
         while (isBattleActive)
@@ -166,9 +199,52 @@ public partial class BattleSystem : Node
             GD.Print($"  --- Round {currentRound} ---");
             RoundStarted?.Invoke(currentRound);
 
-            // Hero attacks first
-            var heroEntry = ExecuteHeroAttack();
-            HeroAttackOccurred?.Invoke(heroEntry);
+            // Process status effects at round start (DoTs, HoTs, duration ticks)
+            heroEffects.ProcessStartOfRound();
+            enemyEffects.ProcessStartOfRound();
+
+            // Check if DoT killed either combatant
+            if (enemyCurrentHP <= 0)
+            {
+                heroHPAtEnd = HeroManager.Instance.GetCurrentHP();
+                enemyHPAtEnd = 0;
+                await ToSignal(GetTree().CreateTimer(BaseFinalBlowPause / speedMultiplier), SceneTreeTimer.SignalName.Timeout);
+                if (!isBattleActive) return;
+                OnHeroVictory();
+                return;
+            }
+            if (!HeroManager.Instance.IsAlive())
+            {
+                heroHPAtEnd = 0;
+                enemyHPAtEnd = enemyCurrentHP;
+                await ToSignal(GetTree().CreateTimer(BaseFinalBlowPause / speedMultiplier), SceneTreeTimer.SignalName.Timeout);
+                if (!isBattleActive) return;
+                OnHeroDefeat();
+                return;
+            }
+
+            // Hero turn: stun check
+            if (heroEffects.IsStunned())
+            {
+                var stunEntry = new BattleLogEntry
+                {
+                    IsHeroAction = true,
+                    Damage = 0,
+                    IsCritical = false,
+                    IsDodge = false,
+                    ActorName = "Hero",
+                    TargetName = currentContext.Enemy.EnemyName,
+                    TargetCurrentHP = enemyCurrentHP,
+                    TargetMaxHP = enemyMaxHP
+                };
+                GD.Print("  Hero is stunned and cannot act!");
+                HeroAttackOccurred?.Invoke(stunEntry);
+            }
+            else //Hero attacks
+            {
+                var heroEntry = ExecuteHeroAttack();
+                HeroAttackOccurred?.Invoke(heroEntry);
+            }
 
             // Check if enemy is dead
             if (enemyCurrentHP <= 0)
@@ -189,9 +265,28 @@ public partial class BattleSystem : Node
 
             if (!isBattleActive) return;
 
-            // Enemy retaliates
-            var enemyEntry = ExecuteEnemyAttack();
-            EnemyAttackOccurred?.Invoke(enemyEntry);
+            // Enemy turn: stun check
+            if (enemyEffects.IsStunned())
+            {
+                var stunEntry = new BattleLogEntry
+                {
+                    IsHeroAction = false,
+                    Damage = 0,
+                    IsCritical = false,
+                    IsDodge = false,
+                    ActorName = currentContext.Enemy.EnemyName,
+                    TargetName = "Hero",
+                    TargetCurrentHP = HeroManager.Instance.GetCurrentHP(),
+                    TargetMaxHP = HeroManager.Instance.GetMaxHP()
+                };
+                GD.Print($"  {currentContext.Enemy.EnemyName} is stunned!");
+                EnemyAttackOccurred?.Invoke(stunEntry);
+            }
+            else
+            {
+                var enemyEntry = ExecuteEnemyAttack();
+                EnemyAttackOccurred?.Invoke(enemyEntry);
+            }
 
             // Check if hero is dead
             if (!HeroManager.Instance.IsAlive())
@@ -207,11 +302,23 @@ public partial class BattleSystem : Node
                 return;
             }
 
+            // End-of-round processing
+            heroEffects.ProcessEndOfRound();
+            enemyEffects.ProcessEndOfRound();
+
             // Delay between rounds
             await ToSignal(GetTree().CreateTimer(BaseRoundDelay / speedMultiplier), SceneTreeTimer.SignalName.Timeout);
 
             if (!isBattleActive) return;
         }
+    }
+
+    private void ClearStatusEffects()
+    {
+        if (heroEffects != null) heroEffects.ClearAll();
+        if (enemyEffects != null) enemyEffects.ClearAll();
+        heroEffects = null;
+        enemyEffects = null;
     }
 
     // -------------------------------------------------------------------------
@@ -220,20 +327,41 @@ public partial class BattleSystem : Node
 
     private BattleLogEntry ExecuteHeroAttack()
     {
+        // Base damage from hero stats
         float baseDamage = HeroManager.Instance.GetDamage();
-        bool isCrit = HeroManager.Instance.RollCrit();
 
-        float finalDamage = baseDamage;
+        // Apply status effect damage modifiers
+        float modifiedDamage = heroEffects.GetModifiedDamage(baseDamage);
+
+        // Crit check: modified chance, enemy crit immunity
+        float baseCritChance = HeroManager.Instance.GetCritChance();
+        float modifiedCritChance = heroEffects.GetModifiedCritChance(baseCritChance);
+        bool canCrit = !enemyEffects.HasCritImmunity();
+        bool isCrit = canCrit && GD.Randf() < modifiedCritChance;
+
+        float finalDamage = modifiedDamage;
         if (isCrit)
         {
             float critMultiplier = HeroManager.Instance.GetCritMultiplier();
-            finalDamage = baseDamage * critMultiplier;
+            finalDamage = modifiedDamage * critMultiplier;
             heroCritsLanded++;
         }
+
+        // Shield absorption on enemy
+        finalDamage = enemyEffects.AbsorbDamage(finalDamage);
 
         // Apply damage to enemy
         enemyCurrentHP -= finalDamage;
         if (enemyCurrentHP < 0) enemyCurrentHP = 0;
+
+        // Damage reflect: enemy reflects a portion back to hero
+        float reflectPercent = enemyEffects.GetReflectPercent();
+        if (reflectPercent > 0f)
+        {
+            float reflected = finalDamage * reflectPercent;
+            HeroManager.Instance.TakeDamage(reflected);
+            GD.Print($"  Damage reflected! {reflected:F1} returned to Hero.");
+        }
 
         // Build log entry
         var entry = new BattleLogEntry
@@ -264,8 +392,10 @@ public partial class BattleSystem : Node
 
     private BattleLogEntry ExecuteEnemyAttack()
     {
-        // Check dodge first
-        bool dodged = HeroManager.Instance.RollDodge();
+        // Dodge check with status modifiers
+        float baseDodge = HeroManager.Instance.GetDodgeChance();
+        float modifiedDodge = heroEffects.GetModifiedDodgeChance(baseDodge);
+        bool dodged = GD.Randf() < modifiedDodge;
 
         if (dodged)
         {
@@ -287,15 +417,31 @@ public partial class BattleSystem : Node
             return dodgeEntry;
         }
 
-        // Calculate enemy damage
-        float damagePerHit = currentContext.Enemy.DamagePerSecond / currentContext.Enemy.AttackRate;
+        // Enemy damage with status modifiers
+        float baseDamagePerHit = currentContext.Enemy.DamagePerSecond
+            / currentContext.Enemy.AttackRate;
+        float modifiedDamage = enemyEffects.GetModifiedDamage(baseDamagePerHit);
 
-        HeroManager.Instance.TakeDamage(damagePerHit);
+        // Shield absorption on hero
+        float finalDamage = heroEffects.AbsorbDamage(modifiedDamage);
+
+        // Apply damage through HeroManager
+        HeroManager.Instance.TakeDamage(finalDamage);
+
+        // Damage reflect: hero reflects a portion back to enemy
+        float reflectPercent = heroEffects.GetReflectPercent();
+        if (reflectPercent > 0f)
+        {
+            float reflected = finalDamage * reflectPercent;
+            enemyCurrentHP -= reflected;
+            if (enemyCurrentHP < 0f) enemyCurrentHP = 0f;
+            GD.Print($"  Attack reflected! {reflected:F1} returned to {currentContext.Enemy.EnemyName}.");
+        }
 
         var entry = new BattleLogEntry
         {
             IsHeroAction = false,
-            Damage = damagePerHit,
+            Damage = finalDamage,
             IsCritical = false,
             IsDodge = false,
             ActorName = currentContext.Enemy.EnemyName,
@@ -304,7 +450,7 @@ public partial class BattleSystem : Node
             TargetMaxHP = HeroManager.Instance.GetMaxHP()
         };
 
-        GD.Print($"  {currentContext.Enemy.EnemyName} attacks for {damagePerHit:F1} damage -> Hero " +
+        GD.Print($"  {currentContext.Enemy.EnemyName} attacks for {finalDamage:F1} damage -> Hero " +
                  $"({HeroManager.Instance.GetCurrentHP():F0}/{HeroManager.Instance.GetMaxHP():F0} HP)");
 
         return entry;
@@ -317,6 +463,8 @@ public partial class BattleSystem : Node
     private void OnHeroVictory()
     {
         isBattleActive = false;
+
+        ClearStatusEffects();
 
         // Calculate reward
         BattleRewardResult reward = DungeonRewardCalculator.CalculateReward(currentContext);
@@ -374,6 +522,8 @@ public partial class BattleSystem : Node
     {
         isBattleActive = false;
 
+        ClearStatusEffects();
+
         // Restore hero to full HP after defeat
         HeroManager.Instance.RestoreFullHP();
 
@@ -430,6 +580,16 @@ public partial class BattleSystem : Node
     public BattleTextLibrary GetTextLibrary()
     {
         return textLibrary;
+    }
+
+    public StatusEffectManager GetHeroEffects()
+    {
+        return heroEffects;
+    }
+
+    public StatusEffectManager GetEnemyEffects()
+    {
+        return enemyEffects;
     }
 }
 
