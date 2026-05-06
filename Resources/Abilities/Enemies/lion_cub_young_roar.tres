@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="CombatAbility" format=3 uid="uid://cfov2svvlflkr"]
+
+[ext_resource type="Script" uid="uid://c122yq68vexea" path="res://Autoloads/Combat/CombatAbility.cs" id="1_script"]
+[ext_resource type="Script" uid="uid://cfgklyq16ar8x" path="res://Autoloads/Combat/AbilityEffect.cs" id="2_effect"]
+
+[sub_resource type="Resource" id="Effect_00000"]
+script = ExtResource("2_effect")
+EffectType = 1
+StatusType = 1
+StatusName = "Shaken"
+StatusValue = 2.0
+StatusDuration = 2
+StatusApplyText = "The roar rattles your confidence!"
+StatusExpireText = "You steady your nerves."
+metadata/_custom_type_script = "uid://cfgklyq16ar8x"
+
+[resource]
+script = ExtResource("1_script")
+AbilityId = "lion_cub_young_roar"
+AbilityName = "Young Roar"
+AbilityColor = Color(0.854902, 0.647059, 0.12549, 1)
+Trigger = 4
+OneTimeUse = true
+Priority = 50
+CastFlavorText = "The cub roars with surprising ferocity!"
+Effects = Array[ExtResource("2_effect")]([SubResource("Effect_00000")])
+metadata/_custom_type_script = "uid://c122yq68vexea"

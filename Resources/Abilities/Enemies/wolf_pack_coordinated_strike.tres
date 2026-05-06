@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CombatAbility" format=3 uid="uid://cvoof2g5nt2q8"]
+
+[ext_resource type="Script" uid="uid://c122yq68vexea" path="res://Autoloads/Combat/CombatAbility.cs" id="1_script"]
+[ext_resource type="Script" uid="uid://cfgklyq16ar8x" path="res://Autoloads/Combat/AbilityEffect.cs" id="2_effect"]
+
+[sub_resource type="Resource" id="Effect_00000"]
+script = ExtResource("2_effect")
+Value = 8.0
+metadata/_custom_type_script = "uid://cfgklyq16ar8x"
+
+[resource]
+script = ExtResource("1_script")
+AbilityId = "wolf_pack_coordinated_strike"
+AbilityName = "Coordinated Strike"
+AbilityColor = Color(0.721569, 0.52549, 0.043137, 1)
+Trigger = 5
+TriggerValue = 3.0
+ReplacesAttack = false
+Priority = 10
+UseChance = 0.9
+CastFlavorText = "The pack strikes as one!"
+Effects = Array[ExtResource("2_effect")]([SubResource("Effect_00000")])
+metadata/_custom_type_script = "uid://c122yq68vexea"

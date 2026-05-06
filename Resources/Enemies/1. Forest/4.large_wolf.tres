@@ -1,6 +1,8 @@
 [gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://b36b7lwrmsy21"]
 
 [ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_2oeaa"]
+[ext_resource type="Script" uid="uid://c122yq68vexea" path="res://Autoloads/Combat/CombatAbility.cs" id="1_eadwt"]
+[ext_resource type="Resource" path="res://Resources/Abilities/Enemies/large_wolf_savage_lunge.tres" id="2_ldl8a"]
 
 [resource]
 script = ExtResource("1_2oeaa")
@@ -10,4 +12,5 @@ Health = 450.0
 DamagePerSecond = 6.5
 AttackRate = 1.6
 KleosReward = 14
+Abilities = Array[ExtResource("1_eadwt")]([ExtResource("2_ldl8a")])
 metadata/_custom_type_script = "uid://b1ahgi2bsjm0e"

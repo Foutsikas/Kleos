@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="CombatAbility" format=3 uid="uid://0qinfpsnrawd"]
+
+[ext_resource type="Script" uid="uid://c122yq68vexea" path="res://Autoloads/Combat/CombatAbility.cs" id="1_script"]
+[ext_resource type="Script" uid="uid://cfgklyq16ar8x" path="res://Autoloads/Combat/AbilityEffect.cs" id="2_effect"]
+
+[sub_resource type="Resource" id="Effect_00000"]
+script = ExtResource("2_effect")
+EffectType = 1
+StatusType = 9
+StatusName = "Thalassa's Curse"
+StatusValue = 5.0
+StatusDuration = 4
+StatusApplyText = "A sickly green mist envelops you!"
+StatusTickText = "The curse eats at your strength..."
+StatusExpireText = "The sea-curse dissipates."
+metadata/_custom_type_script = "uid://cfgklyq16ar8x"
+
+[resource]
+script = ExtResource("1_script")
+AbilityId = "sea_hag_curse_of_thalassa"
+AbilityName = "Curse of Thalassa"
+AbilityColor = Color(0.184314, 0.309804, 0.309804, 1)
+Trigger = 1
+TriggerValue = 0.4
+OneTimeUse = true
+Priority = 40
+CastFlavorText = "The hag spits a vile curse!"
+Effects = Array[ExtResource("2_effect")]([SubResource("Effect_00000")])
+metadata/_custom_type_script = "uid://c122yq68vexea"

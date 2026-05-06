@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="CombatAbility" format=3 uid="uid://bhbf0nfdcmea5"]
+
+[ext_resource type="Script" uid="uid://c122yq68vexea" path="res://Autoloads/Combat/CombatAbility.cs" id="1_script"]
+[ext_resource type="Script" uid="uid://cfgklyq16ar8x" path="res://Autoloads/Combat/AbilityEffect.cs" id="2_effect"]
+
+[sub_resource type="Resource" id="Effect_00000"]
+script = ExtResource("2_effect")
+Value = 15.0
+metadata/_custom_type_script = "uid://cfgklyq16ar8x"
+
+[sub_resource type="Resource" id="Effect_00001"]
+script = ExtResource("2_effect")
+EffectType = 1
+StatusType = 15
+StatusName = "Crushed"
+StatusDuration = 1
+StatusApplyText = "The falling tree pins you to the ground!"
+StatusExpireText = "You wrench yourself free."
+metadata/_custom_type_script = "uid://cfgklyq16ar8x"
+
+[resource]
+script = ExtResource("1_script")
+AbilityId = "pine_bender_bend_the_pine"
+AbilityName = "Bend the Pine"
+AbilityColor = Color(0.545098, 0.270588, 0.07451, 1)
+Trigger = 1
+TriggerValue = 0.7
+CooldownRounds = 6
+Priority = 50
+CastFlavorText = "The Pine-Bender wrenches a tree from the earth!"
+Effects = Array[ExtResource("2_effect")]([SubResource("Effect_00000"), SubResource("Effect_00001")])
+metadata/_custom_type_script = "uid://c122yq68vexea"

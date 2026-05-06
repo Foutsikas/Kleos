@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="CombatAbility" format=3 uid="uid://ej827ljhnoq6"]
+
+[ext_resource type="Script" uid="uid://c122yq68vexea" path="res://Autoloads/Combat/CombatAbility.cs" id="1_script"]
+[ext_resource type="Script" uid="uid://cfgklyq16ar8x" path="res://Autoloads/Combat/AbilityEffect.cs" id="2_effect"]
+
+[sub_resource type="Resource" id="Effect_00000"]
+script = ExtResource("2_effect")
+EffectType = 1
+StatusType = 1
+StatusName = "Enthralled"
+StatusValue = 0.25
+StatusMode = 1
+StatusApplyText = "Her voice drowns all thought of battle!"
+StatusExpireText = "The spell over your mind shatters."
+metadata/_custom_type_script = "uid://cfgklyq16ar8x"
+
+[sub_resource type="Resource" id="Effect_00001"]
+script = ExtResource("2_effect")
+EffectType = 1
+StatusType = 7
+StatusName = "Spellbound"
+StatusValue = 0.2
+StatusApplyText = "Your limbs grow heavy with enchantment!"
+StatusExpireText = "Sensation returns to your limbs."
+metadata/_custom_type_script = "uid://cfgklyq16ar8x"
+
+[resource]
+script = ExtResource("1_script")
+AbilityId = "siren_queen_song_of_oblivion"
+AbilityName = "Song of Oblivion"
+AbilityColor = Color(0.6, 0.196078, 0.8, 1)
+Trigger = 4
+OneTimeUse = true
+Priority = 100
+CastFlavorText = "The Siren Queen opens her mouth and the world falls silent..."
+Effects = Array[ExtResource("2_effect")]([SubResource("Effect_00000"), SubResource("Effect_00001")])
+metadata/_custom_type_script = "uid://c122yq68vexea"
