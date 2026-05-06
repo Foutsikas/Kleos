@@ -1,8 +1,6 @@
 [gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://dxbupdfyiodo4"]
 
-[ext_resource type="Script" uid="uid://c122yq68vexea" path="res://Autoloads/Combat/CombatAbility.cs" id="1_b2vok"]
 [ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_qcjac"]
-[ext_resource type="Resource" path="res://Resources/Abilities/Enemies/wolf_howl.tres" id="2_ltuop"]
 
 [resource]
 script = ExtResource("1_qcjac")
@@ -11,5 +9,4 @@ EnemyId = "wolf"
 Health = 250.0
 DamagePerSecond = 5.0
 KleosReward = 7
-Abilities = Array[ExtResource("1_b2vok")]([ExtResource("2_ltuop")])
 metadata/_custom_type_script = "uid://b1ahgi2bsjm0e"

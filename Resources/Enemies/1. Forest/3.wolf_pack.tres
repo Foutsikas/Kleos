@@ -1,8 +1,6 @@
 [gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://yhsij0tvopab"]
 
 [ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_8jbaj"]
-[ext_resource type="Script" uid="uid://c122yq68vexea" path="res://Autoloads/Combat/CombatAbility.cs" id="1_x4q6i"]
-[ext_resource type="Resource" path="res://Resources/Abilities/Enemies/wolf_pack_coordinated_strike.tres" id="2_61ect"]
 
 [resource]
 script = ExtResource("1_8jbaj")
@@ -12,5 +10,4 @@ Health = 350.0
 DamagePerSecond = 5.5
 AttackRate = 1.6
 KleosReward = 10
-Abilities = Array[ExtResource("1_x4q6i")]([ExtResource("2_61ect")])
 metadata/_custom_type_script = "uid://b1ahgi2bsjm0e"

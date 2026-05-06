@@ -6,7 +6,6 @@
 [ext_resource type="PackedScene" uid="uid://dmgutm6ywv553" path="res://Scenes/Game/UpgradeRow.tscn" id="3_fuq2u"]
 [ext_resource type="PackedScene" uid="uid://dh3pvk0vtmwhp" path="res://Scenes/Game/TierHeader.tscn" id="4_q5o1p"]
 [ext_resource type="Script" uid="uid://cuwb2b82uaevg" path="res://Scenes/Game/BattlePanel.cs" id="6_q5o1p"]
-[ext_resource type="Script" uid="uid://dvussrwxd2447" path="res://Scenes/Game/StatusEffectDisplay.cs" id="7_qkdyd"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gucqa"]
 bg_color = Color(0.3133042, 0.2716998, 0.22091639, 1)
@@ -488,7 +487,6 @@ vertical_alignment = 1
 
 [node name="HeroEffectDisplay" type="VBoxContainer" parent="BattlePanel/CombatArea/HeroSection" unique_id=1498473702]
 layout_mode = 2
-script = ExtResource("7_qkdyd")
 
 [node name="HeroHPBar" type="ProgressBar" parent="BattlePanel/CombatArea/HeroSection" unique_id=2053773614]
 custom_minimum_size = Vector2(120, 14)
@@ -540,7 +538,6 @@ layout_mode = 2
 
 [node name="EnemyEffectDisplay" type="VBoxContainer" parent="BattlePanel/CombatArea/EnemySection" unique_id=551096978]
 layout_mode = 2
-script = ExtResource("7_qkdyd")
 
 [node name="BattleLogContainer" type="VBoxContainer" parent="BattlePanel/CombatArea" unique_id=34781950]
 custom_minimum_size = Vector2(300, 100)

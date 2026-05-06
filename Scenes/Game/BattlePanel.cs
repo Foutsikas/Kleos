@@ -363,13 +363,13 @@ public partial class BattlePanel : Control
 
 			if (entry.AlignCenter)
 			{
-				Color abilityColor = entry.OverrideColor ?? new Color("9A7ABF");
-				PushLogLineCentered(entry.RichTextOverride, abilityColor);
+				// Ability name lines and status messages: centered, use ability color
+				PushLogLineCentered(entry.RichTextOverride, new Color("9A7ABF"));
 			}
 			else
 			{
-				Color abilityLineColor  = entry.OverrideColor ?? HeroActionColor;
-				PushLogLine(entry.RichTextOverride, abilityLineColor , true);
+				// Cast flavor text: hero-aligned
+				PushLogLine(entry.RichTextOverride, HeroActionColor, true);
 			}
 			return;
 		}
@@ -426,13 +426,11 @@ public partial class BattlePanel : Control
 
 			if (entry.AlignCenter)
 			{
-				Color abilityColor = entry.OverrideColor ?? new Color("9A7ABF");
-				PushLogLineCentered(entry.RichTextOverride, abilityColor);
+				PushLogLineCentered(entry.RichTextOverride, new Color("9A7ABF"));
 			}
 			else
 			{
-				Color lineColor = entry.OverrideColor ?? EnemyActionColor;
-				PushLogLine(entry.RichTextOverride, lineColor, false);
+				PushLogLine(entry.RichTextOverride, EnemyActionColor, false);
 			}
 			return;
 		}

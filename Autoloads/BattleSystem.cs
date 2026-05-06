@@ -519,7 +519,8 @@ public partial class BattleSystem : Node
         string casterName = isHeroAbility ? "Hero" : currentContext.Enemy.EnemyName;
 
         // Log ability name (centered, ability color)
-        string abilityNameLine = ability.AbilityName.ToUpper();
+        string colorHex = ability.AbilityColor.ToHtml(false);
+        string abilityNameLine = $"[color=#{colorHex}]{ability.AbilityName.ToUpper()}[/color]";
         var nameEntry = new BattleLogEntry
         {
             IsHeroAction = isHeroAbility,
@@ -531,8 +532,7 @@ public partial class BattleSystem : Node
             TargetCurrentHP = isHeroAbility ? enemyCurrentHP : HeroManager.Instance.GetCurrentHP(),
             TargetMaxHP = isHeroAbility ? enemyMaxHP : HeroManager.Instance.GetMaxHP(),
             RichTextOverride = abilityNameLine,
-            AlignCenter = false,
-            OverrideColor = ability.AbilityColor
+            AlignCenter = true
         };
         if (isHeroAbility)
             HeroAttackOccurred?.Invoke(nameEntry);
@@ -821,7 +821,6 @@ public class BattleLogEntry
     public float TargetMaxHP { get; set; }
     public string RichTextOverride { get; set; } = null;
     public bool AlignCenter { get; set; } = false;
-    public Color? OverrideColor { get; set; } = null;
 }
 
 public class BattleResult
