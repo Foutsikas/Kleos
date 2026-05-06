@@ -163,7 +163,10 @@ public partial class DevConsole : CanvasLayer
                        "  pools -- Show active encounter pools\n" +
                        "  save / load / reset -- Save system\n" +
                        "  status -- Show game state\n" +
-                       " ";
+                       "  effects -- Show active status effects\n" +
+                       "  buff <hero|enemy> <type> <value> <duration>\n" +
+                       "  testability -- Add test ability to enemy"
+                       ;
 
             case "kleos":
                 return CmdKleos(parts);
@@ -204,6 +207,10 @@ public partial class DevConsole : CanvasLayer
 
             case "testability":
                 HandleTestAbilityCommand(parts);
+                return "";
+
+            case "effects":
+                HandleEffectsCommand();
                 return "";
 
 
@@ -502,5 +509,45 @@ public partial class DevConsole : CanvasLayer
         // Add to current enemy's ability list
         BattleSystem.Instance.GetCurrentContext().Enemy.Abilities.Add(testAbility);
         outputLabel.Text = "Added Test Strike to enemy. It will use it next turn.";
+    }
+
+    private void HandleEffectsCommand()
+    {
+        if (!BattleSystem.Instance.IsBattleInProgress())
+        {
+            outputLabel.Text = "No active battle.";
+            return;
+        }
+
+        var heroEffects = BattleSystem.Instance.GetHeroEffects();
+        var enemyEffects = BattleSystem.Instance.GetEnemyEffects();
+
+        string result = "HERO EFFECTS:\n";
+        if (heroEffects != null)
+        {
+            var heroList = heroEffects.GetActiveEffects();
+            if (heroList.Count == 0)
+                result += "  (none)\n";
+            else
+                for (int i = 0; i < heroList.Count; i++)
+                    result += $"  {heroList[i].EffectName} " +
+                              $"({heroList[i].Duration} rounds, " +
+                              $"val:{heroList[i].Value})\n";
+        }
+
+        result += "\nENEMY EFFECTS:\n";
+        if (enemyEffects != null)
+        {
+            var enemyList = enemyEffects.GetActiveEffects();
+            if (enemyList.Count == 0)
+                result += "  (none)";
+            else
+                for (int i = 0; i < enemyList.Count; i++)
+                    result += $"  {enemyList[i].EffectName} " +
+                              $"({enemyList[i].Duration} rounds, " +
+                              $"val:{enemyList[i].Value})";
+        }
+
+        outputLabel.Text = result;
     }
 }

@@ -382,7 +382,7 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="BattlePanel" type="Control" parent="." unique_id=1960193445 node_paths=PackedStringArray("EncounterHeaderLabel", "HeroNameLabel", "HeroLevelLabel", "HeroPortrait", "HeroHPBar", "HeroHPText", "EnemyNameLabel", "EnemyPortrait", "EnemyHPBar", "EnemyHPText", "LogLine1", "LogLine2", "LogLine3", "LogLine4", "SpeedToggleButton", "BattleBackground", "ResultOverlay", "ResultSubtitleLabel", "ResultTitleLabel", "ResultFlavorLabel", "ResultRewardLabel", "ResultLuckLabel", "ResultSummaryLabel", "ResultConsolationLabel", "ResultActionButton", "ViewBattleLogButton", "PostCombatLogOverlay", "PostCombatLogScroll", "PostCombatLogList", "BackToResultsButton", "CombatArea")]
+[node name="BattlePanel" type="Control" parent="." unique_id=1960193445 node_paths=PackedStringArray("EncounterHeaderLabel", "HeroNameLabel", "HeroLevelLabel", "HeroPortrait", "HeroHPBar", "HeroHPText", "HeroEffectDisplay", "EnemyNameLabel", "EnemyPortrait", "EnemyHPBar", "EnemyHPText", "EnemyEffectDisplay", "LogLine1", "LogLine2", "LogLine3", "LogLine4", "SpeedToggleButton", "BattleBackground", "ResultOverlay", "ResultSubtitleLabel", "ResultTitleLabel", "ResultFlavorLabel", "ResultRewardLabel", "ResultLuckLabel", "ResultSummaryLabel", "ResultConsolationLabel", "ResultActionButton", "ViewBattleLogButton", "PostCombatLogOverlay", "PostCombatLogScroll", "PostCombatLogList", "BackToResultsButton", "CombatArea")]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -391,15 +391,17 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("6_q5o1p")
 EncounterHeaderLabel = NodePath("CombatArea/EncounterHeaderLabel")
-HeroNameLabel = NodePath("CombatArea/HeroSection/HBoxContainer/HeroNameLabel")
-HeroLevelLabel = NodePath("CombatArea/HeroSection/HBoxContainer/HeroLevelLabel")
+HeroNameLabel = NodePath("CombatArea/HeroSection/NameAndLevelDisplay/HeroNameLabel")
+HeroLevelLabel = NodePath("CombatArea/HeroSection/NameAndLevelDisplay/HeroLevelLabel")
 HeroPortrait = NodePath("CombatArea/HeroSection/HeroPortrait")
 HeroHPBar = NodePath("CombatArea/HeroSection/HeroHPBar")
 HeroHPText = NodePath("CombatArea/HeroSection/HeroHPText")
+HeroEffectDisplay = NodePath("CombatArea/HeroSection/HeroEffectDisplay")
 EnemyNameLabel = NodePath("CombatArea/EnemySection/EnemyNameLabel")
 EnemyPortrait = NodePath("CombatArea/EnemySection/EnemyPortrait")
 EnemyHPBar = NodePath("CombatArea/EnemySection/EnemyHPBar")
 EnemyHPText = NodePath("CombatArea/EnemySection/EnemyHPText")
+EnemyEffectDisplay = NodePath("CombatArea/EnemySection/EnemyEffectDisplay")
 LogLine1 = NodePath("CombatArea/BattleLogContainer/LogLine1")
 LogLine2 = NodePath("CombatArea/BattleLogContainer/LogLine2")
 LogLine3 = NodePath("CombatArea/BattleLogContainer/LogLine3")
@@ -465,17 +467,17 @@ offset_right = 550.0
 offset_bottom = -80.0
 grow_vertical = 0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="BattlePanel/CombatArea/HeroSection" unique_id=907308245]
+[node name="NameAndLevelDisplay" type="HBoxContainer" parent="BattlePanel/CombatArea/HeroSection" unique_id=907308245]
 layout_mode = 2
 
-[node name="HeroNameLabel" type="Label" parent="BattlePanel/CombatArea/HeroSection/HBoxContainer" unique_id=1680716772]
+[node name="HeroNameLabel" type="Label" parent="BattlePanel/CombatArea/HeroSection/NameAndLevelDisplay" unique_id=1680716772]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 14
 text = "HeroName"
 vertical_alignment = 1
 
-[node name="HeroLevelLabel" type="Label" parent="BattlePanel/CombatArea/HeroSection/HBoxContainer" unique_id=1441675538]
+[node name="HeroLevelLabel" type="Label" parent="BattlePanel/CombatArea/HeroSection/NameAndLevelDisplay" unique_id=1441675538]
 layout_mode = 2
 size_flags_horizontal = 10
 theme_override_font_sizes/font_size = 11
@@ -483,13 +485,16 @@ text = "Lv ?"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="HeroHPText" type="Label" parent="BattlePanel/CombatArea/HeroSection" unique_id=1489927454]
+[node name="HeroEffectDisplay" type="VBoxContainer" parent="BattlePanel/CombatArea/HeroSection" unique_id=1498473702]
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
 
 [node name="HeroHPBar" type="ProgressBar" parent="BattlePanel/CombatArea/HeroSection" unique_id=2053773614]
 custom_minimum_size = Vector2(120, 14)
 layout_mode = 2
+
+[node name="HeroHPText" type="Label" parent="BattlePanel/CombatArea/HeroSection" unique_id=1489927454]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
 
 [node name="HeroPortrait" type="TextureRect" parent="BattlePanel/CombatArea/HeroSection" unique_id=60854752]
 custom_minimum_size = Vector2(500, 500)
@@ -523,13 +528,16 @@ text = "TEST TEST TEST"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="EnemyHPText" type="Label" parent="BattlePanel/CombatArea/EnemySection" unique_id=1963564579]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+
 [node name="EnemyHPBar" type="ProgressBar" parent="BattlePanel/CombatArea/EnemySection" unique_id=1327106970]
 custom_minimum_size = Vector2(120, 14)
 layout_mode = 2
 
-[node name="EnemyHPText" type="Label" parent="BattlePanel/CombatArea/EnemySection" unique_id=1963564579]
+[node name="EnemyEffectDisplay" type="VBoxContainer" parent="BattlePanel/CombatArea/EnemySection" unique_id=551096978]
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
 
 [node name="BattleLogContainer" type="VBoxContainer" parent="BattlePanel/CombatArea" unique_id=34781950]
 custom_minimum_size = Vector2(300, 100)

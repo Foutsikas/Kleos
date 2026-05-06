@@ -16,12 +16,14 @@ public partial class BattlePanel : Control
 	[Export] public TextureRect HeroPortrait { get; set; }
 	[Export] public ProgressBar HeroHPBar { get; set; }
 	[Export] public Label HeroHPText { get; set; }
+	[Export] public StatusEffectDisplay HeroEffectDisplay { get; set; }
 
 	// Enemy side (top-right)
 	[Export] public Label EnemyNameLabel { get; set; }
 	[Export] public TextureRect EnemyPortrait { get; set; }
 	[Export] public ProgressBar EnemyHPBar { get; set; }
 	[Export] public Label EnemyHPText { get; set; }
+	[Export] public StatusEffectDisplay EnemyEffectDisplay { get; set; }
 
 	// Battle log (4 visible lines)
 	[Export] public Label LogLine1 { get; set; }
@@ -212,6 +214,8 @@ public partial class BattlePanel : Control
 
 		// Clear log lines
 		ClearLogLines();
+		if (HeroEffectDisplay != null) HeroEffectDisplay.Clear();
+		if (EnemyEffectDisplay != null) EnemyEffectDisplay.Clear();
 
 		// Set up speed toggle visibility
 		RefreshSpeedToggle();
@@ -342,7 +346,7 @@ public partial class BattlePanel : Control
 
 	private void OnRoundStarted(int roundNumber)
 	{
-		// Reserved for future use (round separators, etc.)
+		RefreshEffectDisplays();
 	}
 
 	private void OnHeroAttack(BattleLogEntry entry)
@@ -405,6 +409,7 @@ public partial class BattlePanel : Control
 		}
 
 		PushLogLine(line, lineColor, true);
+		RefreshEffectDisplays();
 	}
 
 	private void OnEnemyAttack(BattleLogEntry entry)
@@ -465,6 +470,7 @@ public partial class BattlePanel : Control
 			string hitLine = $"{enemyText} {entry.Damage:F0} damage.";
 			PushLogLine(hitLine, EnemyActionColor, false);
 		}
+		RefreshEffectDisplays();
 	}
 
 	// -------------------------------------------------------------------------
@@ -678,6 +684,8 @@ public partial class BattlePanel : Control
 	private void OnBattleEnded(BattleResult result)
 	{
 		isCombatActive = false;
+		if (HeroEffectDisplay != null) HeroEffectDisplay.Clear();
+		if (EnemyEffectDisplay != null) EnemyEffectDisplay.Clear();
 		storedResult = result;
 
 		// Reset portraits to their origin before hiding combat area
@@ -977,6 +985,14 @@ public partial class BattlePanel : Control
 	private void HidePostCombatLog()
 	{
 		if (PostCombatLogOverlay != null) PostCombatLogOverlay.Visible = false;
+	}
+
+	private void RefreshEffectDisplays()
+	{
+		if (HeroEffectDisplay != null)
+			HeroEffectDisplay.Refresh(BattleSystem.Instance.GetHeroEffects());
+		if (EnemyEffectDisplay != null)
+			EnemyEffectDisplay.Refresh(BattleSystem.Instance.GetEnemyEffects());
 	}
 
 	// -------------------------------------------------------------------------
