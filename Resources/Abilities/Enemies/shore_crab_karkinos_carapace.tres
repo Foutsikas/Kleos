@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="CombatAbility" format=3 uid="uid://fnr4dvw4n1cx"]
+
+[ext_resource type="Script" uid="uid://c122yq68vexea" path="res://Autoloads/Combat/CombatAbility.cs" id="1_script"]
+[ext_resource type="Script" uid="uid://cfgklyq16ar8x" path="res://Autoloads/Combat/AbilityEffect.cs" id="2_effect"]
+
+[sub_resource type="Resource" id="Effect_00000"]
+script = ExtResource("2_effect")
+EffectType = 2
+Target = 0
+StatusType = 5
+StatusName = "Hardened Shell"
+StatusDuration = 4
+StatusIsDebuff = false
+StatusApplyText = "The shell hardens to stone!"
+StatusExpireText = "Cracks appear in the ancient shell."
+metadata/_custom_type_script = "uid://cfgklyq16ar8x"
+
+[resource]
+script = ExtResource("1_script")
+AbilityId = "shore_crab_karkinos_carapace"
+AbilityName = "Karkinos Carapace"
+AbilityColor = Color(0.180392, 0.545098, 0.341176, 1)
+Trigger = 1
+TriggerValue = 0.5
+OneTimeUse = true
+Priority = 30
+CastFlavorText = "The crab raises its ancient shell!"
+Effects = Array[ExtResource("2_effect")]([SubResource("Effect_00000")])
+metadata/_custom_type_script = "uid://c122yq68vexea"

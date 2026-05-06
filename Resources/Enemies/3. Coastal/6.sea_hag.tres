@@ -1,6 +1,8 @@
 [gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://dlam6qusc2c4a"]
 
+[ext_resource type="Script" uid="uid://c122yq68vexea" path="res://Autoloads/Combat/CombatAbility.cs" id="1_m2a6k"]
 [ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_script"]
+[ext_resource type="Resource" path="res://Resources/Abilities/Enemies/sea_hag_curse_of_thalassa.tres" id="2_yvs15"]
 
 [resource]
 script = ExtResource("1_script")
@@ -10,6 +12,5 @@ Health = 5800.0
 DamagePerSecond = 25.0
 AttackRate = 2.3
 KleosReward = 45
-EncounterFlavorTexts = PackedStringArray("The hag rises from the brine, grinning.", "Seaweed and barnacles cling to ancient flesh.")
-AttackLines = PackedStringArray("The hag rakes with barnacle-encrusted claws.", "A curse hisses from salt-cracked lips.", "The sea hag strikes with tidal fury.")
+Abilities = Array[ExtResource("1_m2a6k")]([ExtResource("2_yvs15")])
 metadata/_custom_type_script = "uid://b1ahgi2bsjm0e"

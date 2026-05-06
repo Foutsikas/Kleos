@@ -1,6 +1,8 @@
 [gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://jhx0aahhlhlc"]
 
+[ext_resource type="Script" uid="uid://c122yq68vexea" path="res://Autoloads/Combat/CombatAbility.cs" id="1_rm6kc"]
 [ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_vq61f"]
+[ext_resource type="Resource" path="res://Resources/Abilities/Enemies/lion_cub_young_roar.tres" id="2_3q3k0"]
 
 [resource]
 script = ExtResource("1_vq61f")
@@ -10,4 +12,5 @@ Health = 650.0
 DamagePerSecond = 8.5
 AttackRate = 1.8
 KleosReward = 30
+Abilities = Array[ExtResource("1_rm6kc")]([ExtResource("2_3q3k0")])
 metadata/_custom_type_script = "uid://b1ahgi2bsjm0e"
