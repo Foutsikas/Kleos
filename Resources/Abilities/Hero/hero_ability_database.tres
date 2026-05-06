@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="HeroAbilityDatabase" format=3 uid="uid://ub15x0h0dq2i"]
+
+[ext_resource type="Script" uid="uid://c122yq68vexea" path="res://Autoloads/Combat/CombatAbility.cs" id="1_c222q"]
+[ext_resource type="Resource" uid="uid://dfhbbv5gjopa7" path="res://Resources/Abilities/Hero/battle_hardened.tres" id="2_xm105"]
+[ext_resource type="Resource" uid="uid://dm8kxq7vcjco5" path="res://Resources/Abilities/Hero/brigands_instinct.tres" id="3_7qeip"]
+[ext_resource type="Resource" uid="uid://bivrhcal3svwf" path="res://Resources/Abilities/Hero/focused_strike.tres" id="4_v088p"]
+[ext_resource type="Resource" uid="uid://dxu7d8pbuqio3" path="res://Resources/Abilities/Hero/lions_resilience.tres" id="5_8twp5"]
+[ext_resource type="Resource" uid="uid://cb6vm2d337gvy" path="res://Resources/Abilities/Hero/second_wind.tres" id="6_dov4k"]
+[ext_resource type="Resource" uid="uid://d0m675nejs52d" path="res://Resources/Abilities/Hero/shield_of_bronze.tres" id="7_ylc7g"]
+[ext_resource type="Resource" uid="uid://c4n44np3hyn8m" path="res://Resources/Abilities/Hero/tides_blessing.tres" id="8_nbtc1"]
+[ext_resource type="Resource" uid="uid://dn1kj6sg8y5m8" path="res://Resources/Abilities/Hero/vipers_bite.tres" id="9_f3kwm"]
+[ext_resource type="Resource" uid="uid://cs0h7rfl65hj3" path="res://Resources/Abilities/Hero/war_cry.tres" id="10_1e30w"]
+[ext_resource type="Script" uid="uid://bchq08xcn0d8i" path="res://Resources/Abilities/HeroAbilityDatabase.cs" id="11_q84in"]
+
+[resource]
+script = ExtResource("11_q84in")
+Abilities = Array[ExtResource("1_c222q")]([ExtResource("2_xm105"), ExtResource("3_7qeip"), ExtResource("4_v088p"), ExtResource("5_8twp5"), ExtResource("6_dov4k"), ExtResource("7_ylc7g"), ExtResource("8_nbtc1"), ExtResource("9_f3kwm"), ExtResource("10_1e30w")])
+metadata/_custom_type_script = "uid://bchq08xcn0d8i"

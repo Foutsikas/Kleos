@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://c122yq68vexea" path="res://Autoloads/Combat/CombatAbility.cs" id="1_m2a6k"]
 [ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_script"]
-[ext_resource type="Resource" path="res://Resources/Abilities/Enemies/sea_hag_curse_of_thalassa.tres" id="2_yvs15"]
+[ext_resource type="Resource" uid="uid://0qinfpsnrawd" path="res://Resources/Abilities/Enemies/sea_hag_curse_of_thalassa.tres" id="2_yvs15"]
 
 [resource]
 script = ExtResource("1_script")

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://c122yq68vexea" path="res://Autoloads/Combat/CombatAbility.cs" id="1_cgyn4"]
 [ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_script"]
-[ext_resource type="Resource" path="res://Resources/Abilities/Enemies/pine_bender_bend_the_pine.tres" id="2_ak3ai"]
+[ext_resource type="Resource" uid="uid://bhbf0nfdcmea5" path="res://Resources/Abilities/Enemies/pine_bender_bend_the_pine.tres" id="2_ak3ai"]
 
 [resource]
 script = ExtResource("1_script")

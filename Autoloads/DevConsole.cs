@@ -165,7 +165,9 @@ public partial class DevConsole : CanvasLayer
                        "  status -- Show game state\n" +
                        "  effects -- Show active status effects\n" +
                        "  buff <hero|enemy> <type> <value> <duration>\n" +
-                       "  testability -- Add test ability to enemy"
+                       "  testability -- Add test ability to enemy\n" +
+                       "  abilities -- Show hero abilities\n" +
+                       "  unlock <abilityId> -- Force unlock ability"
                        ;
 
             case "kleos":
@@ -213,6 +215,13 @@ public partial class DevConsole : CanvasLayer
                 HandleEffectsCommand();
                 return "";
 
+            case "abilities":
+                HandleAbilitiesCommand();
+                return "";
+
+            case "unlock":
+                HandleUnlockCommand(parts);
+                return "";
 
             default:
                 return $"Unknown command: {cmd}. Type 'help'.";
@@ -352,6 +361,7 @@ public partial class DevConsole : CanvasLayer
         saveData.Upgrades = UpgradeManager.Instance.GetSaveData();
         saveData.Dungeons = DungeonManager.Instance.GetSaveData();
         saveData.Hero = HeroManager.Instance.GetSaveData();
+        saveData.HeroAbilities = HeroAbilityManager.Instance.GetSaveData();
         SaveManager.Instance.Save(saveData);
         return "Game saved.";
     }
@@ -363,6 +373,7 @@ public partial class DevConsole : CanvasLayer
         ArtisanManager.Instance.LoadFromSaveData(data.Artisans);
         UpgradeManager.Instance.LoadFromSaveData(data.Upgrades);
         DungeonManager.Instance.LoadFromSaveData(data.Dungeons);
+        HeroAbilityManager.Instance.LoadFromSaveData(data.HeroAbilities);
         HeroManager.Instance.LoadFromSaveData(data.Hero);
         return "Game loaded.";
     }
@@ -549,5 +560,69 @@ public partial class DevConsole : CanvasLayer
         }
 
         outputLabel.Text = result;
+    }
+
+    private void HandleAbilitiesCommand()
+    {
+        var manager = HeroAbilityManager.Instance;
+        var allAbilities = manager.GetAllAbilities();
+
+        if (allAbilities.Count == 0)
+        {
+            outputLabel.Text = "No hero abilities found.";
+            return;
+        }
+
+        string result = $"HERO ABILITIES ({manager.GetUnlockedCount()}/{manager.GetTotalCount()}):\n";
+
+        for (int i = 0; i < allAbilities.Count; i++)
+        {
+            var ability = allAbilities[i];
+            bool unlocked = manager.IsUnlocked(ability.AbilityId);
+            string status = unlocked ? "[UNLOCKED]" : "[locked]";
+            string unlockInfo = "";
+
+            if (ability.UnlockAtLevel > 0)
+                unlockInfo += $" Lv.{ability.UnlockAtLevel}";
+            if (ability.KleosPurchaseCost > 0)
+                unlockInfo += $" {ability.KleosPurchaseCost} kleos";
+            if (!string.IsNullOrEmpty(ability.UnlockFromDungeonId))
+                unlockInfo += $" {ability.UnlockFromDungeonId}";
+
+            result += $"  {status} {ability.AbilityName}{unlockInfo}\n";
+        }
+
+        outputLabel.Text = result;
+    }
+
+    private void HandleUnlockCommand(string[] parts)
+    {
+        if (parts.Length < 2)
+        {
+            outputLabel.Text = "Usage: unlock <abilityId>";
+            return;
+        }
+
+        string abilityId = parts[1];
+        var ability = HeroAbilityManager.Instance.GetAbilityById(abilityId);
+
+        if (ability == null)
+        {
+            outputLabel.Text = $"Unknown ability: {abilityId}";
+            return;
+        }
+
+        if (HeroAbilityManager.Instance.IsUnlocked(abilityId))
+        {
+            outputLabel.Text = $"{ability.AbilityName} already unlocked.";
+            return;
+        }
+
+        // Force unlock by calling the save data path
+        var saveData = HeroAbilityManager.Instance.GetSaveData();
+        saveData.UnlockedAbilityIds.Add(abilityId);
+        HeroAbilityManager.Instance.LoadFromSaveData(saveData);
+
+        outputLabel.Text = $"Unlocked: {ability.AbilityName}";
     }
 }

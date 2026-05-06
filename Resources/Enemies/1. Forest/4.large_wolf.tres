@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_2oeaa"]
 [ext_resource type="Script" uid="uid://c122yq68vexea" path="res://Autoloads/Combat/CombatAbility.cs" id="1_eadwt"]
-[ext_resource type="Resource" path="res://Resources/Abilities/Enemies/large_wolf_savage_lunge.tres" id="2_ldl8a"]
+[ext_resource type="Resource" uid="uid://gvn87vlks8nd" path="res://Resources/Abilities/Enemies/large_wolf_savage_lunge.tres" id="2_ldl8a"]
 
 [resource]
 script = ExtResource("1_2oeaa")

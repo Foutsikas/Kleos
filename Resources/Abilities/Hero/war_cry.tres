@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="CombatAbility" format=3 uid="uid://cs0h7rfl65hj3"]
+
+[ext_resource type="Script" uid="uid://c122yq68vexea" path="res://Autoloads/Combat/CombatAbility.cs" id="1_script"]
+[ext_resource type="Script" uid="uid://cfgklyq16ar8x" path="res://Autoloads/Combat/AbilityEffect.cs" id="2_effect"]
+
+[sub_resource type="Resource" id="Effect_00000"]
+script = ExtResource("2_effect")
+EffectType = 2
+Target = 0
+StatusName = "War Fury"
+StatusValue = 0.3
+StatusIsDebuff = false
+StatusMode = 1
+StatusApplyText = "Fury courses through every sinew!"
+StatusExpireText = "The battle fury subsides."
+metadata/_custom_type_script = "uid://cfgklyq16ar8x"
+
+[resource]
+script = ExtResource("1_script")
+AbilityId = "war_cry"
+AbilityName = "War Cry"
+AbilityDescription = "A mighty shout that empowers your strikes."
+AbilityColor = Color(0.784314, 0.25098, 0.188235, 1)
+Trigger = 2
+TriggerValue = 0.7
+CooldownRounds = 6
+Priority = 20
+KleosPurchaseCost = 6000.0
+CastFlavorText = "The hero lets out a cry that echoes through the ages!"
+Effects = Array[ExtResource("2_effect")]([SubResource("Effect_00000")])
+metadata/_custom_type_script = "uid://c122yq68vexea"

@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" uid="uid://c122yq68vexea" path="res://Autoloads/Combat/CombatAbility.cs" id="1_1t76v"]
 [ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_script"]
-[ext_resource type="Resource" path="res://Resources/Abilities/Enemies/siren_queen_song_of_oblivion.tres" id="2_ga6co"]
-[ext_resource type="Resource" path="res://Resources/Abilities/Enemies/siren_queen_wrath_of_the_deep.tres" id="3_1asta"]
+[ext_resource type="Resource" uid="uid://ej827ljhnoq6" path="res://Resources/Abilities/Enemies/siren_queen_song_of_oblivion.tres" id="2_ga6co"]
+[ext_resource type="Resource" uid="uid://bvliaom15sj3u" path="res://Resources/Abilities/Enemies/siren_queen_wrath_of_the_deep.tres" id="3_1asta"]
 
 [resource]
 script = ExtResource("1_script")

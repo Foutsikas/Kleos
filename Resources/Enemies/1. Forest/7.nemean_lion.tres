@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_lxlwr"]
 [ext_resource type="Script" uid="uid://c122yq68vexea" path="res://Autoloads/Combat/CombatAbility.cs" id="1_v680u"]
-[ext_resource type="Resource" path="res://Resources/Abilities/Enemies/nemean_lion_impervious_hide.tres" id="2_uk613"]
-[ext_resource type="Resource" path="res://Resources/Abilities/Enemies/nemean_lion_thunderous_roar.tres" id="3_estru"]
+[ext_resource type="Resource" uid="uid://dj5k7la6ym1pg" path="res://Resources/Abilities/Enemies/nemean_lion_impervious_hide.tres" id="2_uk613"]
+[ext_resource type="Resource" uid="uid://baxl3dic4avci" path="res://Resources/Abilities/Enemies/nemean_lion_thunderous_roar.tres" id="3_estru"]
 
 [resource]
 script = ExtResource("1_lxlwr")

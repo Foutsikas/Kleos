@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://c122yq68vexea" path="res://Autoloads/Combat/CombatAbility.cs" id="1_nfw8y"]
 [ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_script"]
-[ext_resource type="Resource" path="res://Resources/Abilities/Enemies/rogue_mercenary_poisoned_blade.tres" id="2_306jn"]
+[ext_resource type="Resource" uid="uid://xmgffsimatjk" path="res://Resources/Abilities/Enemies/rogue_mercenary_poisoned_blade.tres" id="2_306jn"]
 
 [resource]
 script = ExtResource("1_script")

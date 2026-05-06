@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://c122yq68vexea" path="res://Autoloads/Combat/CombatAbility.cs" id="1_rm6kc"]
 [ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_vq61f"]
-[ext_resource type="Resource" path="res://Resources/Abilities/Enemies/lion_cub_young_roar.tres" id="2_3q3k0"]
+[ext_resource type="Resource" uid="uid://cfov2svvlflkr" path="res://Resources/Abilities/Enemies/lion_cub_young_roar.tres" id="2_3q3k0"]
 
 [resource]
 script = ExtResource("1_vq61f")

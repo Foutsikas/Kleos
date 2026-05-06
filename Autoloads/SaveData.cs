@@ -35,6 +35,11 @@ public partial class HeroSaveData : RefCounted
     public int FavorUpgrades { get; set; } = 0;
 }
 
+public partial class HeroAbilitySaveData : RefCounted
+{
+    public Array<string> UnlockedAbilityIds { get; set; } = new();
+}
+
 public partial class SaveData : RefCounted
 {
     public string Version { get; set; } = "1.0";
@@ -44,4 +49,5 @@ public partial class SaveData : RefCounted
     public UpgradeSaveData Upgrades { get; set; } = new();
     public DungeonSaveData Dungeons { get; set; } = new();
     public HeroSaveData Hero { get; set; } = new();
+    public HeroAbilitySaveData HeroAbilities { get; set; } = new();
 }

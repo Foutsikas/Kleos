@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="CombatAbility" format=3 uid="uid://c4n44np3hyn8m"]
+
+[ext_resource type="Script" uid="uid://c122yq68vexea" path="res://Autoloads/Combat/CombatAbility.cs" id="1_script"]
+[ext_resource type="Script" uid="uid://cfgklyq16ar8x" path="res://Autoloads/Combat/AbilityEffect.cs" id="2_effect"]
+
+[sub_resource type="Resource" id="Effect_00000"]
+script = ExtResource("2_effect")
+EffectType = 3
+Target = 0
+Value = 15.0
+metadata/_custom_type_script = "uid://cfgklyq16ar8x"
+
+[sub_resource type="Resource" id="Effect_00001"]
+script = ExtResource("2_effect")
+EffectType = 5
+Target = 0
+metadata/_custom_type_script = "uid://cfgklyq16ar8x"
+
+[resource]
+script = ExtResource("1_script")
+AbilityId = "tides_blessing"
+AbilityName = "Tide's Blessing"
+AbilityDescription = "The sea washes away affliction and mends the flesh."
+AbilityColor = Color(0.27451, 0.509804, 0.705882, 1)
+Trigger = 1
+TriggerValue = 0.4
+OneTimeUse = true
+Priority = 70
+UnlockFromDungeonId = "coastal"
+CastFlavorText = "The sea washes away affliction and mends the flesh."
+Effects = Array[ExtResource("2_effect")]([SubResource("Effect_00000"), SubResource("Effect_00001")])
+metadata/_custom_type_script = "uid://c122yq68vexea"

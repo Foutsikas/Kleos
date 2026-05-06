@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="CombatAbility" format=3 uid="uid://dxu7d8pbuqio3"]
+
+[ext_resource type="Script" uid="uid://c122yq68vexea" path="res://Autoloads/Combat/CombatAbility.cs" id="1_script"]
+[ext_resource type="Script" uid="uid://cfgklyq16ar8x" path="res://Autoloads/Combat/AbilityEffect.cs" id="2_effect"]
+
+[sub_resource type="Resource" id="Effect_00000"]
+script = ExtResource("2_effect")
+EffectType = 2
+Target = 0
+StatusType = 11
+StatusName = "Lion's Vigor"
+StatusValue = 3.0
+StatusDuration = 4
+StatusIsDebuff = false
+StatusApplyText = "The lion's spirit flows through you!"
+StatusTickText = "Ancient strength mends your wounds..."
+StatusExpireText = "The lion's blessing fades."
+metadata/_custom_type_script = "uid://cfgklyq16ar8x"
+
+[resource]
+script = ExtResource("1_script")
+AbilityId = "lions_resilience"
+AbilityName = "Lion's Resilience"
+AbilityDescription = "The spirit of the Nemean Lion lends its endurance."
+AbilityColor = Color(0.854902, 0.647059, 0.12549, 1)
+Trigger = 1
+TriggerValue = 0.5
+OneTimeUse = true
+Priority = 60
+UnlockFromDungeonId = "forest"
+CastFlavorText = "The spirit of the Nemean Lion lends its endurance!"
+Effects = Array[ExtResource("2_effect")]([SubResource("Effect_00000")])
+metadata/_custom_type_script = "uid://c122yq68vexea"

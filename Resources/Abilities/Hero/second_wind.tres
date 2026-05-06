@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="CombatAbility" format=3 uid="uid://cb6vm2d337gvy"]
+
+[ext_resource type="Script" uid="uid://c122yq68vexea" path="res://Autoloads/Combat/CombatAbility.cs" id="1_script"]
+[ext_resource type="Script" uid="uid://cfgklyq16ar8x" path="res://Autoloads/Combat/AbilityEffect.cs" id="2_effect"]
+
+[sub_resource type="Resource" id="Effect_00000"]
+script = ExtResource("2_effect")
+EffectType = 3
+Target = 0
+Value = 25.0
+metadata/_custom_type_script = "uid://cfgklyq16ar8x"
+
+[resource]
+script = ExtResource("1_script")
+AbilityId = "second_wind"
+AbilityName = "Second Wind"
+AbilityDescription = "When near death, find the will to fight on."
+AbilityColor = Color(0.478431, 0.603922, 0.352941, 1)
+Trigger = 1
+TriggerValue = 0.3
+OneTimeUse = true
+Priority = 80
+UnlockAtLevel = 5
+CastFlavorText = "Gritting through the pain, the hero finds new resolve!"
+Effects = Array[ExtResource("2_effect")]([SubResource("Effect_00000")])
+metadata/_custom_type_script = "uid://c122yq68vexea"

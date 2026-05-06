@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="CombatAbility" format=3 uid="uid://dfhbbv5gjopa7"]
+
+[ext_resource type="Script" uid="uid://c122yq68vexea" path="res://Autoloads/Combat/CombatAbility.cs" id="1_script"]
+[ext_resource type="Script" uid="uid://cfgklyq16ar8x" path="res://Autoloads/Combat/AbilityEffect.cs" id="2_effect"]
+
+[sub_resource type="Resource" id="Effect_00000"]
+script = ExtResource("2_effect")
+EffectType = 2
+Target = 0
+StatusType = 6
+StatusName = "Battle Instinct"
+StatusValue = 0.1
+StatusIsDebuff = false
+StatusApplyText = "Years of combat sharpen every sense!"
+StatusExpireText = "The heightened awareness fades."
+metadata/_custom_type_script = "uid://cfgklyq16ar8x"
+
+[resource]
+script = ExtResource("1_script")
+AbilityId = "battle_hardened"
+AbilityName = "Battle Hardened"
+AbilityDescription = "Experience sharpens instincts at the start of every fight."
+AbilityColor = Color(0.541176, 0.603922, 0.666667, 1)
+Trigger = 4
+OneTimeUse = true
+Priority = 50
+UnlockAtLevel = 8
+CastFlavorText = "Experience sharpens the hero's instincts."
+Effects = Array[ExtResource("2_effect")]([SubResource("Effect_00000")])
+metadata/_custom_type_script = "uid://c122yq68vexea"

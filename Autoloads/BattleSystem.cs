@@ -259,8 +259,9 @@ public partial class BattleSystem : Node
                 float enemyHPPercent = enemyCurrentHP / enemyMaxHP;
 
                 CombatAbility heroAbility = heroAbilityResolver.ResolveAbility(
-                    null, heroHPPercent, enemyHPPercent,
-                    heroEffects, enemyEffects);
+                HeroAbilityManager.Instance.GetUnlockedAbilities(),
+                heroHPPercent, enemyHPPercent,
+                heroEffects, enemyEffects);
 
                 if (heroAbility != null)
                 {

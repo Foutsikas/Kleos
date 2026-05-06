@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://c122yq68vexea" path="res://Autoloads/Combat/CombatAbility.cs" id="1_csyjn"]
 [ext_resource type="Script" uid="uid://b1ahgi2bsjm0e" path="res://Resources/EnemyData.cs" id="1_script"]
-[ext_resource type="Resource" path="res://Resources/Abilities/Enemies/scylla_spawn_tentacle_lash.tres" id="2_43th2"]
+[ext_resource type="Resource" uid="uid://d1d4v3hpcbyos" path="res://Resources/Abilities/Enemies/scylla_spawn_tentacle_lash.tres" id="2_43th2"]
 
 [resource]
 script = ExtResource("1_script")

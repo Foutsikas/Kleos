@@ -186,6 +186,11 @@ public partial class SaveManager : Node
                 ["enduranceUpgrades"] = data.Hero.EnduranceUpgrades,
                 ["cunningUpgrades"] = data.Hero.CunningUpgrades,
                 ["favorUpgrades"] = data.Hero.FavorUpgrades
+            },
+
+            ["heroAbilities"] = new Dictionary
+            {
+                ["unlockedAbilityIds"] = data.HeroAbilities.UnlockedAbilityIds
             }
         };
 
@@ -264,6 +269,14 @@ public partial class SaveManager : Node
                 data.Hero.CunningUpgrades = cun.As<int>();
             if (h.TryGetValue("favorUpgrades", out var fav))
                 data.Hero.FavorUpgrades = fav.As<int>();
+        }
+
+        // -- Hero Abilities --
+        if (root.TryGetValue("heroAbilities", out var heroAbilitiesVar))
+        {
+            var ha = heroAbilitiesVar.As<Dictionary>();
+            if (ha.TryGetValue("unlockedAbilityIds", out var uai))
+                data.HeroAbilities.UnlockedAbilityIds = uai.As<Array<string>>();
         }
 
         return data;

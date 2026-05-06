@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="CombatAbility" format=3 uid="uid://dm8kxq7vcjco5"]
+
+[ext_resource type="Script" uid="uid://c122yq68vexea" path="res://Autoloads/Combat/CombatAbility.cs" id="1_script"]
+[ext_resource type="Script" uid="uid://cfgklyq16ar8x" path="res://Autoloads/Combat/AbilityEffect.cs" id="2_effect"]
+
+[sub_resource type="Resource" id="Effect_00000"]
+script = ExtResource("2_effect")
+EffectType = 2
+Target = 0
+StatusType = 4
+StatusName = "Keen Eye"
+StatusValue = 0.15
+StatusIsDebuff = false
+StatusApplyText = "Every weakness stands revealed!"
+StatusExpireText = "The heightened focus passes."
+metadata/_custom_type_script = "uid://cfgklyq16ar8x"
+
+[resource]
+script = ExtResource("1_script")
+AbilityId = "brigands_instinct"
+AbilityName = "Brigand's Instinct"
+AbilityDescription = "The road taught lessons no academy could."
+AbilityColor = Color(0.545098, 0.411765, 0.078431, 1)
+Trigger = 5
+TriggerValue = 4.0
+Priority = 25
+UnlockFromDungeonId = "brigands"
+CastFlavorText = "The road taught lessons no academy could."
+Effects = Array[ExtResource("2_effect")]([SubResource("Effect_00000")])
+metadata/_custom_type_script = "uid://c122yq68vexea"
