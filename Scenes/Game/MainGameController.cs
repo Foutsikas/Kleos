@@ -59,6 +59,13 @@ public partial class MainGameController : Control
     [Export] public PackedScene DungeonRowScene { get; set; }
     [Export] public VBoxContainer DungeonList { get; set; }
 
+    // Ability List
+    [Export] public Button AbilityButton { get; set; }
+    [Export] public Control AbilityPanel { get; set; }
+    [Export] public PackedScene AbilityRowScene { get; set; }
+    [Export] public PackedScene AbilitySectionHeaderScene { get; set; }
+    [Export] public VBoxContainer AbilityList { get; set; }
+
     // Fade
     [Export] public ColorRect FadeOverlay { get; set; }
 
@@ -68,7 +75,7 @@ public partial class MainGameController : Control
 
     private bool heroPanelOpen = false;
 
-    private enum ActivePanel { None, Dungeon, Upgrade }
+    private enum ActivePanel { None, Dungeon, Upgrade, Ability }
     private ActivePanel activePanel = ActivePanel.None;
 
     // -------------------------------------------------------------------------
@@ -87,6 +94,7 @@ public partial class MainGameController : Control
         RefreshDeedContext();
         PopulateArtisanList();
         PopulateUpgradeList();
+        PopulateAbilityList();
         PopulateDungeonList();
     }
 
@@ -111,6 +119,8 @@ public partial class MainGameController : Control
             DungeonButton.Pressed += OnDungeonButtonPressed;
         if (UpgradeButton != null)
             UpgradeButton.Pressed += OnUpgradeButtonPressed;
+        if (AbilityButton != null)
+            AbilityButton.Pressed += OnAbilityButtonPressed;
         if (HeroPortrait != null)
             HeroPortrait.GuiInput += OnHeroPortraitInput;
         if (StrengthUpgradeButton != null)
@@ -137,18 +147,25 @@ public partial class MainGameController : Control
     // Panel Toggles
     // -------------------------------------------------------------------------
 
-    private void OnDungeonButtonPressed()
-    {
-        SetActivePanel(activePanel == ActivePanel.Dungeon
-            ? ActivePanel.None
-            : ActivePanel.Dungeon);
-    }
-
     private void OnUpgradeButtonPressed()
     {
         SetActivePanel(activePanel == ActivePanel.Upgrade
             ? ActivePanel.None
             : ActivePanel.Upgrade);
+    }
+
+    private void OnAbilityButtonPressed()
+    {
+        SetActivePanel(activePanel == ActivePanel.Ability
+            ? ActivePanel.None
+            : ActivePanel.Ability);
+    }
+
+    private void OnDungeonButtonPressed()
+    {
+        SetActivePanel(activePanel == ActivePanel.Dungeon
+            ? ActivePanel.None
+            : ActivePanel.Dungeon);
     }
 
     private void SetActivePanel(ActivePanel panel)
@@ -158,6 +175,8 @@ public partial class MainGameController : Control
             DungeonPanel.Visible = panel == ActivePanel.Dungeon;
         if (UpgradePanel != null)
             UpgradePanel.Visible = panel == ActivePanel.Upgrade;
+        if (AbilityPanel != null)
+            AbilityPanel.Visible = panel == ActivePanel.Ability;
     }
 
     // -------------------------------------------------------------------------
@@ -258,6 +277,80 @@ public partial class MainGameController : Control
             UpgradeList.AddChild(row);
             row.Setup(config);
         }
+    }
+
+    // -------------------------------------------------------------------------
+    // Abilities List
+    // -------------------------------------------------------------------------    
+
+    private void PopulateAbilityList()
+    {
+        if (AbilityList == null || AbilityRowScene == null) return;
+
+        foreach (Node child in AbilityList.GetChildren())
+            child.QueueFree();
+
+        var allAbilities = HeroAbilityManager.Instance.GetAllAbilities();
+
+        // Build sorted groups
+        var levelAbilities = new System.Collections.Generic.List<CombatAbility>();
+        var purchaseAbilities = new System.Collections.Generic.List<CombatAbility>();
+        var dungeonAbilities = new System.Collections.Generic.List<CombatAbility>();
+
+        for (int i = 0; i < allAbilities.Count; i++)
+        {
+            if (allAbilities[i].UnlockAtLevel > 0)
+                levelAbilities.Add(allAbilities[i]);
+            else if (allAbilities[i].KleosPurchaseCost > 0)
+                purchaseAbilities.Add(allAbilities[i]);
+            else if (!string.IsNullOrEmpty(allAbilities[i].UnlockFromDungeonId))
+                dungeonAbilities.Add(allAbilities[i]);
+        }
+
+        // Sort by unlock requirement
+        levelAbilities.Sort((a, b) => a.UnlockAtLevel.CompareTo(b.UnlockAtLevel));
+        purchaseAbilities.Sort((a, b) => a.KleosPurchaseCost.CompareTo(b.KleosPurchaseCost));
+        dungeonAbilities.Sort((a, b) => GetDungeonOrder(a.UnlockFromDungeonId)
+            .CompareTo(GetDungeonOrder(b.UnlockFromDungeonId)));
+
+        AddAbilitySection("Learned through experience");
+        for (int i = 0; i < levelAbilities.Count; i++)
+            AddAbilityRow(levelAbilities[i]);
+
+        AddAbilitySection("Purchased with kleos");
+        for (int i = 0; i < purchaseAbilities.Count; i++)
+            AddAbilityRow(purchaseAbilities[i]);
+
+        AddAbilitySection("Earned through conquest");
+        for (int i = 0; i < dungeonAbilities.Count; i++)
+            AddAbilityRow(dungeonAbilities[i]);
+    }
+
+    private int GetDungeonOrder(string dungeonId)
+    {
+        if (dungeonId == "forest") return 0;
+        if (dungeonId == "brigands") return 1;
+        if (dungeonId == "coastal") return 2;
+        return 99;
+    }
+
+    private void AddAbilitySection(string title)
+    {
+        if (AbilitySectionHeaderScene == null) return;
+
+        var header = AbilitySectionHeaderScene.Instantiate<PanelContainer>();
+        AbilityList.AddChild(header);
+
+        var label = header.GetNode<Label>("SectionLabel");
+        if (label != null)
+            label.Text = title.ToUpper();
+    }
+
+    private void AddAbilityRow(CombatAbility ability)
+    {
+        var row = AbilityRowScene.Instantiate<AbilityRow>();
+        AbilityList.AddChild(row);
+        row.Setup(ability);
     }
 
     // -------------------------------------------------------------------------

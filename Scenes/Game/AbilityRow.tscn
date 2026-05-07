@@ -1,0 +1,99 @@
+[gd_scene format=3 uid="uid://c6jhp8ib8oeq8"]
+
+[ext_resource type="Script" uid="uid://d3q4ugd6hd6bu" path="res://Scenes/Game/AbilityRow.cs" id="1_m68op"]
+
+[node name="AbilityRow" type="PanelContainer" unique_id=1118740689 node_paths=PackedStringArray("AbilityNameLabel", "TypeBadgeLabel", "TypeBadge2Label", "DescriptionLabel", "FlavorLabel", "UnlockConditionLabel", "StatusLabel", "PurchaseButton")]
+custom_minimum_size = Vector2(0, 120)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+script = ExtResource("1_m68op")
+AbilityNameLabel = NodePath("VBoxContainer/TopRow/AbilityNameLabel")
+TypeBadgeLabel = NodePath("VBoxContainer/TopRow/BadgeContainer/TypeBadgeLabel")
+TypeBadge2Label = NodePath("VBoxContainer/TopRow/BadgeContainer/TypeBadgeLabel2")
+DescriptionLabel = NodePath("VBoxContainer/DescriptionLabel")
+FlavorLabel = NodePath("VBoxContainer/FlavorLabel")
+UnlockConditionLabel = NodePath("VBoxContainer/BottomRow/UnlockConditionLabel")
+StatusLabel = NodePath("VBoxContainer/BottomRow/StatusLabel")
+PurchaseButton = NodePath("VBoxContainer/BottomRow/PurchaseButton")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=594503291]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TopRow" type="HBoxContainer" parent="VBoxContainer" unique_id=1053704035]
+layout_mode = 2
+
+[node name="Filler" type="Control" parent="VBoxContainer/TopRow" unique_id=1715050348]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+
+[node name="AbilityNameLabel" type="Label" parent="VBoxContainer/TopRow" unique_id=345535902]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 15
+text = "NAME"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BadgeContainer" type="VBoxContainer" parent="VBoxContainer/TopRow" unique_id=1667285548]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+theme_override_constants/separation = 4
+alignment = 2
+
+[node name="TypeBadgeLabel" type="Label" parent="VBoxContainer/TopRow/BadgeContainer" unique_id=1819868865]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "ADASDASDASDAS"
+horizontal_alignment = 1
+
+[node name="TypeBadgeLabel2" type="Label" parent="VBoxContainer/TopRow/BadgeContainer" unique_id=2024020259]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "ADASDASDASDAS"
+horizontal_alignment = 1
+
+[node name="DescriptionLabel" type="Label" parent="VBoxContainer" unique_id=849402962]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "TEST TEST TEST"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="FlavorLabel" type="Label" parent="VBoxContainer" unique_id=1460285791]
+modulate = Color(0.79607844, 0.79607844, 0.76862746, 1)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "ASDASDASDAS"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BottomRow" type="HBoxContainer" parent="VBoxContainer" unique_id=2084920348]
+layout_mode = 2
+
+[node name="UnlockConditionLabel" type="Label" parent="VBoxContainer/BottomRow" unique_id=16965831]
+modulate = Color(0.85430586, 0.85430586, 0.82665706, 1)
+layout_mode = 2
+size_flags_horizontal = 6
+theme_override_font_sizes/font_size = 12
+text = "GET THIS GET THAT"
+
+[node name="StatusLabel" type="Label" parent="VBoxContainer/BottomRow" unique_id=1909215985]
+layout_mode = 2
+size_flags_horizontal = 6
+theme_override_font_sizes/font_size = 11
+text = "BOUGHT"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PurchaseButton" type="Button" parent="VBoxContainer/BottomRow" unique_id=1400998510]
+visible = false
+custom_minimum_size = Vector2(120, 28)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "GET IT"

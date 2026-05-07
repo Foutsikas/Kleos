@@ -5,7 +5,9 @@
 [ext_resource type="PackedScene" uid="uid://ckusmx83iyvu5" path="res://Scenes/Game/DungeonRow.tscn" id="3_aefse"]
 [ext_resource type="PackedScene" uid="uid://dmgutm6ywv553" path="res://Scenes/Game/UpgradeRow.tscn" id="3_fuq2u"]
 [ext_resource type="PackedScene" uid="uid://dh3pvk0vtmwhp" path="res://Scenes/Game/TierHeader.tscn" id="4_q5o1p"]
+[ext_resource type="PackedScene" uid="uid://c6jhp8ib8oeq8" path="res://Scenes/Game/AbilityRow.tscn" id="6_gjtx3"]
 [ext_resource type="Script" uid="uid://cuwb2b82uaevg" path="res://Scenes/Game/BattlePanel.cs" id="6_q5o1p"]
+[ext_resource type="PackedScene" uid="uid://dqg7340l043g1" path="res://Scenes/Game/AbilitySectionHeader.tscn" id="7_qferr"]
 [ext_resource type="Script" uid="uid://dvussrwxd2447" path="res://Scenes/Game/StatusEffectDisplay.cs" id="7_qkdyd"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gucqa"]
@@ -16,7 +18,7 @@ border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.6262097, 0.50638646, 0.3491902, 1)
 
-[node name="MainGame" type="Control" unique_id=365822274 node_paths=PackedStringArray("KleosLabel", "ProductionLabel", "HeroPortrait", "HeroLevelLabel", "HeroHPBar", "HeroXPBar", "DeedButton", "DeedContextLabel", "DungeonButton", "UpgradeButton", "DungeonPanel", "UpgradePanel", "HeroPanel", "HeroPanelTitle", "HeroNameLabel", "HeroLevelDetailLabel", "HeroHPDetailBar", "HeroXPDetailBar", "StrengthValueLabel", "EnduranceValueLabel", "CunningValueLabel", "FavorValueLabel", "StrengthUpgradeButton", "EnduranceUpgradeButton", "CunningUpgradeButton", "FavorUpgradeButton", "StatPointsLabel", "CombatStatsLabel", "ArtisanList", "UpgradeList", "DungeonList", "FadeOverlay")]
+[node name="MainGame" type="Control" unique_id=365822274 node_paths=PackedStringArray("KleosLabel", "ProductionLabel", "HeroPortrait", "HeroLevelLabel", "HeroHPBar", "HeroXPBar", "DeedButton", "DeedContextLabel", "DungeonButton", "UpgradeButton", "DungeonPanel", "UpgradePanel", "HeroPanel", "HeroPanelTitle", "HeroNameLabel", "HeroLevelDetailLabel", "HeroHPDetailBar", "HeroXPDetailBar", "StrengthValueLabel", "EnduranceValueLabel", "CunningValueLabel", "FavorValueLabel", "StrengthUpgradeButton", "EnduranceUpgradeButton", "CunningUpgradeButton", "FavorUpgradeButton", "StatPointsLabel", "CombatStatsLabel", "ArtisanList", "UpgradeList", "DungeonList", "AbilityButton", "AbilityPanel", "AbilityList", "FadeOverlay")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -59,6 +61,11 @@ TierHeaderScene = ExtResource("4_q5o1p")
 UpgradeList = NodePath("UpgradePanel/ScrollContainer/UpgradeList")
 DungeonRowScene = ExtResource("3_aefse")
 DungeonList = NodePath("DungeonPanel/ScrollContainer/DungeonList")
+AbilityButton = NodePath("RootLayout/MainPanel/LeftPanel/AbilityButton")
+AbilityPanel = NodePath("AbilityPanel")
+AbilityRowScene = ExtResource("6_gjtx3")
+AbilitySectionHeaderScene = ExtResource("7_qferr")
+AbilityList = NodePath("AbilityPanel/ScrollContainer/AbilityList")
 FadeOverlay = NodePath("FadeOverlay")
 
 [node name="Background" type="ColorRect" parent="." unique_id=1115374356]
@@ -142,16 +149,25 @@ layout_mode = 2
 size_flags_vertical = 3
 
 [node name="UpgradeButton" type="Button" parent="RootLayout/MainPanel/LeftPanel" unique_id=2073831653]
-custom_minimum_size = Vector2(50, 3.525)
+custom_minimum_size = Vector2(150, 3.525)
 layout_mode = 2
 size_flags_horizontal = 0
 text = "Upgrades "
+
+[node name="MiddleSpacer2" type="Control" parent="RootLayout/MainPanel/LeftPanel" unique_id=1727570810]
+layout_mode = 2
+
+[node name="AbilityButton" type="Button" parent="RootLayout/MainPanel/LeftPanel" unique_id=1274710767]
+custom_minimum_size = Vector2(150, 3.525)
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Combat Arts"
 
 [node name="MiddleSpacer" type="Control" parent="RootLayout/MainPanel/LeftPanel" unique_id=2098654664]
 layout_mode = 2
 
 [node name="DungeonButton" type="Button" parent="RootLayout/MainPanel/LeftPanel" unique_id=1458184694]
-custom_minimum_size = Vector2(50, 0)
+custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 text = "Dungeons"
@@ -365,6 +381,24 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 
+[node name="AbilityPanel" type="PanelContainer" parent="." unique_id=12584024]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.09
+anchor_top = 0.08
+anchor_right = 0.295
+anchor_bottom = 0.95
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ScrollContainer" type="ScrollContainer" parent="AbilityPanel" unique_id=1710143232]
+layout_mode = 2
+
+[node name="AbilityList" type="VBoxContainer" parent="AbilityPanel/ScrollContainer" unique_id=1914977548]
+layout_mode = 2
+size_flags_horizontal = 3
+
 [node name="UpgradePanel" type="PanelContainer" parent="." unique_id=1058359160]
 visible = false
 layout_mode = 1
@@ -384,6 +418,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="BattlePanel" type="Control" parent="." unique_id=1960193445 node_paths=PackedStringArray("EncounterHeaderLabel", "HeroNameLabel", "HeroLevelLabel", "HeroPortrait", "HeroHPBar", "HeroHPText", "HeroEffectDisplay", "EnemyNameLabel", "EnemyPortrait", "EnemyHPBar", "EnemyHPText", "EnemyEffectDisplay", "LogLine1", "LogLine2", "LogLine3", "LogLine4", "SpeedToggleButton", "BattleBackground", "ResultOverlay", "ResultSubtitleLabel", "ResultTitleLabel", "ResultFlavorLabel", "ResultRewardLabel", "ResultLuckLabel", "ResultSummaryLabel", "ResultConsolationLabel", "ResultActionButton", "ViewBattleLogButton", "PostCombatLogOverlay", "PostCombatLogScroll", "PostCombatLogList", "BackToResultsButton", "CombatArea")]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
