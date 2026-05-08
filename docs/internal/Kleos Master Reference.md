@@ -1,7 +1,7 @@
 # Kleos Master Reference -- Godot Edition
-# KMR_Godot -- Updated April 29, 2026
+# KMR_Godot -- Updated May 8, 2026
 # Engine: Godot 4.6.2 .NET (C#)
-# Status: Core gameplay complete -- battle system, three dungeons, DevConsole
+# Status: Combat RPG system complete, Combat Arts UI, NumberFormatter
 
 ---
 
@@ -21,22 +21,30 @@ what has been confirmed functional.
 
 ## Port Status Overview
 
-Autoload managers: All ten complete and tested (BattleSystem and
-  DevConsole added April 2026).
-Resource classes: All seven ported and functional.
+Autoload managers: All eleven complete and tested (HeroAbilityManager
+  added May 2026).
+Resource classes: All ten ported and functional (added CombatAbility,
+  AbilityEffect, HeroAbilityDatabase May 2026).
 Asset data (.tres files): Artisans complete, all three dungeons complete,
   all three encounter pools complete, 24 upgrade assets complete,
-  BattleTextLibrary asset complete. Tier 2 and Tier 3 upgrade dungeon
-  gates wired to brigands.tres and coastal.tres.
-Main Menu scene: Complete -- fade, prompt text, settings panel.
-Game scene: Complete -- core layout with three-panel structure.
+  BattleTextLibrary asset complete, 20 enemy ability assets complete,
+  9 hero ability assets complete, hero ability database complete.
+  Tier 2 and Tier 3 upgrade dungeon gates wired to brigands.tres
+  and coastal.tres.
+Main Menu scene: Complete -- fade, prompt text, settings panel,
+  scientific notation toggle.
+Game scene: Complete -- core layout with three-panel structure,
+  Combat Arts panel.
 Artisan UI: Complete -- rows with locked/unlocked states, hire flow.
 Hero portrait and panel: Complete -- compact display, full stat panel.
 Dungeon UI: Complete -- DungeonRow with progress display and layer info.
 Upgrade UI: Complete -- UpgradeRow with five visual states and tier headers.
 Battle panel: Complete -- combat display, battle log, result screens,
-  post-combat log, animations, text variety.
-DevConsole: Complete -- backtick toggle, 11 commands, command history.
+  post-combat log, animations, text variety, status effect display,
+  ability name and flavor text log lines.
+Combat Arts panel: Complete -- 9 hero abilities with type badges,
+  auto-generated descriptions, purchase flow, three sections.
+DevConsole: Complete -- backtick toggle, 16 commands, command history.
 
 ---
 
@@ -218,7 +226,7 @@ each dungeon config. Rows fill the full width of the DungeonPanel.
 
 ---
 
-## Section 5 -- Battle System (April 2026)
+## Section 5 -- Battle System
 
 Battles triggered by entering dungeon layers via the DungeonRow
 action button or by random encounter deed clicks. Turn-based combat
@@ -226,31 +234,47 @@ with hero attacking first each round (Greek tradition).
 
 Battle Flow:
 1. Setup: BattleContext created (dungeon or random encounter).
-   Hero HP restored to full. BattlePanel opens with fade-in.
+   Hero HP restored to full. Status effect managers initialized.
+   Ability resolvers initialized. BattlePanel opens with fade-in.
    Encounter flavor text shown in battle log.
-2. Combat Loop: Alternating hero/enemy attacks with timed delays.
-   Hero attacks first, then enemy retaliates after 0.4s delay.
-   0.4s delay between rounds. Dodge and crit rolls each attack.
+2. Combat Loop: Each round:
+   a. Status effects process at round start (DoT ticks, HoT ticks,
+      duration decrements, expiry). Death check after DoT.
+   b. Ability resolver cooldowns advance.
+   c. Hero turn: stun check, ability resolution, attack with
+      modified stats through damage pipeline.
+   d. Death check after hero turn.
+   e. Enemy turn: stun check, ability resolution, attack with
+      modified stats through damage pipeline.
+   f. Death check after enemy turn.
+   g. End-of-round processing.
 3. Resolution: Victory or defeat detected when HP reaches zero.
    0.6s final blow pause before result screen fade-in.
+   Status effects and ability resolvers cleared.
 4. Rewards: Victory grants kleos. Defeat restores hero to full HP.
    Dungeon victories advance layer progress.
 5. Dismissal: Player presses CLAIM GLORY or RETREAT to close panel.
 
+Damage Pipeline (full, with status effect integration):
+  1. Attacker base damage (hero stats or enemy DPS/rate).
+  2. attackerEffects.GetModifiedDamage() applies AttackDamageUp,
+     AttackDamageDown, and WeaponSteal modifiers.
+  3. Dodge check: defenderEffects.GetModifiedDodgeChance().
+  4. If dodged: log and skip.
+  5. Crit immunity check: defenderEffects.HasCritImmunity().
+  6. Crit roll: attackerEffects.GetModifiedCritChance().
+  7. Apply crit multiplier if successful.
+  8. Shield absorption: defenderEffects.AbsorbDamage().
+  9. Remainder hits HP.
+  10. Damage reflect: defenderEffects.GetReflectPercent().
+  11. Log everything with appropriate colors and alignment.
+
 Battle Context:
 Two factory methods create the appropriate context:
   CreateDungeonBattle(dungeon, layerIndex, layer) -- sets dungeon
-    metadata, layer reward, boss flags, header text as
-    "{Dungeon Name} - Layer {N}".
+    metadata, layer reward, boss flags, header text.
   CreateRandomEncounter(enemy, poolName) -- sets enemy reward,
     header text as "Random Encounter", pool name for theming.
-
-Battle Sources:
-  Dungeon: DungeonRow action button triggers
-    BattleSystem.StartDungeonBattle().
-  Random Encounter: RandomEncounterManager.EncounterTriggered
-    signal triggers BattleSystem.StartRandomEncounterBattle().
-    Signal passes pool name alongside enemy data for theming.
 
 Reward Calculation (DungeonRewardCalculator):
   Dungeon rewards (deterministic):
@@ -262,97 +286,215 @@ Reward Calculation (DungeonRewardCalculator):
     Total = (BaseReward + UpgradeBonus) * LuckMultiplier
     Luck roll: 40% = 1x, 20% = 2x, 15% = 3x, 10% = 4x,
       5% = 6x, 5% = 10x, 5% = 20x.
-    WasLucky flag and LuckMultiplier stored for result screen.
-
-Enemy Damage Calculation:
-  Damage per hit = DamagePerSecond / AttackRate.
-  Preserves intended damage output from the original enemy
-  balance tables in the turn-based system.
-
-Post-Victory Healing:
-  If PostVictoryHealPercent upgrade modifier is purchased,
-  hero heals that percentage of max HP after winning.
-
-Post-Defeat:
-  Hero HP restored to full. No reward. No dungeon advancement.
 
 Battle Panel UI:
-  Full-screen overlay (Control node, not PanelContainer).
-  Sits after UpgradePanel and before FadeOverlay in scene tree.
+  Full-screen overlay (Control node).
+  Background theming: Forest green, Brigands brown, Coastal blue.
+  Hero (bottom-left): Name, Level, HP bar, HP text, Portrait,
+    StatusEffectDisplay (below HP).
+  Enemy (top-right): Portrait, Name, HP text, HP bar,
+    StatusEffectDisplay (below HP bar).
+  Battle log (center-bottom): 4 visible lines.
+  Speed toggle (top-left): x1/x2/x4 cycle.
 
-  Layout (asymmetric):
-    Hero (bottom-left): HP text, HP bar, Portrait, Name, Level.
-    Enemy (top-right): Name, Portrait, HP bar, HP text.
-    Battle log (center-bottom): 4 visible lines.
-    Encounter header (top-center): dungeon name or "RANDOM ENCOUNTER".
-    Speed toggle (top-left): hidden until upgrade purchased.
+Battle Log:
+  Hero actions left-aligned in copper (C87840).
+  Enemy actions right-aligned in red (C84030).
+  Critical hits highlighted in gold (FFD700).
+  Dodges in steel grey (8A9AAA).
+  Ability names: aligned with caster side, colored per ability.
+  Cast flavor text: aligned with caster side.
+  Status tick/expiry: centered in muted olive (8A8A6A / 6A6A5A).
+  Older visible lines fade via alpha (newest 100%, oldest 40%).
+  Full history stored for post-combat log with center alignment
+  tracking per line.
 
-  Background Theming:
-    ColorRect background tint changes per dungeon or encounter pool.
-    Forest: dark green (0.12, 0.18, 0.10).
-    Road/Brigands: warm brown (0.20, 0.17, 0.12).
-    Coast/Caves: dark blue (0.10, 0.15, 0.22).
-    Default: dark brown (0.15, 0.13, 0.11).
-    Theme resolved by string matching on dungeon ID or pool name.
+StatusEffectDisplay:
+  VBoxContainer with StatusEffectDisplay.cs script attached.
+  One instance below hero HP, one below enemy HP.
+  Shows active effects as small text labels with duration countdown.
+  Buffs in olive (7A8A3A), debuffs in red (8A3A3A).
+  Format: "EffectName (N)" with stack indicator "x2" if stacked.
+  Refreshes on round start and after every attack.
+  Cleared on battle start and battle end.
 
-  Battle Log:
-    4 visible lines during combat, scrolling as new entries appear.
-    Hero actions left-aligned in copper (C87840).
-    Enemy actions right-aligned in red (C84030).
-    Critical hits highlighted in gold (FFD700).
-    Dodge lines displayed in steel grey (8A9AAA).
-    Older visible lines fade via alpha (newest 100%, oldest 40%).
-    Newest line fades in from transparent (0.15s tween).
-    Full history stored for post-combat log.
+Animations (unchanged from previous):
+  Portrait attack nudge, damage shake, HP bar tween, panel fade.
+  All durations scale with battle speed multiplier.
 
-  Result Screen:
-    Victory: subtitle (random from pool), VICTORY title in gold,
-      flavor text (random from pool with enemy name), formatted
-      reward with N0 number formatting, luck bonus display for
-      RNG multiplier > 1x, battle summary (rounds, HP remaining,
-      crits, dodges), CLAIM GLORY button.
-    Defeat: subtitle (random from pool), DEFEAT title in dark red,
-      flavor text (random from pool with enemy name), battle summary
-      (rounds, enemy HP remaining), consolation quote (random from
-      pool), RETREAT button.
-    VIEW BATTLE LOG button: opens scrollable full combat history
-      with left/right alignment matching the live log.
-    BACK TO RESULTS button: returns to result screen.
-    Result overlay fades in over 0.4s.
+---
 
-  Animations:
-    Portrait attack nudge: attacker slides 20px toward opponent
-      then snaps back (0.12s each direction, Quad easing).
-    Portrait damage shake: defender shakes horizontally 6px,
-      3 oscillations (0.06s each).
-    HP bar tween: smooth transition to new value (0.3s, Quad Out).
-    Panel open/close: fade in/out over 0.25s.
-    All animation durations scale with battle speed multiplier.
+## Section 5a -- Status Effects (May 2026)
 
-  Battle Speed Toggle:
-    Button cycles x1, x2, x4.
-    Only visible when BattleSpeedX2Unlocked upgrade purchased.
-    x4 requires BattleSpeedX4Unlocked upgrade.
-    All timer delays and animation durations divided by multiplier.
+Temporary modifiers on a combatant during battle. Managed by
+StatusEffectManager, one instance per combatant, created at battle
+start, cleared at battle end.
 
-  Combat Text (BattleTextLibrary):
-    9 hero attack lines, 7 crit lines, 7 dodge lines.
-    7 generic enemy attack lines (with {0} for enemy name).
-    5 enemy anticipation lines (reserved for future use).
-    6 victory lines, 4 victory subtitles.
-    5 defeat lines, 4 defeat subtitles, 6 consolation quotes.
-    All Greek-themed, editable in Inspector.
-    Fallback strings if library not loaded.
+StatusEffectType enum (17 types):
+  Stat Modifiers: AttackDamageUp, AttackDamageDown, AttackSpeedUp,
+    AttackSpeedDown, CritChanceUp, CritImmunity, DodgeUp, DodgeDown.
+  Damage Over Time: Bleed, Poison, Burn.
+  Healing Over Time: Regeneration.
+  Defensive: Shield, DamageReflect, DamageAbsorb.
+  Special: Stun, WeaponSteal.
 
-  Enemy-Specific Attack Lines:
-    EnemyData has AttackLines array for per-enemy combat text.
-    Priority: enemy-specific line, then generic pool, then fallback.
-    Allows unique flavor per creature (dog bites, crab pincers, etc).
+StatusEffectMode: Flat or Percentage.
 
-  Encounter Flavor Text:
-    EnemyData.EncounterFlavorTexts array.
-    Random line shown when combat begins.
-    Falls back to "{EnemyName} blocks your path..." if empty.
+StatusEffect data class fields:
+  Type, EffectName, Value, Duration, MaxStacks, CurrentStacks,
+  IsDebuff, Mode, SourceId, ApplyFlavorText, TickFlavorText,
+  ExpireFlavorText.
+
+Stacking rules:
+  Same effect from same source: refreshes duration, no new stacks.
+  Same effect from different sources: stacks up to MaxStacks.
+  Different effect types always coexist.
+
+Processing order each round:
+  1. Start of round: tick DoTs/HoTs, reduce durations, expire.
+  2. Attacker turn: check Stun, apply stat modifiers to attack.
+  3. Damage dealt: Shield absorb, then HP, then DamageReflect.
+  4. End of round: reserved for future triggers.
+
+StatusEffectManager methods:
+  ApplyEffect, RemoveEffect, ProcessStartOfRound, ProcessEndOfRound,
+  GetModifiedDamage, GetModifiedDodgeChance, GetModifiedCritChance,
+  HasEffect, HasCritImmunity, IsStunned, GetShieldAmount,
+  AbsorbDamage, GetReflectPercent, GetActiveEffects, ClearAll.
+
+All modifier methods return base values unchanged when no effects
+are active, preserving identical behavior to pre-status-effect combat.
+
+---
+
+## Section 5b -- Combat Abilities (May 2026)
+
+Actions a combatant uses instead of or alongside normal attacks.
+Defined as CombatAbility Resource files (.tres).
+
+AbilityEffectType enum:
+  DealDamage, ApplyStatus, ApplySelfStatus, HealSelf, HealTarget,
+  RemoveDebuff, RemoveBuff.
+
+AbilityTrigger enum:
+  OnCooldown, WhenHPBelow, WhenHPAbove, WhenTargetHPBelow,
+  FirstRound, EveryNRounds.
+
+CombatAbility Resource fields:
+  Identity: AbilityId, AbilityName, AbilityDescription, AbilityColor.
+  Trigger: Trigger, TriggerValue, CooldownRounds, ReplacesAttack,
+    OneTimeUse.
+  AI: Priority (higher = checked first), UseChance (0-1 probability).
+  Use Conditions: CheckTargetHasNoEffect, RequiresTargetNoEffect,
+    CheckSelfHasEffect, RequiresSelfEffect.
+  Hero Unlock: UnlockAtLevel, KleosPurchaseCost, UnlockFromDungeonId.
+  Flavor: CastFlavorText.
+  Effects: Array of AbilityEffect resources.
+
+AbilityEffect Resource fields:
+  EffectType, Target, Value.
+  Status fields: StatusType, StatusName, StatusValue, StatusDuration,
+    StatusIsDebuff, StatusMode, StatusMaxStacks.
+  Flavor: StatusApplyText, StatusTickText, StatusExpireText.
+
+AbilityResolver (one instance per combatant):
+  Filters abilities by: off cooldown, trigger condition met, use
+  conditions met, not already used if OneTimeUse.
+  Sorts by Priority descending.
+  Rolls UseChance from highest priority down.
+  Returns first ability that passes, or null for normal attack.
+  Tracks cooldowns and one-time-use state per battle. Resets on
+  battle end.
+
+No behavior tree, no state machine. Priority-sorted list is sufficient
+for single-target turn-based combat. Confirmed in Unity testing.
+
+Ability execution in BattleSystem:
+  Logs ability name (aligned with caster, ability color).
+  Logs cast flavor text (aligned with caster).
+  Processes each AbilityEffect: DealDamage routes through shield
+  absorption, ApplyStatus/ApplySelfStatus creates StatusEffect
+  instances, HealSelf/HealTarget restores HP, RemoveDebuff/RemoveBuff
+  removes specific effect types.
+
+BattleLogEntry fields for ability display:
+  RichTextOverride: pre-formatted text bypasses normal log formatting.
+  AlignCenter: forces center alignment (for status messages).
+  OverrideColor: ability-specific color for name lines.
+
+---
+
+## Section 5c -- Enemy Abilities (May 2026)
+
+20 enemy ability .tres files across three dungeons. Assigned to
+EnemyData via the Abilities export array. Enemies without abilities
+use normal attacks only.
+
+Forest of Trials:
+  Wolf: Howl (self buff, +25% damage, below 60% HP).
+  Wolf Pack: Coordinated Strike (bonus damage every 3 rounds).
+  Large Wolf: Savage Lunge (damage + bleed, below 50% HP, one-time).
+  Nemean Lion Cub: Young Roar (debuff hero damage, first round).
+  Nemean Lion: Impervious Hide (50 damage shield, first round) +
+    Thunderous Roar (debuff hero damage and dodge, below 50% HP).
+
+Brigands' Pass:
+  Road Thief: Dirty Trick (dodge reduction, periodic).
+  Bandit Hoplite: Shield Wall (30 damage shield, below 60% HP).
+  Rogue Mercenary: Poisoned Blade (poison DoT, only when hero not
+    already poisoned).
+  Pine-Bender: Bend the Pine (burst damage + stun, below 70% HP).
+  Archilestes: Pickpocket (weapon steal, first round) + Brigand's
+    Cunning (self dodge + damage buff, below 30% HP).
+
+Coastal Caves:
+  Shore Crab: Karkinos Carapace (crit immunity, below 50% HP).
+  Drowned Sailor: Grasp of the Deep (damage reduction, periodic).
+  Siren Thrall: Siren's Call (massive dodge reduction, first round).
+  Sea Hag: Curse of Thalassa (poison DoT, below 40% HP).
+  Scylla Spawn: Tentacle Lash (damage + stacking bleed, every 2 rounds).
+  Charybdis Maw: Whirlpool (burst damage + damage reduction, below 60% HP).
+  Siren Queen: Song of Oblivion (damage + dodge debuff, first round) +
+    Wrath of the Deep (burst + poison + self-regen, below 30% HP).
+
+Enemies without abilities: Wild Dog, Bandit Lookout, Outlaw Peltast,
+  Outlaw Peltast Band, Bandit Champion, War Hounds, Reef Serpent,
+  Reef Serpent Pair, Coastal Chimera.
+
+---
+
+## Section 5d -- Hero Abilities (May 2026)
+
+9 hero ability .tres files managed by HeroAbilityManager. Three
+unlock paths: level-based (automatic), kleos purchase (manual),
+dungeon reward (automatic on dungeon completion).
+
+All unlocked abilities are automatically available in combat via
+AbilityResolver. No loadout selection. Idle-friendly.
+
+Level-based (automatic unlock):
+  Focused Strike (level 2): 20 damage, replaces attack, 4 round cd.
+  Second Wind (level 5): heal 25 HP below 30% HP, one-time per battle.
+  Battle Hardened (level 8): +10% dodge for 3 rounds, first round.
+
+Kleos-purchased (via Combat Arts panel):
+  Shield of Bronze (2,000 kleos): 15 damage shield below 60% HP, 5 cd.
+  Viper's Bite (4,000 kleos): 5 damage + 3/round poison 3 rounds,
+    3 cd, does not replace attack, only used when target not poisoned.
+  War Cry (6,000 kleos): +30% attack damage 3 rounds above 70% HP, 6 cd.
+
+Dungeon rewards (automatic on completion):
+  Lion's Resilience (Forest): 3 HP/round regen 4 rounds below 50% HP.
+  Brigand's Instinct (Brigands): +15% crit chance 3 rounds every 4 rounds.
+  Tide's Blessing (Coastal): heal 15 HP + remove poison below 40% HP.
+
+HeroAbilityManager:
+  Loads ability configs from HeroAbilityDatabase resource.
+  Subscribes to HeroManager.LevelUp and DungeonManager.DungeonCompleted.
+  CheckLevelUnlocks() and CheckDungeonUnlocks() run on signals.
+  PurchaseAbility() checks kleos, level requirements, spends kleos.
+  GetUnlockedAbilities() returns Godot Array for AbilityResolver.
+  Save/load persists UnlockedAbilityIds list.
 
 ---
 
@@ -382,35 +524,16 @@ ModifierMode: Flat or Multiplier.
     Stolen Blade, Spoils of the Road, Scribe's Discipline,
     Bard's War Song, Road-Hardened, Brigand's Cunning,
     Victor's Instinct. Costs range 1,500 to 5,000 kleos.
-    Dungeon gate wired to brigands.tres.
 
   Tier 3 -- Trials of the Shore (requires Coastal Caves, 7 upgrades):
     Poseidon's Tide, Sailor's Fortune, Potter's Legacy,
     Sculptor's Vision, Sea-Hardened Body, Tidal Instinct,
     Coastal Plunder. Costs range 6,000 to 20,000 kleos.
-    Dungeon gate wired to coastal.tres.
 
 Upgrade UI (UpgradeRow):
-Each upgrade displays as a row with name, cost, description, lock
-reason, and a purchase button.
-
-Five visual states:
-  Affordable -- full color, button enabled, text "Purchase".
-  Unaffordable -- dimmed, button disabled, text "Purchase".
-  Purchased -- green tint, button disabled, text "Purchased".
-  Tier Locked -- dark grey, shows dungeon requirement, text "Locked".
-  Individual Locked -- warm brown, shows specific reason, text "Locked".
-
-Tier headers (TierHeader scene) inserted between upgrade groups.
-UpgradeRow refreshes on KleosChanged, UpgradePurchased, and
-DungeonCompleted signals. The DungeonCompleted subscription ensures
-tier gates update immediately when a dungeon is cleared (fixed April
-2026 -- previously tier gates only refreshed on kleos changes).
-Purchasing an upgrade triggers ArtisanManager.RecalculateTotalProduction()
-to immediately apply production modifiers.
-
-PopulateUpgradeList() in MainGameController spawns tier headers and
-upgrade rows sorted by tier then cost.
+Five visual states: Affordable, Unaffordable, Purchased, Tier Locked,
+Individual Locked. Tier headers inserted between groups. Sorted by
+tier then cost.
 
 ---
 
@@ -424,22 +547,6 @@ dungeon completion requirement. Forest pool is always active (no gate).
 When an encounter triggers, a random active pool is selected, then a
 random enemy from that pool using weighted selection.
 
-Pool loading uses ResourceScanner.LoadAll<EncounterPool>() to scan the
-EncounterPools directory (fixed April 2026 -- was previously hardcoded
-to only load the Forest pool).
-
-Forest encounter pool:
-  Wild Dog (weight 3.0), Wild Boar (3.0), Wolf (2.5),
-  Wolf Pack (1.5), Large Wolf (1.0).
-
-Brigands encounter pool (unlocks when Brigands' Pass completed):
-  Road Thief (3.0), Bandit Lookout (2.5), Outlaw Peltast (2.0),
-  Bandit Hoplite (1.5), Rogue Mercenary (1.0), War Hounds (0.5).
-
-Coastal encounter pool (unlocks when Coastal Caves completed):
-  Shore Crab (3.0), Reef Serpent (2.5), Drowned Sailor (2.0),
-  Siren Thrall (1.5), Sea Hag (1.0), Scylla Spawn (0.5).
-
 Bosses and mini-bosses excluded from all encounter pools. They are
 dungeon-exclusive.
 
@@ -451,42 +558,40 @@ JSON file-based persistence using Godot FileAccess and user:// path.
 
 SaveData structure:
   version (string)
-  lastSaveTime (string, ISO format)
-  KleosSaveData: currentKleos
-  ArtisanSaveData: owned counts dictionary
+  lastSaveTime (long, unix timestamp)
+  KleosSaveData: currentKleos, totalKleosPerSecond
+  ArtisanSaveData: owned counts dictionary, unlocked artisans list
   UpgradeSaveData: purchased upgrade IDs list
-  DungeonSaveData: progress dictionary
+  DungeonSaveData: progress dictionary, completed dungeons list
   HeroSaveData: level, XP, stat points, stat upgrade counts
+  HeroAbilitySaveData: unlocked ability IDs list (May 2026)
 
 SaveManager methods:
-  Save(SaveData) -- serializes to JSON, writes to user://kleos_save.json
-  Load() -- reads file, deserializes, returns SaveData
-  HasSaveData() -- checks file existence (used by main menu)
-  DeleteSaveData() -- removes save file
+  Save(SaveData) -- creates backup, serializes to JSON, writes file.
+  Load() -- tries main file, falls back to backup, returns empty if both fail.
+  HasSaveData() -- checks file existence.
+  ResetAllSaveData() -- removes both main and backup files.
+  Selective reset methods for each subsystem.
 
 All managers implement GetSaveData() and LoadFromSaveData() methods.
-hasInitialized guard flags on ArtisanManager, UpgradeManager, and
-HeroManager prevent race conditions between load and _Ready().
-
-Tested: save/load round-trip confirmed via console output.
 
 ---
 
 ## Section 9 -- Settings System
 
-SettingsManager is a persistent Autoload (does not use DontDestroyOnLoad
-since Godot autoloads persist automatically across scenes).
-
-Stores settings in a separate JSON file at user://kleos_settings.json.
+SettingsManager is a persistent Autoload. Uses ConfigFile storage
+at user://settings.cfg (separate from game save).
 
 Settings:
   Music volume (float, 0-1)
   SFX volume (float, 0-1)
   Fullscreen (bool)
   Resolution index (int)
+  Scientific notation (bool, default false) -- May 2026
 
-SettingsUI provides sliders for audio, a fullscreen toggle, a resolution
-dropdown, and a delete save button with confirmation dialog.
+Scientific notation toggle controls NumberFormatter display mode.
+When enabled, numbers above 999,999 display as scientific notation
+(e.g. 1.23e6). Below 1 million, standard suffixes are always used.
 
 ---
 
@@ -496,20 +601,10 @@ Separate scene (res://Scenes/MainMenu/main_menu.tscn), set as the main
 scene in Project Settings.
 
 Title "KLEOS" displayed at center.
-Prompt text below title:
-  First play (no save file): "Begin Your Journey"
-  Returning plays: random from pool ("Continue Your Deeds",
-    "Continue Your Journey", "Amuse the Gods", "The Fates Await",
-    "Glory Calls Once More")
-
-Pulse animation on prompt text via sine wave (alpha oscillates between
-0.3 and 1.0).
-
-Click anywhere or press Enter/Space to start.
-Fade to black, then async scene change to the game scene.
-
-Settings button opens settings panel. While settings panel is open,
-clicks do not trigger game start.
+Prompt text below title with pulse animation.
+Settings panel with audio sliders, fullscreen toggle, scientific
+notation toggle, and delete save button.
+Fade to black on game start, async scene change.
 
 ---
 
@@ -529,172 +624,182 @@ Layout structure:
         ProductionLabel
       MainPanel (HBoxContainer)
         LeftPanel (VBoxContainer, fixed width)
-          TopSpacer
-          DungeonButton
-          MiddleSpacer
           UpgradeButton
-          BottomSpacer
+          AbilityButton ("Combat Arts")
+          DungeonButton
         CenterPanel (VBoxContainer, expands)
           DeedButton
           DeedContextLabel
         RightPanel (VBoxContainer, fixed width)
           ArtisanScrollContainer
-            ArtisanList (VBoxContainer, artisan rows spawned here)
-    HeroPanel (PanelContainer, overlay, starts hidden)
-    DungeonPanel (PanelContainer, overlay, starts hidden)
-      ScrollContainer > DungeonList
-    UpgradePanel (PanelContainer, overlay, starts hidden)
-      ScrollContainer > UpgradeList
-    BattlePanel (Control, overlay, starts hidden)
-      BattleBackground (ColorRect)
-      CombatArea (Control)
-        EncounterHeaderLabel, HeroSection, EnemySection,
-        BattleLogContainer (4 Labels), SpeedToggleButton
-      ResultOverlay (Control, hidden)
-        ResultContent (VBoxContainer with result labels and buttons)
-      PostCombatLogOverlay (Control, hidden)
-        LogMargin (MarginContainer)
-          PostCombatLogScroll > PostCombatLogList
-        BackToResultsButton
+            ArtisanList
+    HeroPanel (overlay, starts hidden)
+    DungeonPanel (overlay, starts hidden)
+    UpgradePanel (overlay, starts hidden)
+    AbilityPanel (overlay, starts hidden) -- May 2026
+      ScrollContainer > AbilityList
+    BattlePanel (overlay, starts hidden)
     FadeOverlay (ColorRect)
 
-Dungeon and Upgrade panels are mutually exclusive -- opening one closes
-the other. Both toggle on their respective button press. HeroPanel
-toggles independently on portrait click.
-
-Artisan rows are always visible in the RightPanel. All six rows spawn
-on scene load. Locked artisans are greyed out with requirements shown.
-
-Dungeon rows spawn into DungeonList when scene loads. One row per
-dungeon config. Rows fill full panel width.
-
-Upgrade rows spawn into UpgradeList when scene loads. Tier headers
-inserted between tier groups. Sorted by tier then cost.
-
-Fade overlay handles scene-in transition (black to transparent).
+Four overlay panels: Dungeon, Upgrade, and Ability are mutually
+exclusive (opening one closes the others). HeroPanel toggles
+independently on portrait click.
 
 ---
 
-## Section 12 -- Resource Loading
+## Section 12 -- Combat Arts Panel (May 2026)
 
-All managers use ResourceScanner.LoadAll<T>() to scan directories for
-.tres and .res files instead of hardcoding paths. This means adding
-new content only requires dropping a .tres file into the correct folder.
+Displays all 9 hero abilities grouped into three sections:
+  "Learned through experience" -- level-based abilities, sorted by level.
+  "Purchased with kleos" -- buyable abilities, sorted by cost.
+  "Earned through conquest" -- dungeon reward abilities, sorted by
+    dungeon progression order.
 
-ResourceScanner is a static utility class (not an Autoload). It uses
-DirAccess to list directory contents, loads each file with GD.Load(),
-and uses pattern matching (resource is T) to skip files of the wrong
-type. This prevents crashes from stray files in resource folders.
+AbilityRow displays per ability:
+  Top row: ability name + type badges.
+  Type badges: color-coded pills auto-determined from effects.
+    Attack (red), Self buff (olive), Poison/Debuff (amber),
+    Heal/Regen (teal), Cleanse (blue).
+    Multi-type abilities show two badges (Viper's Bite: Attack + Poison).
+  Description: auto-generated from effect data. Includes trigger
+    condition, cooldown, one-time-use, replaces-attack info.
+  Flavor text: from CastFlavorText field, dimmed italic style.
+  Bottom row: unlock condition + status/purchase button.
+    Level-based: "Unlocked at level N" or "Requires level N".
+    Purchasable: cost in kleos with Purchase button.
+    Dungeon reward: "Clear {Dungeon Name}".
+  Three visual states: Unlocked (green left accent), Purchasable
+    (dimmed with active button), Locked (dimmed with "Locked" badge).
 
-Each manager applies its own sort after scanning:
-  ArtisanManager -- sorts by unlock chain (Scribe first, then each
-    artisan whose requirement is the previous one).
-  DungeonManager -- sorts by progression chain (dungeons with no
-    RequiredDungeon first, then chained by RequiredDungeon reference).
-  UpgradeManager -- sorts by tier first, then by cost within each tier.
-  RandomEncounterManager -- loads all pools via ResourceScanner
-    (fixed April 2026).
-
-Resource directories:
-  res://Resources/Artisans/       -- 6 artisan .tres files
-  res://Resources/Dungeons/       -- 3 dungeon .tres files
-  res://Resources/Enemies/        -- enemy .tres files organized by dungeon
-    1. Forest/ (7 enemies), 2. Brigands/ (10 enemies), 3. Coastal/ (10 enemies)
-  res://Resources/Upgrades/       -- 24 upgrade .tres files
-  res://Resources/EncounterPools/ -- 3 encounter pool .tres files
-  res://Resources/BattleText/     -- battle_text_library.tres
+AbilityRow refreshes on KleosChanged, LevelUp, AbilityUnlocked,
+and DungeonCompleted signals.
 
 ---
 
-## Section 13 -- DevConsole (April 2026)
+## Section 13 -- NumberFormatter (May 2026)
 
-Developer tool for testing. Registered as Autoload position 10.
+Static utility class for compact number display. Not a Node, not
+an Autoload. Called directly as NumberFormatter.FormatCompact(),
+FormatFull(), or FormatCost().
+
+Suffix table (short scale, up to decillion):
+  K (10^3), M (10^6), B (10^9), T (10^12), Qa (10^15), Qi (10^18),
+  Sx (10^21), Sp (10^24), Oc (10^27), No (10^30), Dc (10^33).
+
+Beyond 999 decillion (10^36+): automatic scientific notation.
+
+Display modes:
+  Standard (default): 1.5K, 12.34M, 1.12B, 999Dc, then scientific.
+  Scientific (user toggle): 1.23e6, 1e12 (only above 999,999).
+
+Formatting rules:
+  Below 1000: full integer with thousand separators.
+  1.0 - 99.99 in a tier: two decimals, trailing zeros dropped.
+  100 - 999 in a tier: no decimal.
+  All values truncated (floor), never rounded.
+
+FormatCost: full number with separators below 10K, compact above.
+FormatFull: always full number with separators (for DevConsole).
+
+Wired into: MainGameController (kleos, KpS), ArtisanRow (costs),
+UpgradeRow (costs), BattlePanel (rewards), AbilityRow (costs),
+DevConsole (full precision for debugging).
+
+---
+
+## Section 14 -- DevConsole
+
+Developer tool for testing. Registered as Autoload position 11.
 CanvasLayer with Layer 100 so it renders above everything.
 
-Toggle: backtick (`) key. Opens a top-of-screen panel with input
-field and output label.
+Toggle: backtick (`) key.
 
 Commands:
   kleos <amount>            -- adds kleos
   level <target>            -- sets hero to target level via XP grant
-  stat <str/end/cun/fav> <n>-- upgrades stat N times (tracks actual applied)
-  clear <dungeonId>         -- completes a dungeon (calls ForceCompleteDungeon)
+  stat <str/end/cun/fav> <n>-- upgrades stat N times
+  clear <dungeonId>         -- completes a dungeon
   layer <dungeonId> <count> -- clears next N layers
   hp <amount>               -- sets hero HP to specific value
   pools                     -- shows active encounter pool count
-  save                      -- saves game state
-  load                      -- loads game state
-  reset                     -- deletes save data
+  save / load / reset       -- save system
   status                    -- shows kleos, KpS, hero level, stats
+  effects                   -- shows active status effects in battle
+  buff <target> <type> <val> <dur> -- applies status effect in battle
+  testability               -- adds test ability to current enemy
+  abilities                 -- shows all hero abilities with unlock status
+  unlock <abilityId>        -- force-unlocks a hero ability
 
-Command history via up/down arrow keys. All input lowercased before
-parsing. UI built entirely in code (no scene file needed).
+Command history via up/down arrow keys.
 
 ---
 
 ## Integration Notes
 
-KleosManager.KleosChanged signal drives:
-  KleosLabel text update, ArtisanRow affordability checks,
-  UpgradeRow affordability checks, DungeonRow unlock checks.
+KleosManager signals drive: KleosLabel, ArtisanRow affordability,
+  UpgradeRow affordability, DungeonRow unlock checks, HeroManager XP.
 
-KleosManager.KleosGained signal drives:
-  HeroManager XP tracking.
-
-KleosManager.ProductionChanged signal drives:
-  ProductionLabel text update.
-
-KleosManager.DeedContextChanged signal drives:
-  DeedContextLabel text update.
-
-ArtisanManager.ArtisanPurchased signal drives:
-  ArtisanRow unlock checks (locked rows self-unlock when conditions met),
+ArtisanManager.ArtisanPurchased drives: ArtisanRow unlock checks,
   production recalculation.
 
-UpgradeManager.UpgradePurchased signal drives:
-  UpgradeRow refresh (prerequisite checks, purchased state).
+UpgradeManager.UpgradePurchased drives: UpgradeRow refresh.
 
-DungeonManager.LayerCleared signal drives:
-  DungeonRow progress and state refresh.
+DungeonManager.DungeonCompleted drives: RandomEncounterManager pool
+  refresh, DungeonRow state refresh, UpgradeRow tier gate refresh,
+  HeroAbilityManager dungeon unlock checks.
 
-DungeonManager.DungeonCompleted signal drives:
-  RandomEncounterManager (marks pools dirty),
-  DungeonRow (refreshes rows whose RequiredDungeon just completed),
-  UpgradeRow (refreshes tier-gated rows for the completed dungeon).
+HeroManager.LevelUp drives: HeroAbilityManager level unlock checks,
+  AbilityRow refresh.
 
-HeroManager.StatsChanged signal drives:
-  Hero panel stat display refresh, hero portrait bar updates.
+HeroAbilityManager.AbilityUnlocked drives: AbilityRow state refresh.
 
-HeroManager.LevelUp signal drives:
-  Stat point notification, hero panel refresh.
+BattleSystem C# events drive: BattlePanel (BattleStarted,
+  HeroAttackOccurred, EnemyAttackOccurred, RoundStarted, BattleEnded).
 
-BattleSystem.BattleStarted (C# event):
-  BattlePanel.OnBattleStarted
+---
 
-BattleSystem.HeroAttackOccurred (C# event):
-  BattlePanel.OnHeroAttack
+## Autoload Order
 
-BattleSystem.EnemyAttackOccurred (C# event):
-  BattlePanel.OnEnemyAttack
+  1. SettingsManager
+  2. SaveManager
+  3. UpgradeManager
+  4. KleosManager
+  5. ArtisanManager
+  6. HeroManager
+  7. DungeonManager
+  8. HeroAbilityManager
+  9. RandomEncounterManager
+  10. BattleSystem
+  11. DevConsole
 
-BattleSystem.RoundStarted (C# event):
-  BattlePanel.OnRoundStarted
+---
 
-BattleSystem.BattleEnded (C# event):
-  BattlePanel.OnBattleEnded
+## Resource Directories
 
-RandomEncounterManager.EncounterTriggered:
-  BattleSystem.OnRandomEncounterTriggered
+  res://Autoloads/                -- manager scripts
+  res://Autoloads/Cobat/          -- combat system classes
+    StatusEffectType.cs, StatusEffect.cs, StatusEffectManager.cs,
+    AbilityResolver.cs, AbilityEnums.cs, AbilityEffect.cs,
+    CombatAbility.cs
+  res://Resources/Artisans/       -- 6 artisan .tres + database
+  res://Resources/Dungeons/       -- 3 dungeon .tres + database
+  res://Resources/Enemies/        -- enemy .tres by dungeon
+  res://Resources/Upgrades/       -- 24 upgrade .tres + database
+  res://Resources/EncounterPools/ -- 3 pool .tres + database
+  res://Resources/BattleText/     -- battle_text_library.tres
+  res://Resources/Abilities/
+    Enemies/                      -- 20 enemy ability .tres
+    Hero/                         -- 9 hero ability .tres + database
+  res://Scenes/Game/              -- game scene, UI row scripts/scenes
+  res://Scenes/MainMenu/          -- main menu scene
 
 ---
 
 ## What Is Not Yet Implemented
 
-Status effect and ability system (implemented in Unity, not ported).
 Deed button visual evolution (Bronze/Silver/Gold/Divine tiers).
 Flavor text floating notifications.
 Omen system pre-battle warnings.
-Number formatting utility (NumberFormatter equivalent).
 Prestige/meta-progression system (Echo/Arete mechanics).
 
 ---
