@@ -9,18 +9,21 @@ public partial class SettingsManager : Node
     private const string KeySfxVolume = "sfx_volume";
     private const string KeyFullscreen = "fullscreen";
     private const string KeyResolutionIndex = "resolution_index";
+    private const string KeyScientificNotation = "scientific_notation";
 
     // --- Defaults ---
     private const float DefaultMusicVolume = 1f;
     private const float DefaultSfxVolume = 1f;
     private const bool DefaultFullscreen = false;
     private const int DefaultResolutionIndex = 0;
+    private const bool DefaultScientificNotation = false;
 
     // --- State ---
     public float MusicVolume { get; private set; } = DefaultMusicVolume;
     public float SfxVolume { get; private set; } = DefaultSfxVolume;
     public bool Fullscreen { get; private set; } = DefaultFullscreen;
     public int ResolutionIndex { get; private set; } = DefaultResolutionIndex;
+    public bool ScientificNotation { get; private set; } = DefaultScientificNotation;
 
     // --- Lifecycle ---
 
@@ -67,6 +70,12 @@ public partial class SettingsManager : Node
         Save();
     }
 
+    public void SetScientificNotation(bool value)
+    {
+        ScientificNotation = value;
+        Save();
+    }
+
     // --- Apply ---
 
     public void ApplyAll()
@@ -108,6 +117,7 @@ public partial class SettingsManager : Node
         config.SetValue("audio", KeySfxVolume, SfxVolume);
         config.SetValue("display", KeyFullscreen, Fullscreen);
         config.SetValue("display", KeyResolutionIndex, ResolutionIndex);
+        config.SetValue("display", KeyScientificNotation, ScientificNotation);
         config.Save("user://settings.cfg");
     }
 
@@ -124,6 +134,7 @@ public partial class SettingsManager : Node
         MusicVolume = (float)config.GetValue("audio", KeyMusicVolume, DefaultMusicVolume);
         SfxVolume = (float)config.GetValue("audio", KeySfxVolume, DefaultSfxVolume);
         Fullscreen = (bool)config.GetValue("display", KeyFullscreen, DefaultFullscreen);
+        ScientificNotation = (bool)config.GetValue("display", KeyScientificNotation, DefaultScientificNotation);
         ResolutionIndex = (int)config.GetValue("display", KeyResolutionIndex, DefaultResolutionIndex);
     }
 
@@ -135,6 +146,7 @@ public partial class SettingsManager : Node
         SfxVolume = DefaultSfxVolume;
         Fullscreen = DefaultFullscreen;
         ResolutionIndex = DefaultResolutionIndex;
+        ScientificNotation = DefaultScientificNotation;
         ApplyAll();
         Save();
         GD.Print("[SettingsManager] Reset to defaults.");

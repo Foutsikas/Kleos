@@ -238,7 +238,8 @@ public partial class DevConsole : CanvasLayer
         if (!float.TryParse(parts[1], out float amount)) return "Invalid number.";
 
         KleosManager.Instance.AddKleos(amount);
-        return $"Added {amount:N0} kleos. Total: {KleosManager.Instance.CurrentKleos:N0}";
+        return $"Added {NumberFormatter.FormatFull(amount)} kleos. Total: {NumberFormatter.FormatFull(KleosManager.Instance.CurrentKleos)}";
+
     }
 
     private string CmdLevel(string[] parts)
@@ -386,8 +387,8 @@ public partial class DevConsole : CanvasLayer
 
     private string CmdStatus()
     {
-        return $"Kleos: {KleosManager.Instance.CurrentKleos:N0} | " +
-               $"KpS: {KleosManager.Instance.TotalKleosPerSecond:F1}\n" +
+        return $"Kleos: {NumberFormatter.FormatFull(KleosManager.Instance.CurrentKleos)} | " +
+               $"KpS: {NumberFormatter.FormatCompact(KleosManager.Instance.TotalKleosPerSecond)}\n" +
                $"Hero Lv.{HeroManager.Instance.GetLevel()} | " +
                $"HP: {HeroManager.Instance.GetCurrentHP():F0}/{HeroManager.Instance.GetMaxHP():F0} | " +
                $"DMG: {HeroManager.Instance.GetDamage():F1} | " +

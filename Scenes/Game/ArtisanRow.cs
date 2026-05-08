@@ -130,7 +130,8 @@ public partial class ArtisanRow : PanelContainer
 			ArtisanKPSLabel.Text = $"{artisanData.KleosPerSecond:F1} K/s each";
 
 		if (ArtisanCostLabel != null)
-			ArtisanCostLabel.Text = $"{Mathf.Floor(cost):N0}";
+			ArtisanCostLabel.Text = NumberFormatter.FormatCost(cost);
+
 
 		if (ArtisanOwnedLabel != null)
 			ArtisanOwnedLabel.Text = $"Owned: {owned}";
@@ -159,7 +160,7 @@ public partial class ArtisanRow : PanelContainer
 		if (ArtisanCostLabel != null)
 		{
 			float cost = ArtisanManager.Instance.GetCurrentCost(artisanData);
-			ArtisanCostLabel.Text = $"{Mathf.Floor(cost):N0}";
+			ArtisanCostLabel.Text = NumberFormatter.FormatCost(cost);
 		}
 	}
 

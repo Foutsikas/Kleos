@@ -12,6 +12,7 @@ public partial class MainMenuController : Control
     [Export] public HSlider MusicSlider { get; set; }
     [Export] public HSlider SfxSlider { get; set; }
     [Export] public CheckBox FullscreenToggle { get; set; }
+    [Export] public CheckBox ScientificNotationToggle { get; set; }
     [Export] public ColorRect FadeOverlay { get; set; }
 
     // --- Prompt Text ---
@@ -63,6 +64,8 @@ public partial class MainMenuController : Control
             SfxSlider.Value = SettingsManager.Instance.SfxVolume;
         if (FullscreenToggle != null)
             FullscreenToggle.SetPressedNoSignal(SettingsManager.Instance.Fullscreen);
+        if (ScientificNotationToggle != null)
+            ScientificNotationToggle.SetPressedNoSignal(SettingsManager.Instance.ScientificNotation);
     }
 
     private void ConnectButtons()
@@ -81,6 +84,8 @@ public partial class MainMenuController : Control
             SfxSlider.ValueChanged += OnSfxVolumeChanged;
         if (FullscreenToggle != null)
             FullscreenToggle.Toggled += OnFullscreenToggled;
+        if (ScientificNotationToggle != null)
+            ScientificNotationToggle.Toggled += OnScientificNotationToggled;
     }
 
     // --- Fade ---
@@ -185,5 +190,10 @@ public partial class MainMenuController : Control
     private void OnFullscreenToggled(bool pressed)
     {
         SettingsManager.Instance.SetFullscreen(pressed);
+    }
+
+    private void OnScientificNotationToggled(bool pressed)
+    {
+        SettingsManager.Instance.SetScientificNotation(pressed);
     }
 }

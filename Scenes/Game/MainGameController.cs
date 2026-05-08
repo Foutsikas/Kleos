@@ -382,13 +382,16 @@ public partial class MainGameController : Control
     private void RefreshKleosDisplay(float amount)
     {
         if (KleosLabel != null)
-            KleosLabel.Text = $"Kleos: {Mathf.Floor(amount):N0}";
+            KleosLabel.Text = $"Kleos: {NumberFormatter.FormatCompact(amount)}";
     }
 
     private void RefreshProductionDisplay(float amount)
     {
         if (ProductionLabel != null)
-            ProductionLabel.Text = $"{amount:F1} K/s";
+            if (amount < 1000f)
+                ProductionLabel.Text = $"{amount:F1} K/s";
+            else
+                ProductionLabel.Text = $"{NumberFormatter.FormatCompact(amount)} K/s";
     }
 
     private void RefreshDeedContext()

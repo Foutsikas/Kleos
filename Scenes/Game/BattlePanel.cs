@@ -368,8 +368,8 @@ public partial class BattlePanel : Control
 			}
 			else
 			{
-				Color abilityLineColor  = entry.OverrideColor ?? HeroActionColor;
-				PushLogLine(entry.RichTextOverride, abilityLineColor , true);
+				Color abilityLineColor = entry.OverrideColor ?? HeroActionColor;
+				PushLogLine(entry.RichTextOverride, abilityLineColor, true);
 			}
 			return;
 		}
@@ -736,7 +736,7 @@ public partial class BattlePanel : Control
 
 		if (ResultRewardLabel != null)
 		{
-			ResultRewardLabel.Text = $"+{result.Reward.FinalReward:N0} Kleos";
+			ResultRewardLabel.Text = $"+{NumberFormatter.FormatCompact(result.Reward.FinalReward)} Kleos";
 			ResultRewardLabel.Visible = true;
 		}
 

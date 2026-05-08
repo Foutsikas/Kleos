@@ -60,7 +60,8 @@ public partial class UpgradeRow : PanelContainer
 			UpgradeNameLabel.Text = upgradeConfig.UpgradeName;
 
 		if (UpgradeCostLabel != null)
-			UpgradeCostLabel.Text = $"{upgradeConfig.Cost:N0}";
+			UpgradeCostLabel.Text = NumberFormatter.FormatCost(upgradeConfig.Cost);
+
 
 		if (DescriptionLabel != null)
 			DescriptionLabel.Text = upgradeConfig.Description;

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bv3q7j8qheojl" path="res://Scenes/MainMenu/MainMenuController.cs" id="1_uqdog"]
 
-[node name="MainMenu" type="Control" unique_id=1232211877 node_paths=PackedStringArray("PromptLabel", "StartButton", "SettingsButton", "SettingsPanel", "CloseSettingsButton", "DeleteSaveButton", "MusicSlider", "SfxSlider", "FullscreenToggle", "FadeOverlay")]
+[node name="MainMenu" type="Control" unique_id=1232211877 node_paths=PackedStringArray("PromptLabel", "StartButton", "SettingsButton", "SettingsPanel", "CloseSettingsButton", "DeleteSaveButton", "MusicSlider", "SfxSlider", "FullscreenToggle", "ScientificNotationToggle", "FadeOverlay")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -19,6 +19,7 @@ DeleteSaveButton = NodePath("SettingsPanel/VBoxContainer/DeleteSaveButton")
 MusicSlider = NodePath("SettingsPanel/VBoxContainer/MusicRow/MusicSlider")
 SfxSlider = NodePath("SettingsPanel/VBoxContainer/SfxRow/SfxSlider")
 FullscreenToggle = NodePath("SettingsPanel/VBoxContainer/FullscreenToggle")
+ScientificNotationToggle = NodePath("SettingsPanel/VBoxContainer/ScientificNotationToggle")
 FadeOverlay = NodePath("FadeOverlay")
 
 [node name="Background" type="ColorRect" parent="." unique_id=1026084877]
@@ -141,6 +142,10 @@ value = 1.0
 [node name="FullscreenToggle" type="CheckBox" parent="SettingsPanel/VBoxContainer" unique_id=1815918980]
 layout_mode = 2
 text = "Fullscreen"
+
+[node name="ScientificNotationToggle" type="CheckBox" parent="SettingsPanel/VBoxContainer" unique_id=217802932]
+layout_mode = 2
+text = "Scientific Notation"
 
 [node name="DeleteSaveButton" type="Button" parent="SettingsPanel/VBoxContainer" unique_id=889884698]
 layout_mode = 2

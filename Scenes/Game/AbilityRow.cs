@@ -150,7 +150,7 @@ public partial class AbilityRow : PanelContainer
         if (PurchaseButton != null)
         {
             PurchaseButton.Visible = true;
-            PurchaseButton.Text = $"Purchase ({abilityData.KleosPurchaseCost:N0})";
+            PurchaseButton.Text = $"Purchase ({NumberFormatter.FormatCost(abilityData.KleosPurchaseCost)})";
             PurchaseButton.Disabled = !HeroAbilityManager.Instance
                 .CanPurchaseAbility(abilityData.AbilityId);
         }
@@ -412,7 +412,7 @@ public partial class AbilityRow : PanelContainer
         }
 
         if (abilityData.KleosPurchaseCost > 0)
-            return $"{abilityData.KleosPurchaseCost:N0} kleos";
+            return $"{NumberFormatter.FormatCost(abilityData.KleosPurchaseCost)} kleos";
 
         if (!string.IsNullOrEmpty(abilityData.UnlockFromDungeonId))
         {
