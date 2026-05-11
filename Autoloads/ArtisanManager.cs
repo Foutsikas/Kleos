@@ -192,6 +192,11 @@ public partial class ArtisanManager : Node
         return null;
     }
 
+    public int GetUnlockedCount()
+    {
+        return unlockedArtisans.Count;
+    }
+
     // --- Production ---
 
     public void RecalculateTotalProduction()

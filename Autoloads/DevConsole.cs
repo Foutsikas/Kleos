@@ -167,7 +167,8 @@ public partial class DevConsole : CanvasLayer
                        "  buff <hero|enemy> <type> <value> <duration>\n" +
                        "  testability -- Add test ability to enemy\n" +
                        "  abilities -- Show hero abilities\n" +
-                       "  unlock <abilityId> -- Force unlock ability"
+                       "  unlock <abilityId> -- Force unlock ability\n" +
+                       "  deed_tier <0-3>    -- Force deed button visual tier"
                        ;
 
             case "kleos":
@@ -222,6 +223,9 @@ public partial class DevConsole : CanvasLayer
             case "unlock":
                 HandleUnlockCommand(parts);
                 return "";
+
+            case "deed_tier":
+                return CmdDeedTier(parts);
 
             default:
                 return $"Unknown command: {cmd}. Type 'help'.";
@@ -625,5 +629,26 @@ public partial class DevConsole : CanvasLayer
         HeroAbilityManager.Instance.LoadFromSaveData(saveData);
 
         outputLabel.Text = $"Unlocked: {ability.AbilityName}";
+    }
+
+    private string CmdDeedTier(string[] parts)
+    {
+        if (parts.Length < 2)
+            return "Usage: deed_tier <0-3>  (0=Bronze, 1=Silver, 2=Gold, 3=Divine)";
+
+        if (!int.TryParse(parts[1], out int tier) || tier < 0 || tier > 3)
+            return "Invalid tier. Use 0-3.";
+
+        var container = GetTree().Root.FindChild("DeedButtonContainer", true, false);
+        if (container == null)
+            return "DeedButtonContainer not found in scene.";
+
+        var evolution = container as DeedButtonEvolution;
+        if (evolution == null)
+            return "DeedButtonEvolution script not found.";
+
+        evolution.ForceVisualTier(tier);
+        string[] tierNames = { "Bronze", "Silver", "Gold", "Divine" };
+        return $"Deed button forced to {tierNames[tier]} tier.";
     }
 }

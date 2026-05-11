@@ -10,5 +10,5 @@ BaseCost = 1800.0
 KleosPerSecond = 4.0
 CostMultiplier = 1.2
 RequiredArtisanId = "potter"
-RequiredArtisanCount = 5
+RequiredArtisanCount = 20
 metadata/_custom_type_script = "uid://m8ou3y8lx4kt"

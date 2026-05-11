@@ -9,5 +9,5 @@ ArtisanId = "bard"
 BaseCost = 70.0
 KleosPerSecond = 0.5
 RequiredArtisanId = "scribe"
-RequiredArtisanCount = 5
+RequiredArtisanCount = 10
 metadata/_custom_type_script = "uid://m8ou3y8lx4kt"
