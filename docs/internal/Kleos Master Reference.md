@@ -1,7 +1,8 @@
 # Kleos Master Reference -- Godot Edition
-# KMR_Godot -- Updated May 8, 2026
+# KMR_Godot -- Updated June 3, 2026
 # Engine: Godot 4.6.2 .NET (C#)
-# Status: Combat RPG system complete, Combat Arts UI, NumberFormatter
+# Status: Combat RPG system complete, Combat Arts UI, NumberFormatter,
+#   Deed Button Visual Evolution, artisan unlock rebalance
 
 ---
 
@@ -10,12 +11,6 @@
 This is the gameplay and system reference for the Godot port of Kleos.
 It documents what has been implemented, tested, and confirmed working
 in the Godot project specifically.
-
-All gameplay values (artisan costs, enemy stats, upgrade effects, hero
-formulas) are unchanged from the Unity version. Refer to the Unity KMR
-(KMR_Updated_2026-03-20.md) for balance tables and design rationale.
-This document only records Godot-specific implementation details and
-what has been confirmed functional.
 
 ---
 
@@ -34,8 +29,9 @@ Asset data (.tres files): Artisans complete, all three dungeons complete,
 Main Menu scene: Complete -- fade, prompt text, settings panel,
   scientific notation toggle.
 Game scene: Complete -- core layout with three-panel structure,
-  Combat Arts panel.
+  Combat Arts panel, Deed Button visual evolution.
 Artisan UI: Complete -- rows with locked/unlocked states, hire flow.
+  Unlock chain rebalanced June 2026.
 Hero portrait and panel: Complete -- compact display, full stat panel.
 Dungeon UI: Complete -- DungeonRow with progress display and layer info.
 Upgrade UI: Complete -- UpgradeRow with five visual states and tier headers.
@@ -44,7 +40,7 @@ Battle panel: Complete -- combat display, battle log, result screens,
   ability name and flavor text log lines.
 Combat Arts panel: Complete -- 9 hero abilities with type badges,
   auto-generated descriptions, purchase flow, three sections.
-DevConsole: Complete -- backtick toggle, 16 commands, command history.
+DevConsole: Complete -- backtick toggle, 17 commands, command history.
 
 ---
 
@@ -82,14 +78,17 @@ updates automatically.
 Six artisans, each a separate .tres asset file. Passive kleos per
 second generation. Purchase using kleos.
 
-Artisan table (values unchanged from Unity KMR):
+Artisan table (unlock chain rebalanced June 2026):
 
   Scribe    -- BaseCost 10,    KpS 0.2,  CostMult 1.18, always unlocked
-  Bard      -- BaseCost 70,    KpS 0.5,  CostMult 1.18, requires 5 Scribes
-  Potter    -- BaseCost 350,   KpS 1.2,  CostMult 1.20, requires 5 Bards
-  Sculptor  -- BaseCost 1800,  KpS 4.0,  CostMult 1.20, requires 5 Potters
-  Playwright-- BaseCost 9000,  KpS 10.0, CostMult 1.22, requires 5 Sculptors
-  Historian -- BaseCost 40000, KpS 25.0, CostMult 1.22, requires 3 Playwrights
+  Bard      -- BaseCost 70,    KpS 0.5,  CostMult 1.18, requires 10 Scribes
+  Potter    -- BaseCost 350,   KpS 1.2,  CostMult 1.20, requires 15 Bards
+  Sculptor  -- BaseCost 1800,  KpS 4.0,  CostMult 1.20, requires 20 Potters
+  Playwright-- BaseCost 9000,  KpS 10.0, CostMult 1.22, requires 15 Sculptors
+  Historian -- BaseCost 40000, KpS 25.0, CostMult 1.22, requires 10 Playwrights
+
+These six artisans are all early-game content. Additional artisan tiers
+for mid and late game are planned for future development.
 
 Cost formula: BaseCost * CostMultiplier ^ ownedCount.
 Production formula: KleosPerSecond * ownedCount * GetMultiplier(ArtisanProductionMultiplier).
@@ -159,8 +158,8 @@ Three dungeons implemented, each with 10 layers:
 Forest of Trials (forest.tres):
   Unlocked from start. No requirements.
   Layers: Wild Dog, Wild Dog, Wolf, Wolf Pack, Wolf Pack,
-    Large Wolf, Large Wolf, Large Wolf Pack,
-    Nemean Lion Cub (mini-boss), Nemean Lion (boss).
+	Large Wolf, Large Wolf, Large Wolf Pack,
+	Nemean Lion Cub (mini-boss), Nemean Lion (boss).
   Enemy stats: HP 135-800, DPS 4-10, AttackRate 1.5-1.9.
 
 Brigands' Pass (brigands.tres):
@@ -174,9 +173,9 @@ Brigands' Pass (brigands.tres):
 Coastal Caves (coastal.tres):
   Requires: Brigands' Pass completed, 2000 kleos.
   Layers: Shore Crab, Reef Serpent, Drowned Sailor,
-    Reef Serpent Pair, Siren Thrall, Sea Hag,
-    Coastal Chimera, Scylla Spawn,
-    Charybdis Maw (mini-boss), The Siren Queen (boss).
+	Reef Serpent Pair, Siren Thrall, Sea Hag,
+	Coastal Chimera, Scylla Spawn,
+	Charybdis Maw (mini-boss), The Siren Queen (boss).
   Enemy stats: HP 3000-9500, DPS 14-32, AttackRate 2.0-2.5.
 
 HP scaling is steeper than DPS scaling within each dungeon. This
@@ -442,7 +441,7 @@ Brigands' Pass:
   Road Thief: Dirty Trick (dodge reduction, periodic).
   Bandit Hoplite: Shield Wall (30 damage shield, below 60% HP).
   Rogue Mercenary: Poisoned Blade (poison DoT, only when hero not
-    already poisoned).
+	already poisoned).
   Pine-Bender: Bend the Pine (burst damage + stun, below 70% HP).
   Archilestes: Pickpocket (weapon steal, first round) + Brigand's
     Cunning (self dodge + damage buff, below 30% HP).
@@ -455,7 +454,7 @@ Coastal Caves:
   Scylla Spawn: Tentacle Lash (damage + stacking bleed, every 2 rounds).
   Charybdis Maw: Whirlpool (burst damage + damage reduction, below 60% HP).
   Siren Queen: Song of Oblivion (damage + dodge debuff, first round) +
-    Wrath of the Deep (burst + poison + self-regen, below 30% HP).
+	Wrath of the Deep (burst + poison + self-regen, below 30% HP).
 
 Enemies without abilities: Wild Dog, Bandit Lookout, Outlaw Peltast,
   Outlaw Peltast Band, Bandit Champion, War Hounds, Reef Serpent,
@@ -515,19 +514,19 @@ ModifierMode: Flat or Multiplier.
 24 upgrade .tres assets created across 3 tiers:
 
   Tier 1 -- Trials of the Forest (no dungeon gate, 10 upgrades):
-    Scribe's Quill, Bronze Training, Inspiring Presence,
-    Bard's Inspiration, Blessed Growth, Spartan's Endurance,
-    Potter's Craft, Warrior's Discipline, Olympian Strike,
+	Scribe's Quill, Bronze Training, Inspiring Presence,
+	Bard's Inspiration, Blessed Growth, Spartan's Endurance,
+	Potter's Craft, Warrior's Discipline, Olympian Strike,
     Echoing Deed. Costs range 50 to 3,500 kleos.
 
   Tier 2 -- Trials of the Road (requires Brigands Pass, 7 upgrades):
-    Stolen Blade, Spoils of the Road, Scribe's Discipline,
-    Bard's War Song, Road-Hardened, Brigand's Cunning,
-    Victor's Instinct. Costs range 1,500 to 5,000 kleos.
+	Stolen Blade, Spoils of the Road, Scribe's Discipline,
+	Bard's War Song, Road-Hardened, Brigand's Cunning,
+	Victor's Instinct. Costs range 1,500 to 5,000 kleos.
 
   Tier 3 -- Trials of the Shore (requires Coastal Caves, 7 upgrades):
-    Poseidon's Tide, Sailor's Fortune, Potter's Legacy,
-    Sculptor's Vision, Sea-Hardened Body, Tidal Instinct,
+	Poseidon's Tide, Sailor's Fortune, Potter's Legacy,
+	Sculptor's Vision, Sea-Hardened Body, Tidal Instinct,
     Coastal Plunder. Costs range 6,000 to 20,000 kleos.
 
 Upgrade UI (UpgradeRow):
@@ -628,7 +627,9 @@ Layout structure:
           AbilityButton ("Combat Arts")
           DungeonButton
         CenterPanel (VBoxContainer, expands)
-          DeedButton
+          DeedButtonContainer (Control, DeedButtonEvolution.cs)
+            DeedGlow (ColorRect, behind button, hidden by default)
+            DeedButton (Button)
           DeedContextLabel
         RightPanel (VBoxContainer, fixed width)
           ArtisanScrollContainer
@@ -660,16 +661,16 @@ AbilityRow displays per ability:
   Type badges: color-coded pills auto-determined from effects.
     Attack (red), Self buff (olive), Poison/Debuff (amber),
     Heal/Regen (teal), Cleanse (blue).
-    Multi-type abilities show two badges (Viper's Bite: Attack + Poison).
+	Multi-type abilities show two badges (Viper's Bite: Attack + Poison).
   Description: auto-generated from effect data. Includes trigger
-    condition, cooldown, one-time-use, replaces-attack info.
+	condition, cooldown, one-time-use, replaces-attack info.
   Flavor text: from CastFlavorText field, dimmed italic style.
   Bottom row: unlock condition + status/purchase button.
-    Level-based: "Unlocked at level N" or "Requires level N".
-    Purchasable: cost in kleos with Purchase button.
-    Dungeon reward: "Clear {Dungeon Name}".
+	Level-based: "Unlocked at level N" or "Requires level N".
+	Purchasable: cost in kleos with Purchase button.
+	Dungeon reward: "Clear {Dungeon Name}".
   Three visual states: Unlocked (green left accent), Purchasable
-    (dimmed with active button), Locked (dimmed with "Locked" badge).
+	(dimmed with active button), Locked (dimmed with "Locked" badge).
 
 AbilityRow refreshes on KleosChanged, LevelUp, AbilityUnlocked,
 and DungeonCompleted signals.
@@ -707,7 +708,56 @@ DevConsole (full precision for debugging).
 
 ---
 
-## Section 14 -- DevConsole
+## Section 14 -- Deed Button Visual Evolution (June 2026)
+
+The Deed button changes appearance as the player progresses through
+artisan tiers. Button text always stays "Deeds" -- the hero is humble.
+The visual presentation reflects the world's growing recognition.
+
+Four tiers based on unique artisan types unlocked:
+
+  Tier 0 -- Bronze (0-1 unique artisans):
+    Terracotta background, dark brown border (1px), light text.
+    The hero is unknown. Plain unfired clay.
+
+  Tier 1 -- Silver (2-3 unique artisans):
+    Cooler earth tone background, warm grey border (2px).
+    Word is spreading. The clay has been fired.
+
+  Tier 2 -- Gold (4-5 unique artisans):
+    Warm bronze-gold background, golden border (2px).
+	The hero's name is known.
+
+  Tier 3 -- Divine (6 unique artisans, all unlocked):
+	Deep navy background, bright gold border (3px), gold text.
+	Persistent gold glow pulse behind the button.
+	The gods have taken notice.
+
+Tier-up animation (during gameplay only, not on load):
+  Step 1: White flash burst from button center (0.3 seconds).
+  Step 2: Color tween from old tier to new tier (0.5 seconds).
+  Step 3: Divine tier starts persistent glow loop after transition.
+
+Divine glow: gold ColorRect behind button, alpha pulses between
+0.10 and 0.30 over 2.0 seconds (sine wave, infinite loop).
+
+On game load, current tier is applied instantly with no animation.
+Tier is purely derived from artisan state -- nothing to save.
+
+Button evolution tier thresholds for owned artisan counts:
+  Bronze:  10 Scribes, 5 Bards
+  Silver:  25 Scribes, 15 Bards, 10 Potters
+  Gold:    50 Scribes, 30 Bards, 20 Potters, 10 Sculptors
+  Divine:  75 Scribes, 50 Bards, 35 Potters, 20 Sculptors,
+		   15 Playwrights, 5 Historians
+
+Implementation: DeedButtonEvolution.cs on DeedButtonContainer node.
+Uses StyleBoxFlat theme overrides (normal, hover, pressed, focus).
+Subscribes to ArtisanManager.ArtisanPurchased signal.
+
+---
+
+## Section 15 -- DevConsole
 
 Developer tool for testing. Registered as Autoload position 11.
 CanvasLayer with Layer 100 so it renders above everything.
@@ -729,6 +779,7 @@ Commands:
   testability               -- adds test ability to current enemy
   abilities                 -- shows all hero abilities with unlock status
   unlock <abilityId>        -- force-unlocks a hero ability
+  deed_tier <0-3>           -- forces deed button visual tier
 
 Command history via up/down arrow keys.
 
@@ -740,7 +791,7 @@ KleosManager signals drive: KleosLabel, ArtisanRow affordability,
   UpgradeRow affordability, DungeonRow unlock checks, HeroManager XP.
 
 ArtisanManager.ArtisanPurchased drives: ArtisanRow unlock checks,
-  production recalculation.
+  production recalculation, DeedButtonEvolution tier check.
 
 UpgradeManager.UpgradePurchased drives: UpgradeRow refresh.
 
@@ -778,9 +829,9 @@ BattleSystem C# events drive: BattlePanel (BattleStarted,
 
   res://Autoloads/                -- manager scripts
   res://Autoloads/Cobat/          -- combat system classes
-    StatusEffectType.cs, StatusEffect.cs, StatusEffectManager.cs,
-    AbilityResolver.cs, AbilityEnums.cs, AbilityEffect.cs,
-    CombatAbility.cs
+	StatusEffectType.cs, StatusEffect.cs, StatusEffectManager.cs,
+	AbilityResolver.cs, AbilityEnums.cs, AbilityEffect.cs,
+	CombatAbility.cs
   res://Resources/Artisans/       -- 6 artisan .tres + database
   res://Resources/Dungeons/       -- 3 dungeon .tres + database
   res://Resources/Enemies/        -- enemy .tres by dungeon
@@ -788,16 +839,16 @@ BattleSystem C# events drive: BattlePanel (BattleStarted,
   res://Resources/EncounterPools/ -- 3 pool .tres + database
   res://Resources/BattleText/     -- battle_text_library.tres
   res://Resources/Abilities/
-    Enemies/                      -- 20 enemy ability .tres
-    Hero/                         -- 9 hero ability .tres + database
-  res://Scenes/Game/              -- game scene, UI row scripts/scenes
+	Enemies/                      -- 20 enemy ability .tres
+	Hero/                         -- 9 hero ability .tres + database
+  res://Scenes/Game/              -- game scene, UI row scripts/scenes,
+	DeedButtonEvolution.cs
   res://Scenes/MainMenu/          -- main menu scene
 
 ---
 
 ## What Is Not Yet Implemented
 
-Deed button visual evolution (Bronze/Silver/Gold/Divine tiers).
 Flavor text floating notifications.
 Omen system pre-battle warnings.
 Prestige/meta-progression system (Echo/Arete mechanics).

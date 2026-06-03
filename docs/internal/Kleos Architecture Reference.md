@@ -1,7 +1,8 @@
 # Kleos Architecture Reference -- Godot Edition
-# KAR_Godot -- Updated April 29, 2026
+# KAR_Godot -- Updated June 3, 2026
 # Engine: Godot 4.6.2 .NET (C#)
-# Status: Core gameplay complete -- battle system, three dungeons, DevConsole
+# Status: Combat RPG complete, abilities, status effects,
+#   NumberFormatter, Deed Button Visual Evolution
 
 ---
 
@@ -10,10 +11,6 @@
 This is the technical architecture reference for the Godot port of Kleos.
 It documents how each system is implemented in Godot, including class
 structures, signal wiring, file paths, and Godot-specific patterns.
-
-The Unity KAR (KAR_Updated_2026-03-20.md) remains the reference for
-Unity-specific implementation. This document is independent and does not
-duplicate Unity content. Only Godot architecture is recorded here.
 
 ---
 
@@ -31,100 +28,122 @@ Target: Desktop (Windows, Linux)
 ```
 res://
   Autoloads/
-    SettingsManager.cs
-    SaveManager.cs
-    UpgradeManager.cs
-    KleosManager.cs
-    ArtisanManager.cs
-    HeroManager.cs
-    DungeonManager.cs
-    RandomEncounterManager.cs
-    BattleSystem.cs
-    BattleContext.cs             (plain C# class, not an Autoload)
-    DungeonRewardCalculator.cs   (static utility, not an Autoload)
-    DevConsole.cs
-    ResourceScanner.cs           (static utility, not an Autoload)
+	SettingsManager.cs
+	SaveManager.cs
+	UpgradeManager.cs
+	KleosManager.cs
+	ArtisanManager.cs
+	HeroManager.cs
+	DungeonManager.cs
+	RandomEncounterManager.cs
+	BattleSystem.cs
+	BattleContext.cs             (plain C# class, not an Autoload)
+	DungeonRewardCalculator.cs   (static utility, not an Autoload)
+	DevConsole.cs
+	ResourceScanner.cs           (static utility, not an Autoload)
+	NumberFormatter.cs           (static utility, not an Autoload)
+	Cobat/
+	  StatusEffectType.cs
+	  StatusEffect.cs
+	  StatusEffectManager.cs
+	  AbilityEnums.cs
+	  AbilityEffect.cs
+	  CombatAbility.cs
+	  AbilityResolver.cs
+	HeroAbilityManager.cs        (Autoload)
   Resources/
-    ArtisanData.cs
-    EnemyData.cs
-    DungeonData.cs
-    DungeonLayer.cs
-    UpgradeConfig.cs
-    HeroData.cs
-    EncounterPool.cs
-    EncounterPoolEntry.cs
-    BattleTextLibrary.cs
-    ModifierEffect.cs
-    ModifierEnums.cs            (ModifierType and ModifierMode enums)
-    HeroStat.cs                 (enum)
-    Artisans/
-      scribe.tres
-      bard.tres
-      potter.tres
-      sculptor.tres
-      playwright.tres
-      historian.tres
-    Enemies/
-      1. Forest/
-        1.wild_dog.tres
-        2.wolf.tres
-        3.wolf_pack.tres
-        4.large_wolf.tres
-        5.large_wolf_pack.tres
-        6.nemean_lion_cub.tres
-        7.nemean_lion.tres
-      2. Brigands/
-        1.road_thief.tres
-        2.bandit_lookout.tres
-        3.outlaw_peltast.tres
-        4.bandit_hoplite.tres
-        5.rogue_mercenary.tres
-        6.outlaw_peltast_band.tres
-        7.bandit_champion.tres
-        8.war_hounds.tres
-        9.pine_bender.tres
-        10.archilestes.tres
-      3. Coastal/
-        1.shore_crab.tres
-        2.reef_serpent.tres
-        3.drowned_sailor.tres
-        4.reef_serpent_pair.tres
-        5.siren_thrall.tres
-        6.sea_hag.tres
-        7.coastal_chimera.tres
-        8.scylla_spawn.tres
-        9.charybdis_maw.tres
-        10.siren_queen.tres
-    Dungeons/
-      forest.tres
-      brigands.tres
-      coastal.tres
-    Upgrades/
-      1_01_scribes_quill.tres
-      1_02_bronze_training.tres
-      ... (24 total, prefixed by tier and order)
-      3_07_coastal_plunder.tres
-    EncounterPools/
-      pool_forest.tres
-      pool_brigands.tres
-      pool_coastal.tres
-    BattleText/
-      battle_text_library.tres
+	ArtisanData.cs
+	EnemyData.cs
+	DungeonData.cs
+	DungeonLayer.cs
+	UpgradeConfig.cs
+	HeroData.cs
+	EncounterPool.cs
+	EncounterPoolEntry.cs
+	BattleTextLibrary.cs
+	ModifierEffect.cs
+	ModifierEnums.cs            (ModifierType and ModifierMode enums)
+	HeroStat.cs                 (enum)
+	CombatAbility.cs            ([GlobalClass] Resource)
+	AbilityEffect.cs            ([GlobalClass] Resource)
+	HeroAbilityDatabase.cs      ([GlobalClass] Resource)
+	Artisans/
+	  scribe.tres
+	  bard.tres
+	  potter.tres
+	  sculptor.tres
+	  playwright.tres
+	  historian.tres
+	Enemies/
+	  1. Forest/
+		1.wild_dog.tres
+		2.wolf.tres
+		3.wolf_pack.tres
+		4.large_wolf.tres
+		5.large_wolf_pack.tres
+		6.nemean_lion_cub.tres
+		7.nemean_lion.tres
+	  2. Brigands/
+		1.road_thief.tres
+		2.bandit_lookout.tres
+		3.outlaw_peltast.tres
+		4.bandit_hoplite.tres
+		5.rogue_mercenary.tres
+		6.outlaw_peltast_band.tres
+		7.bandit_champion.tres
+		8.war_hounds.tres
+		9.pine_bender.tres
+		10.archilestes.tres
+	  3. Coastal/
+		1.shore_crab.tres
+		2.reef_serpent.tres
+		3.drowned_sailor.tres
+		4.reef_serpent_pair.tres
+		5.siren_thrall.tres
+		6.sea_hag.tres
+		7.coastal_chimera.tres
+		8.scylla_spawn.tres
+		9.charybdis_maw.tres
+		10.siren_queen.tres
+	Dungeons/
+	  forest.tres
+	  brigands.tres
+	  coastal.tres
+	Upgrades/
+	  1_01_scribes_quill.tres
+	  1_02_bronze_training.tres
+	  ... (24 total, prefixed by tier and order)
+	  3_07_coastal_plunder.tres
+	EncounterPools/
+	  pool_forest.tres
+	  pool_brigands.tres
+	  pool_coastal.tres
+	BattleText/
+	  battle_text_library.tres
+	Abilities/
+	  Enemies/
+		20 enemy ability .tres files (across 3 dungeons)
+	  Hero/
+		9 hero ability .tres files
+		hero_ability_database.tres
   Scenes/
-    MainMenu/
-      main_menu.tscn
-      MainMenuController.cs
-    Game/
-      main_game.tscn
-      MainGameController.cs
-      ArtisanRow.tscn
-      ArtisanRow.cs
-      DungeonRow.tscn
-      DungeonRow.cs
-      UpgradeRow.tscn
-      UpgradeRow.cs
-      BattlePanel.cs
-      TierHeader.tscn
+	MainMenu/
+	  main_menu.tscn
+	  MainMenuController.cs
+	Game/
+	  main_game.tscn
+	  MainGameController.cs
+	  ArtisanRow.tscn
+	  ArtisanRow.cs
+	  DungeonRow.tscn
+	  DungeonRow.cs
+	  UpgradeRow.tscn
+	  UpgradeRow.cs
+	  BattlePanel.cs
+	  TierHeader.tscn
+	  AbilityRow.tscn
+	  AbilityRow.cs
+	  DeedButtonEvolution.cs
 ```
 
 ---
@@ -142,13 +161,17 @@ their _Ready() methods.
   5. ArtisanManager
   6. HeroManager
   7. DungeonManager
-  8. RandomEncounterManager
-  9. BattleSystem
-  10. DevConsole
+  8. HeroAbilityManager
+  9. RandomEncounterManager
+  10. BattleSystem
+  11. DevConsole
 
 Each uses a static Instance property with a guard in _Ready() that
 calls QueueFree() if Instance is already set. This prevents duplicate
 instantiation if the autoload node somehow appears twice.
+
+HeroAbilityManager must come after HeroManager and DungeonManager
+because it subscribes to LevelUp and DungeonCompleted signals.
 
 BattleSystem must come after RandomEncounterManager because it
 subscribes to the EncounterTriggered signal in _Ready().
@@ -215,8 +238,8 @@ Click damage calculation:
 Passive income in _Process():
   passiveAccumulator += totalKleosPerSecond * (float)delta;
   while passiveAccumulator >= 1.0:
-    AddKleos(1f);
-    passiveAccumulator -= 1f;
+	AddKleos(1f);
+	passiveAccumulator -= 1f;
 
 Save/Load:
   GetSaveData() returns KleosSaveData
@@ -247,7 +270,7 @@ Config loading:
 
 Key methods:
   PurchaseArtisan(ArtisanData) -- spends kleos, increments count,
-    recalculates production, checks for new unlocks
+	recalculates production, checks for new unlocks
   IsArtisanUnlocked(ArtisanData) -- checks unlock condition
   GetOwnedCount(string artisanId) -- returns count for given artisan
   GetCurrentCost(ArtisanData) -- BaseCost * CostMultiplier ^ owned
@@ -255,12 +278,14 @@ Key methods:
   RecalculateTotalProduction() -- sums all artisan output with modifiers
   RefreshUnlocks() -- checks all artisan unlock conditions after purchase
   GetArtisanById(string artisanId) -- returns ArtisanData by ID
+  GetUnlockedCount() -- returns unlockedArtisans.Count (used by
+	DeedButtonEvolution for tier calculation)
 
 Production calculation:
   For each artisan:
-    baseProd = KleosPerSecond * ownedCount
-    multiplier = UpgradeManager.GetMultiplier(ArtisanProductionMultiplier)
-    totalProd += baseProd * multiplier
+	baseProd = KleosPerSecond * ownedCount
+	multiplier = UpgradeManager.GetMultiplier(ArtisanProductionMultiplier)
+	totalProd += baseProd * multiplier
   Calls KleosManager.RecalculateTotalProduction(totalProd)
 
 Save/Load:
@@ -290,9 +315,9 @@ Config loading:
 
 Key methods:
   GetFlat(ModifierType type) -- sums all flat modifiers of given type
-    across purchased upgrades
+	across purchased upgrades
   GetMultiplier(ModifierType type) -- multiplies all multiplier modifiers
-    of given type across purchased upgrades (starts at 1.0)
+	of given type across purchased upgrades (starts at 1.0)
   PurchaseUpgrade(string upgradeId) -- spends kleos, adds to purchased list
   IsUpgradePurchased(string upgradeId) -- checks purchase state
   CanPurchase(string upgradeId) -- checks tier gate, individual lock, cost
@@ -300,7 +325,7 @@ Key methods:
 Lock checks:
   IsTierUnlocked(UpgradeConfig) -- checks RequiredDungeon completion
   IsIndividualLockMet(UpgradeConfig) -- checks hero level, prerequisite
-    upgrade, and artisan count requirements
+	upgrade, and artisan count requirements
 
 Save/Load:
   GetSaveData() returns UpgradeSaveData (purchased IDs list)
@@ -362,7 +387,7 @@ Signals:
 
 State:
   dungeonProgress (Dictionary, string to int -- dungeon name to highest
-    cleared layer)
+	cleared layer)
   completedDungeons (Dictionary, string to bool)
 
 Config loading:
@@ -381,7 +406,7 @@ Key methods:
   GetLayer(string dungeonId, int index) -- returns DungeonLayer with null check
   OnLayerCleared(string dungeonId, int layerIndex) -- updates progress
   ForceCompleteDungeon(string dungeonId) -- DEV API, sets progress to
-    final layer, emits DungeonCompleted then LayerCleared
+	final layer, emits DungeonCompleted then LayerCleared
 
 Signal ordering in OnLayerCleared():
   1. Update dungeonProgress dictionary
@@ -458,7 +483,7 @@ State:
   isBattleActive (bool)
   speedMultiplier (float, default 1.0)
   Tracking: totalRounds, heroCritsLanded, heroDodgesPerformed,
-    heroHPAtEnd, enemyHPAtEnd
+	heroHPAtEnd, enemyHPAtEnd
 
 Timing constants:
   BaseSetupPause: 0.8s before first round
@@ -469,7 +494,7 @@ Timing constants:
 
 Key methods:
   StartDungeonBattle(DungeonData, int layerIndex) -- null check on
-    GetLayer instead of bounds check after call (fixed April 2026)
+	GetLayer instead of bounds check after call (fixed April 2026)
   StartRandomEncounterBattle(EnemyData, string poolName)
   SetSpeedMultiplier(float)
   GetCurrentSpeedMultiplier() -- returns current speed
@@ -479,19 +504,19 @@ Key methods:
 
 Combat flow (async):
   BeginBattle() -- creates context, resets state, invokes
-    BattleStarted, awaits setup pause, calls RunCombatAsync().
+	BattleStarted, awaits setup pause, calls RunCombatAsync().
   RunCombatAsync() -- while loop with await between each attack
-    and round. Each await checks isBattleActive before continuing.
-    Hero attacks first (ExecuteHeroAttack), checks enemy death,
-    awaits attack delay, enemy retaliates (ExecuteEnemyAttack),
-    checks hero death, awaits round delay.
+	and round. Each await checks isBattleActive before continuing.
+	Hero attacks first (ExecuteHeroAttack), checks enemy death,
+	awaits attack delay, enemy retaliates (ExecuteEnemyAttack),
+	checks hero death, awaits round delay.
   ExecuteHeroAttack() -- calculates damage, rolls crit, applies
-    damage to enemy, returns BattleLogEntry.
+	damage to enemy, returns BattleLogEntry.
   ExecuteEnemyAttack() -- rolls dodge, calculates damage per hit
-    (DPS / AttackRate), applies via HeroManager.TakeDamage(),
-    returns BattleLogEntry.
+	(DPS / AttackRate), applies via HeroManager.TakeDamage(),
+	returns BattleLogEntry.
   OnHeroVictory() -- calculates reward, grants kleos, applies
-    post-victory heal, advances dungeon layer, invokes BattleEnded.
+	post-victory heal, advances dungeon layer, invokes BattleEnded.
   OnHeroDefeat() -- restores hero HP to full, invokes BattleEnded.
 
 Text library:
@@ -545,7 +570,9 @@ LuckMultiplier, and WasLucky fields.
 Fields:
   IsHeroAction (bool), Damage (float), IsCritical (bool),
   IsDodge (bool), ActorName (string), TargetName (string),
-  TargetCurrentHP (float), TargetMaxHP (float)
+  TargetCurrentHP (float), TargetMaxHP (float),
+  RichTextOverride (string, May 2026 -- overrides default log line),
+  AlignCenter (bool, May 2026), OverrideColor (Color, May 2026)
 
 ### BattleResult (Plain C# class, in BattleSystem.cs)
 
@@ -564,9 +591,183 @@ Fields:
 
 ---
 
+### StatusEffectType (Enum, in Cobat/StatusEffectType.cs) (May 2026)
+
+Values: AttackDamageUp, AttackDamageDown, DodgeUp, DodgeDown,
+  CritChanceUp, CritImmunity, Stun, DamageOverTime, HealOverTime,
+  Shield, Absorb, Reflect.
+
+### StatusEffect (Plain C# class, in Cobat/StatusEffect.cs) (May 2026)
+
+Fields:
+  EffectType (StatusEffectType), EffectName (string), Value (float),
+  Duration (int, rounds), IsDebuff (bool), Mode (StatusEffectMode),
+  MaxStacks (int), CurrentStacks (int),
+  ApplyFlavorText (string), ExpireFlavorText (string).
+
+StatusEffectMode enum: Flat, Percentage.
+
+### StatusEffectManager (Plain C# class, in Cobat/StatusEffectManager.cs) (May 2026)
+
+One instance per combatant (hero and enemy each have one).
+Managed by BattleSystem, created fresh per battle.
+
+Key methods:
+  ApplyEffect(StatusEffect, sourceId) -- applies or stacks effect
+  TickEffects() -- decrements durations, removes expired effects
+  GetActiveEffects() -- returns list of active effects
+  GetDamageModifier() -- sums AttackDamageUp/Down modifiers
+  GetDodgeModifier() -- sums DodgeUp/Down modifiers
+  GetCritModifier() -- sums CritChanceUp modifiers
+  HasCritImmunity() -- checks for active CritImmunity
+  IsStunned() -- checks for active Stun
+  GetShieldAmount() -- returns remaining shield value
+  ApplyShieldDamage(float) -- reduces shield, returns overflow
+
+BattleSystem damage pipeline routes through StatusEffectManager:
+  base damage -> modifiers -> shield absorption -> final damage.
+
+### AbilityEnums (in Cobat/AbilityEnums.cs) (May 2026)
+
+AbilityEffectType: DealDamage, Heal, ApplyStatus.
+AbilityTrigger: OnCooldown, OnLowHP, OnBattleStart, OnAllyDeath.
+AbilityTargetType: Self, Enemy.
+
+### AbilityEffect (Resource, in Cobat/AbilityEffect.cs) (May 2026)
+
+[GlobalClass] Resource. Fields:
+  EffectType, Target, Value (for damage/heal),
+  StatusType, StatusName, StatusValue, StatusDuration,
+  StatusIsDebuff, StatusMode, StatusMaxStacks,
+  StatusApplyText, StatusExpireText.
+
+### CombatAbility (Resource, in Cobat/CombatAbility.cs) (May 2026)
+
+[GlobalClass] Resource. Replaces Unity ScriptableObject.
+Fields:
+  AbilityId, AbilityName, AbilityDescription, AbilityColor (Color).
+  Trigger (AbilityTrigger), Priority (int), UseChance (float).
+  CooldownDuration (int), CurrentCooldown (int).
+  ReplacesAttack (bool), OneTimeUse (bool).
+  CastFlavorText (string).
+  Effects (Array of AbilityEffect).
+
+### AbilityResolver (in Cobat/AbilityResolver.cs) (May 2026)
+
+One instance per combatant. Initialized with a list of CombatAbility.
+Evaluated each round by BattleSystem.
+
+Key methods:
+  TryGetAbility() -- iterates abilities by priority, checks trigger
+	conditions and use chance, returns the first matching ability
+	or null if none qualify
+  AdvanceCooldowns() -- decrements cooldowns each round
+  MarkUsed(CombatAbility) -- sets cooldown, removes if OneTimeUse
+
+Priority list design (not behavior tree): abilities are sorted by
+priority and evaluated in order. First match wins. Covers phase
+transitions and conditional logic without architectural complexity.
+
+### HeroAbilityManager (Autoload, May 2026)
+
+Singleton autoload (position 8). Manages hero combat ability unlocks.
+
+File: res://Autoloads/HeroAbilityManager.cs
+
+Signals:
+  AbilityUnlocked(string abilityId)
+
+Config loading:
+  Loads HeroAbilityDatabase resource via GD.Load<HeroAbilityDatabase>()
+  (not ResourceScanner -- uses database pattern for single resource).
+
+Three unlock paths:
+  Level-based: auto-unlocked when HeroManager.LevelUp fires
+  Kleos-purchased: PurchaseAbility() checks kleos and level reqs
+  Dungeon reward: auto-unlocked when DungeonManager.DungeonCompleted fires
+
+Key methods:
+  IsUnlocked(string abilityId) -- checks unlock state
+  GetUnlockedAbilities() -- returns Array for AbilityResolver init
+  GetAllAbilities() -- returns full list for Combat Arts panel
+  GetAbilityById(string) -- lookup by ID
+  GetUnlockedCount() / GetTotalCount() -- counts
+  PurchaseAbility(CombatAbility) -- spends kleos, unlocks ability
+
+Save/Load:
+  GetSaveData() returns HeroAbilitySaveData
+  LoadFromSaveData(HeroAbilitySaveData) restores unlock state
+
+### HeroAbilityDatabase (Resource, May 2026)
+
+[GlobalClass] Resource. Single .tres file containing an Array of
+CombatAbility references. Used by HeroAbilityManager for config
+loading instead of directory scanning.
+
+### NumberFormatter (Static Utility, May 2026)
+
+File: res://Autoloads/NumberFormatter.cs
+Static class, not a Node or Autoload.
+
+Suffix table (short scale): K, M, B, T, Qa, Qi, Sx, Sp, Oc, No, Dc.
+Scientific notation fallback beyond 999 decillion (10^36+).
+
+Methods:
+  FormatCompact(double) -- suffix display or scientific if toggled
+  FormatFull(double) -- always full integer with thousand separators
+  FormatCost(double) -- full below 10K, compact above
+
+Reads SettingsManager.Instance.UseScientificNotation for toggle.
+
+### DeedButtonEvolution (Scene Script, June 2026)
+
+File: res://Scenes/Game/DeedButtonEvolution.cs
+Attached to: DeedButtonContainer (Control node in CenterPanel)
+Not an Autoload. Scene-level script.
+
+Exports:
+  Button DeedButton
+  ColorRect DeedGlow
+
+State:
+  currentTier (int, -1 on init)
+  transitionTween, glowTween (Tween references for cancellation)
+  styleNormal, styleHover, stylePressed, styleFocus (StyleBoxFlat)
+
+Signal subscription:
+  ArtisanManager.ArtisanPurchased -> OnArtisanPurchased()
+  Subscribes in _Ready(), unsubscribes in _ExitTree().
+
+Tier calculation:
+  CalculateTier() calls ArtisanManager.Instance.GetUnlockedCount().
+  Maps count to tier: 0-1 = Bronze, 2-3 = Silver, 4-5 = Gold, 6 = Divine.
+
+Visual application:
+  Creates four StyleBoxFlat instances in _Ready(), assigns to button
+  theme overrides (normal, hover, pressed, focus).
+  ApplyTierInstant() sets all colors and border widths directly.
+  TransitionToTier() uses Tween for animated color transitions.
+
+Tier-up animation:
+  PlayFlash() -- white ColorRect burst, scale 1.0 to 1.3, alpha 0.6 to 0.0
+	over 0.3 seconds.
+  Color tween -- StyleBoxFlat bg_color, border_color tweened over 0.5 seconds.
+  Font color -- tweened via TweenMethod with lerp callback (theme color
+	overrides cannot be directly tweened).
+
+Divine glow:
+  StartGlowLoop() -- infinite Tween, alpha 0.10 to 0.30, sine ease,
+	1.0 second per half-cycle.
+  StopGlowLoop() -- kills glow tween, called on _ExitTree or tier change.
+
+Public method:
+  ForceVisualTier(int) -- used by DevConsole deed_tier command.
+
+---
+
 ### DevConsole
 
-CanvasLayer autoload (position 10). Developer tool for testing.
+CanvasLayer autoload (position 11). Developer tool for testing.
 Builds its entire UI in code -- no .tscn file needed.
 
 File: res://Autoloads/DevConsole.cs
@@ -577,10 +778,10 @@ Command history: up/down arrow keys.
 
 UI structure (built in _Ready()):
   PanelContainer (dark background, top of screen, 160px tall)
-    VBoxContainer
-      Label ("DEV CONSOLE" title)
-      Label (output display, autowrap)
-      LineEdit (command input, TextSubmitted signal)
+	VBoxContainer
+	  Label ("DEV CONSOLE" title)
+	  Label (output display, autowrap)
+	  LineEdit (command input, TextSubmitted signal)
 
 Command processing:
   OnCommandSubmitted() adds to history, calls ExecuteCommand().
@@ -592,7 +793,7 @@ Commands:
   kleos <amount> -- calls KleosManager.AddKleos()
   level <target> -- grants XP to reach target level (single large grant)
   stat <str/end/cun/fav> <n> -- calls HeroManager.UpgradeStat() N times,
-    tracks actual applied count vs requested
+	tracks actual applied count vs requested
   clear <dungeonId> -- calls DungeonManager.ForceCompleteDungeon()
   layer <dungeonId> <count> -- calls OnLayerCleared() for next N layers
   hp <amount> -- RestoreFullHP then TakeDamage to set exact value
@@ -601,6 +802,12 @@ Commands:
   load -- calls SaveManager.Load(), distributes to all managers
   reset -- calls SaveManager.ResetAllSaveData()
   status -- displays kleos, KpS, hero level, HP, damage, dodge, crit
+  effects -- shows active status effects in battle (May 2026)
+  buff <target> <type> <val> <dur> -- applies status effect in battle (May 2026)
+  testability -- adds test ability to current enemy (May 2026)
+  abilities -- shows all hero abilities with unlock status (May 2026)
+  unlock <abilityId> -- force-unlocks a hero ability (May 2026)
+  deed_tier <0-3> -- forces deed button visual tier (June 2026)
 
 Known limitation: ExecuteCommand lowercases entire input including
 arguments. Currently safe because all dungeon IDs are lowercase.
@@ -618,9 +825,9 @@ File paths:
 
 Key methods:
   Save(SaveData) -- serializes to JSON via BuildJson(), creates backup,
-    writes file
+	writes file
   Load() -- reads file via ParseJson(), falls back to backup, returns
-    empty SaveData if both fail
+	empty SaveData if both fail
   HasSaveData() -- checks if save file exists
   DeleteSaveData() -- deletes save and backup files
   ResetAllSaveData() -- alias for DeleteSaveData
@@ -647,12 +854,14 @@ State:
   SFXVolume (float, 0-1)
   Fullscreen (bool)
   ResolutionIndex (int)
+  UseScientificNotation (bool, default false) -- May 2026
 
 Key methods:
   SetMusicVolume(float) -- clamps, applies, saves
   SetSfxVolume(float) -- clamps, applies, saves
   SetFullscreen(bool) -- applies, saves
   SetResolutionIndex(int) -- applies, saves
+  SetScientificNotation(bool) -- saves (May 2026)
   ApplyAudio() -- converts linear to dB, sets AudioServer bus volumes
   ApplyDisplay() -- sets window mode
   ResetToDefaults() -- restores all settings to defaults
@@ -692,6 +901,7 @@ Fields:
   KleosReward (int)
   EncounterFlavorTexts (Array of string)
   AttackLines (Array of string, enemy-specific combat text)
+  Abilities (Array of CombatAbility, enemy combat abilities)
 
 ### DungeonData (Resource)
 
@@ -818,9 +1028,13 @@ Loaded by BattleSystem in _Ready() via GD.Load().
     Upgrades (UpgradeSaveData)
     Dungeons (DungeonSaveData)
     Hero (HeroSaveData)
+    HeroAbilities (HeroAbilitySaveData) -- May 2026
 
 Each sub-class extends RefCounted and contains only serializable
 properties (strings, ints, floats, dictionaries, arrays).
+
+HeroAbilitySaveData fields:
+  UnlockedAbilityIds (Array of string)
 
 ---
 
@@ -871,7 +1085,10 @@ Node tree:
         LeftPanel (VBoxContainer)
           TopSpacer, DungeonButton, MiddleSpacer, UpgradeButton, BottomSpacer
         CenterPanel (VBoxContainer)
-          DeedButton, DeedContextLabel
+          DeedButtonContainer (Control, DeedButtonEvolution.cs)
+            DeedGlow (ColorRect, behind button, starts hidden)
+            DeedButton (Button)
+          DeedContextLabel
         RightPanel (VBoxContainer)
           ArtisanScrollContainer > ArtisanList (VBoxContainer)
     HeroPanel (PanelContainer, overlay, hidden)
@@ -880,6 +1097,8 @@ Node tree:
       ScrollContainer > DungeonList (VBoxContainer)
     UpgradePanel (PanelContainer, overlay, hidden)
       ScrollContainer > UpgradeList (VBoxContainer)
+    AbilityPanel (PanelContainer, overlay, hidden) -- May 2026
+      ScrollContainer > AbilityList (VBoxContainer)
     BattlePanel (Control, overlay, hidden)
       BattleBackground (ColorRect, Full Rect)
       CombatArea (Control, Full Rect)
@@ -906,12 +1125,13 @@ Node tree:
 MainGameController responsibilities:
   Connects all button signals in _Ready().
   Subscribes to manager signals for display updates.
-  Manages panel visibility (hero, dungeon, upgrade).
-  Dungeon and Upgrade panels are mutually exclusive (ActivePanel enum).
+  Manages panel visibility (hero, dungeon, upgrade, ability).
+  Dungeon, Upgrade, and Ability panels are mutually exclusive (ActivePanel enum).
   Spawns ArtisanRow instances into ArtisanList via PopulateArtisanList().
   Spawns DungeonRow instances into DungeonList via PopulateDungeonList().
   Spawns UpgradeRow and TierHeader instances into UpgradeList via
     PopulateUpgradeList().
+  Spawns AbilityRow instances into AbilityList via PopulateAbilityList().
   Refreshes kleos display, production display, deed context,
     hero portrait bars, and hero panel stats.
   Handles stat upgrade button presses.
@@ -999,8 +1219,8 @@ Completed state:
 Signal subscriptions:
   DungeonManager.LayerCleared -- refreshes display for this dungeon.
   DungeonManager.DungeonCompleted -- refreshes when this dungeon completes
-    OR when the completed dungeon is this row's RequiredDungeon
-    (so downstream dungeons unlock immediately).
+	OR when the completed dungeon is this row's RequiredDungeon
+	(so downstream dungeons unlock immediately).
   KleosManager.KleosChanged -- refreshes if dungeon has kleos requirement.
 
 OnActionPressed() calls BattleSystem.Instance.StartDungeonBattle()
@@ -1020,13 +1240,13 @@ Root node: PanelContainer
 
 Node tree:
   UpgradeRow (PanelContainer)
-    VBoxContainer
-      HeaderRow (HBoxContainer)
-        UpgradeNameLabel (Label)
-        UpgradeCostLabel (Label)
-      DescriptionLabel (Label)
-      LockReasonLabel (Label, hidden by default)
-      UpgradeBuyButton (Button)
+	VBoxContainer
+	  HeaderRow (HBoxContainer)
+		UpgradeNameLabel (Label)
+		UpgradeCostLabel (Label)
+	  DescriptionLabel (Label)
+	  LockReasonLabel (Label, hidden by default)
+	  UpgradeBuyButton (Button)
 
 Five visual states managed internally:
 
@@ -1051,15 +1271,15 @@ Individual Locked:
 Lock checks:
   IsTierUnlocked() checks RequiredDungeon completion.
   TryGetIndividualLockReason() checks hero level, prerequisite upgrade,
-    and artisan count. Returns lock reason string if locked.
+	and artisan count. Returns lock reason string if locked.
   Dead GetIndividualLockReason() method removed (April 2026 cleanup).
 
 Signal subscriptions:
   KleosManager.KleosChanged -- refreshes affordability.
   UpgradeManager.UpgradePurchased -- refreshes all rows (prerequisite
-    checks may have changed).
+	checks may have changed).
   DungeonManager.DungeonCompleted -- refreshes tier-gated rows when
-    their RequiredDungeon is completed (added April 2026).
+	their RequiredDungeon is completed (added April 2026).
 
 _ExitTree() unsubscribes from all signals with -= operators.
 Fixed April 2026: was previously using += instead of -= for
@@ -1079,6 +1299,34 @@ Tier names:
   Tier 1: "Tier 1 -- Trials of the Forest"
   Tier 2: "Tier 2 -- Trials of the Road"
   Tier 3: "Tier 3 -- Trials of the Shore"
+
+### AbilityRow (AbilityRow.tscn, May 2026)
+
+Script: AbilityRow.cs
+Root node: PanelContainer
+
+Displays a single hero ability in the Combat Arts panel.
+Spawned by MainGameController.PopulateAbilityList().
+
+Visual elements:
+  Left accent bar (ColorRect, green when unlocked, hidden when locked)
+  Ability name label + type badges (HBoxContainer)
+  Type badges: color-coded pills auto-determined from AbilityEffect data
+	(Attack = red, Heal = green, Buff = blue, Debuff = purple, etc.)
+  Description label: auto-generated from effect data
+  Flavor text label: from CastFlavorText, dimmed italic
+  Bottom row: unlock condition + status/purchase button
+
+Three visual states:
+  Unlocked: green left accent, full opacity
+  Purchasable: dimmed, active Purchase button with kleos cost
+  Locked: dimmed, "Locked" badge with unlock requirement text
+
+Signal subscriptions:
+  KleosManager.KleosChanged -- refreshes affordability
+  HeroManager.LevelUp -- refreshes level requirements
+  HeroAbilityManager.AbilityUnlocked -- refreshes unlock state
+  DungeonManager.DungeonCompleted -- refreshes dungeon requirements
 
 ### BattlePanel (in main_game.tscn)
 
@@ -1123,10 +1371,10 @@ Animation methods:
 
 Helper methods:
   GetEnemyAttackLine(string) -- priority chain: enemy-specific
-    AttackLines array, then BattleTextLibrary generic pool,
-    then hardcoded fallback.
+	AttackLines array, then BattleTextLibrary generic pool,
+	then hardcoded fallback.
   SetProgressBarColor() -- creates StyleBoxFlat and applies as
-    theme override for ProgressBar fill color.
+	theme override for ProgressBar fill color.
 
 Export properties: 30 node references wired in the editor Inspector.
 All exports use null checks before access for safety.
@@ -1140,6 +1388,7 @@ KleosManager.KleosChanged:
   ArtisanRow.OnKleosChanged (per row)
   UpgradeRow.OnKleosChanged (per row)
   DungeonRow.OnKleosChanged (per row)
+  AbilityRow.OnKleosChanged (per row, May 2026)
 
 KleosManager.KleosGained:
   HeroManager.OnKleosGained (XP tracking)
@@ -1152,6 +1401,7 @@ KleosManager.DeedContextChanged:
 
 ArtisanManager.ArtisanPurchased:
   ArtisanRow.OnAnyArtisanPurchased (per row, for self-unlock)
+  DeedButtonEvolution.OnArtisanPurchased (tier check, June 2026)
 
 UpgradeManager.UpgradePurchased:
   UpgradeRow.OnAnyUpgradePurchased (per row, for prerequisite refresh)
@@ -1162,14 +1412,21 @@ DungeonManager.LayerCleared:
 DungeonManager.DungeonCompleted:
   RandomEncounterManager.OnDungeonCompleted (marks pools dirty)
   DungeonRow.OnDungeonCompleted (per row, refreshes self and
-    rows whose RequiredDungeon matches)
+	rows whose RequiredDungeon matches)
   UpgradeRow.OnDungeonCompleted (per row, refreshes tier gate)
+  HeroAbilityManager.OnDungeonCompleted (dungeon reward unlocks, May 2026)
+  AbilityRow.OnDungeonCompleted (per row, May 2026)
 
 HeroManager.StatsChanged:
   MainGameController.RefreshHeroDisplay
 
 HeroManager.LevelUp:
   MainGameController.OnHeroLevelUp
+  HeroAbilityManager.OnLevelUp (level-based ability unlocks, May 2026)
+  AbilityRow.OnLevelUp (per row, May 2026)
+
+HeroAbilityManager.AbilityUnlocked (May 2026):
+  AbilityRow.OnAbilityUnlocked (per row)
 
 BattleSystem.BattleStarted (C# event):
   BattlePanel.OnBattleStarted
@@ -1280,11 +1537,8 @@ Control vs PanelContainer for overlays:
 
 ## What Is Not Yet Implemented
 
-Status effect and ability system (implemented in Unity, not ported)
-Deed button visual evolution (tier-based appearance changes)
 Flavor text floating notifications
 Omen system
-Number formatting utility (NumberFormatter equivalent)
 Prestige/meta-progression system (Echo/Arete mechanics)
 
 ---
