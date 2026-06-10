@@ -30,6 +30,7 @@ HeroAbilityManager="*uid://bfnuyypawagty"
 RandomEncounterManager="*uid://25u2g1l7njm7"
 BattleSystem="*uid://ckkxy4lxu2dto"
 DevConsole="*uid://maaqgf082qbt"
+FlavorTextManager="*uid://7s54d7v3gq4l"
 
 [display]
 
