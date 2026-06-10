@@ -1,8 +1,9 @@
 # Kleos Architecture Reference -- Godot Edition
-# KAR_Godot -- Updated June 3, 2026
+# KAR_Godot -- Updated June 10, 2026
 # Engine: Godot 4.6.2 .NET (C#)
 # Status: Combat RPG complete, abilities, status effects,
-#   NumberFormatter, Deed Button Visual Evolution
+#   NumberFormatter, Deed Button Visual Evolution,
+#   FlavorTextManager, Omen system
 
 ---
 
@@ -11,6 +12,10 @@
 This is the technical architecture reference for the Godot port of Kleos.
 It documents how each system is implemented in Godot, including class
 structures, signal wiring, file paths, and Godot-specific patterns.
+
+The Unity KAR (KAR_Updated_2026-03-20.md) remains the reference for
+Unity-specific implementation. This document is independent and does not
+duplicate Unity content. Only Godot architecture is recorded here.
 
 ---
 
@@ -51,6 +56,7 @@ res://
 	  CombatAbility.cs
 	  AbilityResolver.cs
 	HeroAbilityManager.cs        (Autoload)
+	FlavorTextManager.cs         (Autoload)
   Resources/
 	ArtisanData.cs
 	EnemyData.cs
@@ -165,6 +171,7 @@ their _Ready() methods.
   9. RandomEncounterManager
   10. BattleSystem
   11. DevConsole
+  12. FlavorTextManager
 
 Each uses a static Instance property with a guard in _Ready() that
 calls QueueFree() if Instance is already set. This prevents duplicate
@@ -765,9 +772,69 @@ Public method:
 
 ---
 
+### FlavorTextManager (Autoload, June 2026)
+
+Singleton autoload (position 12). Manages temporary text display
+in FlavorTextLabel below DeedContextLabel.
+
+File: res://Autoloads/FlavorTextManager.cs
+
+State:
+  flavorLabel (Label, set by MainGameController via SetLabel())
+  activeTween (Tween, current animation)
+  isOmenActive (bool, omen priority flag)
+
+Constants:
+  FlavorDisplayTime: 2.5 seconds
+  FadeInTime: 0.3 seconds
+  FadeOutTime: 0.5 seconds
+  FlavorColor: #B8A88A (muted earth tone)
+  OmenColor: #C4785A (amber warning)
+
+Static data:
+  OmenTexts: 12 atmospheric pre-battle warnings (string array)
+  ArtisanFlavorTexts: Dictionary keyed by artisan ID, 4 messages each
+
+Public API:
+  SetLabel(Label) -- called by MainGameController in _Ready()
+  ShowFlavor(string) -- brief timed message, ignored if omen active
+  ShowOmen(string) -- persistent warning, replaces current text
+  ShowRandomOmen() -- picks from OmenTexts pool
+  ClearOmen() -- fades out omen, resets isOmenActive
+  Clear() -- force clears any displayed text
+
+Signal subscriptions:
+  ArtisanManager.ArtisanPurchased -> OnArtisanPurchased()
+  Subscribes in _Ready(), unsubscribes in _ExitTree().
+
+Animation:
+  PlayFlavorSequence() -- fade in, hold, fade out, clear text
+  FadeOut() -- used by ClearOmen for smooth omen dismissal
+  All animations use Godot Tween. Previous tween killed before
+  starting a new one to prevent overlap.
+
+### RandomEncounterManager Omen Integration (June 2026)
+
+Added fields:
+  omenTriggerPoint (int) -- click count at which omen fires
+  omenShownThisCycle (bool) -- prevents repeat omen per cycle
+
+Modified methods:
+  RollNewThreshold() -- also rolls omenTriggerPoint (threshold
+	minus random 3-8 offset, minimum 1)
+  OnDeedClicked() -- checks omenTriggerPoint before threshold,
+	calls FlavorTextManager.ShowRandomOmen(). On encounter trigger,
+	calls FlavorTextManager.ClearOmen() before firing.
+
+---
+
 ### DevConsole
 
 CanvasLayer autoload (position 11). Developer tool for testing.
+
+FlavorTextManager must come after DevConsole in the autoload order.
+It subscribes to ArtisanManager.ArtisanPurchased in _Ready() and
+receives its label reference from MainGameController.
 Builds its entire UI in code -- no .tscn file needed.
 
 File: res://Autoloads/DevConsole.cs
@@ -1089,6 +1156,7 @@ Node tree:
             DeedGlow (ColorRect, behind button, starts hidden)
             DeedButton (Button)
           DeedContextLabel
+          FlavorTextLabel (Label, managed by FlavorTextManager)
         RightPanel (VBoxContainer)
           ArtisanScrollContainer > ArtisanList (VBoxContainer)
     HeroPanel (PanelContainer, overlay, hidden)
@@ -1132,6 +1200,7 @@ MainGameController responsibilities:
   Spawns UpgradeRow and TierHeader instances into UpgradeList via
     PopulateUpgradeList().
   Spawns AbilityRow instances into AbilityList via PopulateAbilityList().
+  Wires FlavorTextLabel to FlavorTextManager via SetLabel() in _Ready().
   Refreshes kleos display, production display, deed context,
     hero portrait bars, and hero panel stats.
   Handles stat upgrade button presses.
@@ -1402,6 +1471,7 @@ KleosManager.DeedContextChanged:
 ArtisanManager.ArtisanPurchased:
   ArtisanRow.OnAnyArtisanPurchased (per row, for self-unlock)
   DeedButtonEvolution.OnArtisanPurchased (tier check, June 2026)
+  FlavorTextManager.OnArtisanPurchased (flavor text, June 2026)
 
 UpgradeManager.UpgradePurchased:
   UpgradeRow.OnAnyUpgradePurchased (per row, for prerequisite refresh)
@@ -1537,8 +1607,6 @@ Control vs PanelContainer for overlays:
 
 ## What Is Not Yet Implemented
 
-Flavor text floating notifications
-Omen system
 Prestige/meta-progression system (Echo/Arete mechanics)
 
 ---

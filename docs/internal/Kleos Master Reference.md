@@ -1,8 +1,9 @@
 # Kleos Master Reference -- Godot Edition
-# KMR_Godot -- Updated June 3, 2026
+# KMR_Godot -- Updated June 10, 2026
 # Engine: Godot 4.6.2 .NET (C#)
 # Status: Combat RPG system complete, Combat Arts UI, NumberFormatter,
-#   Deed Button Visual Evolution, artisan unlock rebalance
+#   Deed Button Visual Evolution, artisan unlock rebalance,
+#   FlavorTextManager, Omen system
 
 ---
 
@@ -11,6 +12,12 @@
 This is the gameplay and system reference for the Godot port of Kleos.
 It documents what has been implemented, tested, and confirmed working
 in the Godot project specifically.
+
+All gameplay values (artisan costs, enemy stats, upgrade effects, hero
+formulas) are unchanged from the Unity version. Refer to the Unity KMR
+(KMR_Updated_2026-03-20.md) for balance tables and design rationale.
+This document only records Godot-specific implementation details and
+what has been confirmed functional.
 
 ---
 
@@ -549,6 +556,11 @@ random enemy from that pool using weighted selection.
 Bosses and mini-bosses excluded from all encounter pools. They are
 dungeon-exclusive.
 
+Omen integration (June 2026): each encounter cycle rolls an omen
+trigger point 3-8 clicks before the threshold. When reached,
+FlavorTextManager displays a warning in amber. Cleared when the
+encounter fires. See Section 15 for full omen details.
+
 ---
 
 ## Section 8 -- Save System
@@ -631,6 +643,7 @@ Layout structure:
             DeedGlow (ColorRect, behind button, hidden by default)
             DeedButton (Button)
           DeedContextLabel
+          FlavorTextLabel
         RightPanel (VBoxContainer, fixed width)
           ArtisanScrollContainer
             ArtisanList
@@ -757,9 +770,68 @@ Subscribes to ArtisanManager.ArtisanPurchased signal.
 
 ---
 
-## Section 15 -- DevConsole
+## Section 15 -- Flavor Text and Omen System (June 2026)
 
-Developer tool for testing. Registered as Autoload position 11.
+FlavorTextManager is an Autoload singleton (position 12) that manages
+a dedicated FlavorTextLabel in CenterPanel, below DeedContextLabel.
+
+Two message types with different priority and behavior:
+
+  Flavor text (low priority):
+	Brief messages triggered by artisan purchases. Fades in over 0.3
+	seconds, holds for 2.5 seconds, fades out over 0.5 seconds.
+	Suppressed while an omen is active.
+
+	Each artisan type has a pool of four themed messages:
+	  Scribe: "A reed pen scratches parchment..."
+	  Bard: "A new voice joins the chorus..."
+	  Potter: "Clay takes shape beneath steady hands..."
+	  Sculptor: "Chisel strikes marble..."
+	  Playwright: "A new act unfolds on the stage..."
+	  Historian: "The chronicles grow longer..."
+
+  Omen text (high priority):
+	Pre-battle warnings from RandomEncounterManager. Appears in amber
+	and stays visible until the encounter fires or is cleared.
+	Replaces any current flavor text immediately.
+
+	Omen trigger: RandomEncounterManager rolls an omenTriggerPoint
+	(3-8 clicks before the encounter threshold). When the click
+	counter reaches the omen point, a random omen is displayed.
+	When the encounter fires, ClearOmen() fades the text out.
+
+	Omen text pool (12 atmospheric warnings):
+      "The birds have gone quiet..."
+      "A cold wind stirs the dust..."
+      "Something watches from the treeline..."
+      "The shadows grow restless..."
+      "Your hand reaches for a weapon..."
+      "The air tastes of iron..."
+      "A branch snaps in the distance..."
+      "The hairs on your neck rise..."
+      "An unnatural stillness settles..."
+      "The ground trembles faintly..."
+      "A crow circles overhead..."
+      "The wind carries a low growl..."
+
+Colors:
+  Flavor text: muted earth tone (#B8A88A)
+  Omen text: amber warning (#C4785A)
+
+Label reference is set by MainGameController via SetLabel() in _Ready().
+FlavorTextManager subscribes to ArtisanManager.ArtisanPurchased for
+automatic artisan flavor text display.
+
+DeedContextLabel remains as a separate system: it shows persistent
+progression text based on total artisan count ("Training in solitude..."
+through "Historians record your selfless acts..."). FlavorTextLabel
+shows temporary messages below it.
+
+---
+
+## Section 16 -- DevConsole
+
+Developer tool for testing. Registered as Autoload position 13.
 CanvasLayer with Layer 100 so it renders above everything.
 
 Toggle: backtick (`) key.
@@ -791,7 +863,8 @@ KleosManager signals drive: KleosLabel, ArtisanRow affordability,
   UpgradeRow affordability, DungeonRow unlock checks, HeroManager XP.
 
 ArtisanManager.ArtisanPurchased drives: ArtisanRow unlock checks,
-  production recalculation, DeedButtonEvolution tier check.
+  production recalculation, DeedButtonEvolution tier check,
+  FlavorTextManager artisan flavor text.
 
 UpgradeManager.UpgradePurchased drives: UpgradeRow refresh.
 
@@ -822,6 +895,7 @@ BattleSystem C# events drive: BattlePanel (BattleStarted,
   9. RandomEncounterManager
   10. BattleSystem
   11. DevConsole
+  12. FlavorTextManager
 
 ---
 
@@ -849,8 +923,6 @@ BattleSystem C# events drive: BattlePanel (BattleStarted,
 
 ## What Is Not Yet Implemented
 
-Flavor text floating notifications.
-Omen system pre-battle warnings.
 Prestige/meta-progression system (Echo/Arete mechanics).
 
 ---
