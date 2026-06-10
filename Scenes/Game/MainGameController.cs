@@ -19,6 +19,7 @@ public partial class MainGameController : Control
     // Deed
     [Export] public Button DeedButton { get; set; }
     [Export] public Label DeedContextLabel { get; set; }
+    [Export] public Label FlavorTextLabel { get; set; }
 
     // Panel Toggle Buttons
     [Export] public Button DungeonButton { get; set; }
@@ -96,6 +97,10 @@ public partial class MainGameController : Control
         PopulateUpgradeList();
         PopulateAbilityList();
         PopulateDungeonList();
+
+         // Wire flavor text label to manager
+        if (FlavorTextLabel != null && FlavorTextManager.Instance != null)
+            FlavorTextManager.Instance.SetLabel(FlavorTextLabel);
     }
 
     // -------------------------------------------------------------------------

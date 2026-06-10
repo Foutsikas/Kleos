@@ -19,7 +19,7 @@ border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.6262097, 0.50638646, 0.3491902, 1)
 
-[node name="MainGame" type="Control" unique_id=365822274 node_paths=PackedStringArray("KleosLabel", "ProductionLabel", "HeroPortrait", "HeroLevelLabel", "HeroHPBar", "HeroXPBar", "DeedButton", "DeedContextLabel", "DungeonButton", "UpgradeButton", "DungeonPanel", "UpgradePanel", "HeroPanel", "HeroPanelTitle", "HeroNameLabel", "HeroLevelDetailLabel", "HeroHPDetailBar", "HeroXPDetailBar", "StrengthValueLabel", "EnduranceValueLabel", "CunningValueLabel", "FavorValueLabel", "StrengthUpgradeButton", "EnduranceUpgradeButton", "CunningUpgradeButton", "FavorUpgradeButton", "StatPointsLabel", "CombatStatsLabel", "ArtisanList", "UpgradeList", "DungeonList", "AbilityButton", "AbilityPanel", "AbilityList", "FadeOverlay")]
+[node name="MainGame" type="Control" unique_id=365822274 node_paths=PackedStringArray("KleosLabel", "ProductionLabel", "HeroPortrait", "HeroLevelLabel", "HeroHPBar", "HeroXPBar", "DeedButton", "DeedContextLabel", "FlavorTextLabel", "DungeonButton", "UpgradeButton", "DungeonPanel", "UpgradePanel", "HeroPanel", "HeroPanelTitle", "HeroNameLabel", "HeroLevelDetailLabel", "HeroHPDetailBar", "HeroXPDetailBar", "StrengthValueLabel", "EnduranceValueLabel", "CunningValueLabel", "FavorValueLabel", "StrengthUpgradeButton", "EnduranceUpgradeButton", "CunningUpgradeButton", "FavorUpgradeButton", "StatPointsLabel", "CombatStatsLabel", "ArtisanList", "UpgradeList", "DungeonList", "AbilityButton", "AbilityPanel", "AbilityList", "FadeOverlay")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -35,6 +35,7 @@ HeroHPBar = NodePath("RootLayout/TopBar/HeroPortrait/VBoxContainer/HeroHPBar")
 HeroXPBar = NodePath("RootLayout/TopBar/HeroPortrait/VBoxContainer/HeroXPBar")
 DeedButton = NodePath("RootLayout/MainPanel/CenterPanel/DeedButtonContainer/DeedButton")
 DeedContextLabel = NodePath("RootLayout/MainPanel/CenterPanel/DeedContextLabel")
+FlavorTextLabel = NodePath("RootLayout/MainPanel/CenterPanel/FlavorTextLabel")
 DungeonButton = NodePath("RootLayout/MainPanel/LeftPanel/DungeonButton")
 UpgradeButton = NodePath("RootLayout/MainPanel/LeftPanel/UpgradeButton")
 DungeonPanel = NodePath("DungeonPanel")
@@ -180,6 +181,17 @@ size_flags_vertical = 3
 [node name="CenterPanel" type="VBoxContainer" parent="RootLayout/MainPanel" unique_id=636368352]
 custom_minimum_size = Vector2(350, 0)
 layout_mode = 2
+size_flags_vertical = 4
+
+[node name="FlavorTextLabel" type="Label" parent="RootLayout/MainPanel/CenterPanel" unique_id=1969909236]
+custom_minimum_size = Vector2(1, 20)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 13
+text = "Training in solitude..."
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
 
 [node name="DeedButtonContainer" type="Control" parent="RootLayout/MainPanel/CenterPanel" unique_id=1169541220 node_paths=PackedStringArray("DeedButton", "DeedGlow")]
 custom_minimum_size = Vector2(0, 80)

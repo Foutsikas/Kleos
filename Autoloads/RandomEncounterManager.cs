@@ -30,6 +30,10 @@ public partial class RandomEncounterManager : Node
     private bool poolsDirty = true;
     private Array<EncounterPool> activePools = new();
 
+    // --- Omen state ---
+    private int omenTriggerPoint = 0;
+    private bool omenShownThisCycle = false;
+
     // --- Lifecycle ---
 
     public override void _Ready()
@@ -56,8 +60,25 @@ public partial class RandomEncounterManager : Node
     public void OnDeedClicked()
     {
         clickAccumulator++;
+
+        // Check for omen (warning before battle)
+        if (!omenShownThisCycle && clickAccumulator >= omenTriggerPoint)
+        {
+            omenShownThisCycle = true;
+            if (FlavorTextManager.Instance != null)
+            {
+                FlavorTextManager.Instance.ShowRandomOmen();
+            }
+        }
+
         if (clickAccumulator >= clickThreshold)
         {
+            // Clear omen before triggering encounter
+            if (FlavorTextManager.Instance != null)
+            {
+                FlavorTextManager.Instance.ClearOmen();
+            }
+
             TryTriggerEncounter();
             clickAccumulator = 0;
             RollNewThreshold();
@@ -67,6 +88,11 @@ public partial class RandomEncounterManager : Node
     private void RollNewThreshold()
     {
         clickThreshold = GD.RandRange(10, 30);
+
+        // Roll omen trigger point: 3-8 clicks before the encounter
+        int omenOffset = GD.RandRange(3, 8);
+        omenTriggerPoint = Mathf.Max(1, clickThreshold - omenOffset);
+        omenShownThisCycle = false;
     }
 
     // --- Encounter Trigger ---
