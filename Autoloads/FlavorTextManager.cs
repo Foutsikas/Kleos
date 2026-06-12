@@ -1,20 +1,3 @@
-// FlavorTextManager.cs
-// Location: res://Autoloads/FlavorTextManager.cs
-// Autoload singleton (position 12, after DevConsole).
-//
-// Manages the FlavorTextLabel in CenterPanel. Handles two types
-// of messages:
-//
-//   Flavor text: brief messages on artisan purchases, milestones.
-//     Shows for 2.5 seconds, then fades out. Low priority.
-//
-//   Omen text: pre-battle warnings from RandomEncounterManager.
-//     Stays visible until cleared by the encounter trigger or
-//     a timeout. High priority -- replaces current flavor text.
-//
-// Any system can call Show() or ShowOmen() to display a message.
-// The label reference is set by MainGameController after scene load.
-
 using Godot;
 using System.Collections.Generic;
 
@@ -29,6 +12,7 @@ public partial class FlavorTextManager : Node
     private Label flavorLabel;
     private Tween activeTween;
     private bool isOmenActive = false;
+    private FlavorTextLibrary library;
 
     // Flavor text duration
     private const float FlavorDisplayTime = 2.5f;
@@ -38,70 +22,6 @@ public partial class FlavorTextManager : Node
     // Colors
     private static readonly Color FlavorColor = new Color("B8A88A");
     private static readonly Color OmenColor = new Color("C4785A");
-
-    // Omen text pool
-    private static readonly string[] OmenTexts = new string[]
-    {
-        "The birds have gone quiet...",
-        "A cold wind stirs the dust...",
-        "Something watches from the treeline...",
-        "The shadows grow restless...",
-        "Your hand reaches for a weapon...",
-        "The air tastes of iron...",
-        "A branch snaps in the distance...",
-        "The hairs on your neck rise...",
-        "An unnatural stillness settles...",
-        "The ground trembles faintly...",
-        "A crow circles overhead...",
-        "The wind carries a low growl...",
-    };
-
-    // Artisan flavor text pools (per artisan ID)
-    private static readonly Dictionary<string, string[]> ArtisanFlavorTexts = new()
-    {
-        ["scribe"] = new string[]
-        {
-            "A reed pen scratches parchment...",
-            "Another hand to record your deeds...",
-            "Ink flows in your name...",
-            "Words take shape on papyrus...",
-        },
-        ["bard"] = new string[]
-        {
-            "A new voice joins the chorus...",
-            "The melody grows richer...",
-            "A lyre string hums your name...",
-            "Song carries across the agora...",
-        },
-        ["potter"] = new string[]
-        {
-            "Clay takes shape beneath steady hands...",
-            "Another vessel bears your mark...",
-            "The kiln fire burns bright...",
-            "Red earth becomes art...",
-        },
-        ["sculptor"] = new string[]
-        {
-            "Chisel strikes marble...",
-            "Your likeness emerges from stone...",
-            "Dust fills the workshop...",
-            "Another statue stands in your honor...",
-        },
-        ["playwright"] = new string[]
-        {
-            "A new act unfolds on the stage...",
-            "The audience leans forward...",
-            "Drama echoes through the amphitheater...",
-            "The chorus speaks your name...",
-        },
-        ["historian"] = new string[]
-        {
-            "The chronicles grow longer...",
-            "Your name is etched into record...",
-            "History bends toward your deeds...",
-            "Scrolls fill the archive...",
-        },
-    };
 
     // -------------------------------------------------------------------------
     // Lifecycle
@@ -115,6 +35,10 @@ public partial class FlavorTextManager : Node
             return;
         }
         Instance = this;
+
+        library = GD.Load<FlavorTextLibrary>("res://Resources/FlavorText/flavor_text_library.tres");
+        if (library == null)
+            GD.PrintErr("[FlavorTextManager] FlavorTextLibrary failed to load.");
 
         // Subscribe to artisan purchases for flavor text
         if (ArtisanManager.Instance != null)
@@ -183,8 +107,10 @@ public partial class FlavorTextManager : Node
     /// Show a random omen from the built-in pool.
     public void ShowRandomOmen()
     {
-        int index = (int)(GD.Randi() % OmenTexts.Length);
-        ShowOmen(OmenTexts[index]);
+        string line = library != null
+            ? library.GetRandomOmenLine()
+            : "A cold wind stirs the dust...";
+        ShowOmen(line);
     }
 
     /// Clear the current omen. Called when encounter fires.
@@ -219,11 +145,19 @@ public partial class FlavorTextManager : Node
     {
         if (isOmenActive) return;
 
-        if (ArtisanFlavorTexts.TryGetValue(artisanId, out string[] texts))
+        var artisan = ArtisanManager.Instance?.GetArtisanById(artisanId);
+
+        if (artisan != null
+            && artisan.PurchaseFlavorLines != null
+            && artisan.PurchaseFlavorLines.Count > 0)
         {
-            int index = (int)(GD.Randi() % texts.Length);
-            ShowFlavor(texts[index]);
+            int index = (int)(GD.Randi() % artisan.PurchaseFlavorLines.Count);
+            ShowFlavor(artisan.PurchaseFlavorLines[index]);
+            return;
         }
+
+        if (library != null)
+            ShowFlavor(library.GetRandomGenericArtisanLine());
     }
 
     // -------------------------------------------------------------------------

@@ -15,4 +15,5 @@ public partial class ArtisanData : Resource
     [ExportGroup("Unlock Condition")]
     [Export] public string RequiredArtisanId { get; set; } = "";
     [Export] public int RequiredArtisanCount { get; set; } = 0;
+    [Export] public Godot.Collections.Array<string> PurchaseFlavorLines { get; set; } = new();
 }

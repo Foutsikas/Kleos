@@ -11,4 +11,5 @@ KleosPerSecond = 10.0
 CostMultiplier = 1.22
 RequiredArtisanId = "sculptor"
 RequiredArtisanCount = 15
+PurchaseFlavorLines = Array[String](["A new act unfolds on the stage...", "The audience leans forward...", "Drama echoes through the amphitheater...", "The chorus speaks your name..."])
 metadata/_custom_type_script = "uid://m8ou3y8lx4kt"

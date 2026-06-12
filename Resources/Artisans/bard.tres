@@ -10,4 +10,5 @@ BaseCost = 70.0
 KleosPerSecond = 0.5
 RequiredArtisanId = "scribe"
 RequiredArtisanCount = 10
+PurchaseFlavorLines = Array[String](["A new voice joins the chorus...", "The melody grows richer...", "A lyre string hums your name...", "Song carries across the agora..."])
 metadata/_custom_type_script = "uid://m8ou3y8lx4kt"

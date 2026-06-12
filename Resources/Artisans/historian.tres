@@ -11,4 +11,5 @@ KleosPerSecond = 25.0
 CostMultiplier = 1.22
 RequiredArtisanId = "playwright"
 RequiredArtisanCount = 10
+PurchaseFlavorLines = Array[String](["The chronicles grow longer...", "Your name is etched into record...", "History bends toward your deeds...", "Scrolls fill the archive..."])
 metadata/_custom_type_script = "uid://m8ou3y8lx4kt"

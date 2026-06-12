@@ -6,4 +6,5 @@
 script = ExtResource("1_wcurt")
 ArtisanName = "Scribe"
 ArtisanId = "scribe"
+PurchaseFlavorLines = Array[String](["A reed pen scratches parchment...", "Another hand to record your deeds...", "Ink flows in your name...", "Words take shape on papyrus..."])
 metadata/_custom_type_script = "uid://m8ou3y8lx4kt"

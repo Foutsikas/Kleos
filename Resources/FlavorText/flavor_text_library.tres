@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="FlavorTextLibrary" format=3]
+
+[ext_resource type="Script" path="res://Resources/FlavorText/FlavorTextLibrary.cs" id="1_ftlib"]
+
+[resource]
+script = ExtResource("1_ftlib")
+GenericOmenLines = Array[String](["The birds have gone quiet...", "A cold wind stirs the dust...", "Something watches from the treeline...", "The shadows grow restless...", "Your hand reaches for a weapon...", "The air tastes of iron...", "A branch snaps in the distance...", "The hairs on your neck rise...", "An unnatural stillness settles...", "The ground trembles faintly...", "A crow circles overhead...", "The wind carries a low growl..."])
+GenericArtisanLines = Array[String](["Another pair of hands joins the work...", "The workshop grows busier...", "Another craftsman takes up your cause...", "Word of honest work spreads..."])
+MilestoneLines = Array[String]([])
