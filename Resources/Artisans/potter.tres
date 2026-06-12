@@ -11,5 +11,5 @@ KleosPerSecond = 1.2
 CostMultiplier = 1.2
 RequiredArtisanId = "bard"
 RequiredArtisanCount = 15
-PurchaseFlavorLines = Array[String](["Clay takes shape beneath steady hands..", "Another vessel bears your mark...", "The kiln fire burns bright...", "Red earth becomes art..."])
+PurchaseFlavorLines = Array[String](["Clay takes shape beneath steady hands...", "Another vessel bears your mark...", "The kiln fire burns bright...", "Red earth becomes art..."])
 metadata/_custom_type_script = "uid://m8ou3y8lx4kt"
