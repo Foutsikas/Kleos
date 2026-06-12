@@ -256,7 +256,7 @@ public partial class BattlePanel : Control
 	private void SetupHeroDisplay()
 	{
 		if (HeroNameLabel != null)
-			HeroNameLabel.Text = "Hero of Hellas";
+			HeroNameLabel.Text = "Hero";
 
 		if (HeroLevelLabel != null)
 			HeroLevelLabel.Text = $"Lv. {HeroManager.Instance.GetLevel()}";
