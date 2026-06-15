@@ -33,6 +33,7 @@ public partial class RandomEncounterManager : Node
     // --- Omen state ---
     private int omenTriggerPoint = 0;
     private bool omenShownThisCycle = false;
+    private EncounterPool pendingPool = null;
 
     // --- Lifecycle ---
 
@@ -67,7 +68,7 @@ public partial class RandomEncounterManager : Node
             omenShownThisCycle = true;
             if (FlavorTextManager.Instance != null)
             {
-                FlavorTextManager.Instance.ShowRandomOmen();
+                FlavorTextManager.Instance.ShowOmenForPool(pendingPool);
             }
         }
 
@@ -93,6 +94,8 @@ public partial class RandomEncounterManager : Node
         int omenOffset = GD.RandRange(3, 8);
         omenTriggerPoint = Mathf.Max(1, clickThreshold - omenOffset);
         omenShownThisCycle = false;
+        RefreshPoolsIfDirty();
+        pendingPool = PickRandomPool();
     }
 
     // --- Encounter Trigger ---
@@ -103,7 +106,7 @@ public partial class RandomEncounterManager : Node
 
         if (activePools.Count == 0) return;
 
-        EncounterPool pool = PickRandomPool();
+        EncounterPool pool = pendingPool ?? PickRandomPool();
         if (pool == null) return;
 
         EnemyData enemy = PickRandomEnemy(pool);

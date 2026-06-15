@@ -50,4 +50,5 @@ script = ExtResource("ext_1")
 PoolName = "Brigands"
 RequiredDungeon = ExtResource("ext_3")
 Entries = [SubResource("Resource_00000"), SubResource("Resource_00001"), SubResource("Resource_00002"), SubResource("Resource_00003"), SubResource("Resource_00004"), SubResource("Resource_00005")]
+OmenLines = Array[String](["Hoofbeats, and more than one rider...", "A whistle answers from the rocks...", "The road ahead is too quiet...", "Fresh ash, a camp left in haste...", "Steel glints between the boulders...", "Someone has been on the trail for a while..."])
 metadata/_custom_type_script = "uid://s7fl6a0p44k6"

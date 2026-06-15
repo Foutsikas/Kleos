@@ -50,4 +50,5 @@ script = ExtResource("ext_1")
 PoolName = "Coastal"
 RequiredDungeon = ExtResource("ext_3")
 Entries = [SubResource("Resource_00000"), SubResource("Resource_00001"), SubResource("Resource_00002"), SubResource("Resource_00003"), SubResource("Resource_00004"), SubResource("Resource_00005")]
+OmenLines = Array[String](["The tide pulls back too far...", "Salt spray carries a strange song...", "The gulls have all gone silent...", "Something large moves beneath the surface...", "The cave mouth breathes cold air...", "Wet footprints lead away from the water..."])
 metadata/_custom_type_script = "uid://s7fl6a0p44k6"

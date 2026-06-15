@@ -1,9 +1,8 @@
-[gd_resource type="Resource" script_class="FlavorTextLibrary" format=3]
+[gd_resource type="Resource" script_class="FlavorTextLibrary" format=3 uid="uid://bxga100tkab51"]
 
-[ext_resource type="Script" path="res://Resources/FlavorText/FlavorTextLibrary.cs" id="1_ftlib"]
+[ext_resource type="Script" uid="uid://dqa6ivnk1r7pv" path="res://Resources/FlavorText/FlavorTextLibrary.cs" id="1_ftlib"]
 
 [resource]
 script = ExtResource("1_ftlib")
-GenericOmenLines = Array[String](["The birds have gone quiet...", "A cold wind stirs the dust...", "Something watches from the treeline...", "The shadows grow restless...", "Your hand reaches for a weapon...", "The air tastes of iron...", "A branch snaps in the distance...", "The hairs on your neck rise...", "An unnatural stillness settles...", "The ground trembles faintly...", "A crow circles overhead...", "The wind carries a low growl..."])
+GenericOmenLines = Array[String](["A cold wind stirs the dust...", "The shadows grow restless...", "Your hand reaches for a weapon...", "The air tastes of iron...", "The hairs on your neck rise...", "An unnatural stillness settles...", "The ground trembles faintly...", "A crow circles overhead..."])
 GenericArtisanLines = Array[String](["Another pair of hands joins the work...", "The workshop grows busier...", "Another craftsman takes up your cause...", "Word of honest work spreads..."])
-MilestoneLines = Array[String]([])

@@ -34,4 +34,5 @@ metadata/_custom_type_script = "uid://ckh8qm7xv6xp"
 script = ExtResource("1_ombx0")
 PoolName = "Forest Encounters"
 Entries = [SubResource("Resource_spqiy"), SubResource("Resource_uy8yv"), SubResource("Resource_vtlxa"), SubResource("Resource_dtu35")]
+OmenLines = Array[String](["The birds have gone quiet...", "Something watches from the treeline...", "A branch snaps in the distance...", "The wind carries a low growl...", "Paw prints cross the path, still fresh...", "The undergrowth shivers where no wind blows..."])
 metadata/_custom_type_script = "uid://s7fl6a0p44k6"

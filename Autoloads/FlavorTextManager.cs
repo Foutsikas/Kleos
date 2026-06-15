@@ -113,6 +113,17 @@ public partial class FlavorTextManager : Node
         ShowOmen(line);
     }
 
+    public void ShowOmenForPool(EncounterPool pool)
+    {
+        if (pool != null && pool.OmenLines != null && pool.OmenLines.Count > 0)
+        {
+            int i = (int)(GD.Randi() % pool.OmenLines.Count);
+            ShowOmen(pool.OmenLines[i]);
+            return;
+        }
+        ShowRandomOmen();
+    }
+
     /// Clear the current omen. Called when encounter fires.
     public void ClearOmen()
     {

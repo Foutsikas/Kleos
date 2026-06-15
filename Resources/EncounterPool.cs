@@ -13,6 +13,9 @@ public partial class EncounterPool : Resource
     [ExportGroup("Enemies")]
     [Export] public Array Entries { get; set; } = new();
 
+    [ExportGroup("Omens")]
+    [Export] public Godot.Collections.Array<string> OmenLines { get; set; } = new();
+
     public EncounterPoolEntry GetEntry(int index)
     {
         if (index < 0 || index >= Entries.Count) return null;
