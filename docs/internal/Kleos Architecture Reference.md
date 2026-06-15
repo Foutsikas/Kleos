@@ -452,10 +452,12 @@ Config loading:
 
 Key methods:
   OnDeedClicked() -- increments counter, checks threshold
-  RollNewThreshold() -- random int between configurable min/max
+  RollNewThreshold() -- random int between configurable min/max;
+	also pre-selects pendingPool for the cycle (see Omen Integration)
   RefreshPoolsIfDirty() -- rebuilds active pool list
   PickRandomPool() -- selects random pool from active pools
   PickRandomEnemy(EncounterPool) -- weighted random selection
+  TryTriggerEncounter() -- fires the encounter using pendingPool
 
 Pool activation:
   Forest pool: always active (RequiredDungeon is null)
@@ -772,7 +774,7 @@ Public method:
 
 ---
 
-### FlavorTextManager (Autoload, June 2026)
+### FlavorTextManager (Autoload, June 2026; data-driven June 12; per-pool omens June 15)
 
 Singleton autoload (position 12). Manages temporary text display
 in FlavorTextLabel below DeedContextLabel.
@@ -783,6 +785,11 @@ State:
   flavorLabel (Label, set by MainGameController via SetLabel())
   activeTween (Tween, current animation)
   isOmenActive (bool, omen priority flag)
+  library (FlavorTextLibrary) -- loaded in _Ready() via GD.Load from
+	res://Resources/FlavorText/flavor_text_library.tres, immediately
+	after Instance assignment and before the ArtisanPurchased
+	subscription. PrintErr on load failure; readers carry hardcoded
+	single-line fallbacks for the null-library case.
 
 Constants:
   FlavorDisplayTime: 2.5 seconds
@@ -791,21 +798,35 @@ Constants:
   FlavorColor: #B8A88A (muted earth tone)
   OmenColor: #C4785A (amber warning)
 
-Static data:
-  OmenTexts: 12 atmospheric pre-battle warnings (string array)
-  ArtisanFlavorTexts: Dictionary keyed by artisan ID, 4 messages each
+Data (June 12, 2026 -- data-driven):
+  The former static OmenTexts array and ArtisanFlavorTexts dictionary
+  are removed. Omen lines now come from EncounterPool.OmenLines (the
+  per-pool path) or library.GenericOmenLines (fallback); artisan
+  lines come from ArtisanData.PurchaseFlavorLines or
+  library.GenericArtisanLines (fallback).
 
 Public API:
   SetLabel(Label) -- called by MainGameController in _Ready()
   ShowFlavor(string) -- brief timed message, ignored if omen active
   ShowOmen(string) -- persistent warning, replaces current text
-  ShowRandomOmen() -- picks from OmenTexts pool
+  ShowOmenForPool(EncounterPool) -- shows a line from the pool's
+    OmenLines if non-empty, else falls back to ShowRandomOmen(). The
+    per-pool omen entry point (June 15); placed directly below
+    ShowRandomOmen.
+  ShowRandomOmen() -- picks from library.GenericOmenLines (hardcoded
+    single-line fallback if the library is null). Still the generic
+    fallback and the DevConsole test path.
   ClearOmen() -- fades out omen, resets isOmenActive
   Clear() -- force clears any displayed text
 
 Signal subscriptions:
   ArtisanManager.ArtisanPurchased -> OnArtisanPurchased()
   Subscribes in _Ready(), unsubscribes in _ExitTree().
+  OnArtisanPurchased(artisanId) priority chain:
+    1. ArtisanManager.GetArtisanById(artisanId).PurchaseFlavorLines
+       if non-empty
+    2. library.GetRandomGenericArtisanLine()
+  Mirrors the EnemyData AttackLines precedent.
 
 Animation:
   PlayFlavorSequence() -- fade in, hold, fade out, clear text
@@ -813,18 +834,26 @@ Animation:
   All animations use Godot Tween. Previous tween killed before
   starting a new one to prevent overlap.
 
-### RandomEncounterManager Omen Integration (June 2026)
+### RandomEncounterManager Omen Integration (June 2026; per-pool June 15)
 
 Added fields:
   omenTriggerPoint (int) -- click count at which omen fires
   omenShownThisCycle (bool) -- prevents repeat omen per cycle
+  pendingPool (EncounterPool) -- the pool chosen for the coming
+    encounter, selected once at cycle start so the omen and the
+    encounter draw from the same pool.
 
 Modified methods:
-  RollNewThreshold() -- also rolls omenTriggerPoint (threshold
-	minus random 3-8 offset, minimum 1)
-  OnDeedClicked() -- checks omenTriggerPoint before threshold,
-	calls FlavorTextManager.ShowRandomOmen(). On encounter trigger,
-	calls FlavorTextManager.ClearOmen() before firing.
+  RollNewThreshold() -- rolls omenTriggerPoint (threshold minus
+    random 3-8 offset, minimum 1), then RefreshPoolsIfDirty() and
+    pendingPool = PickRandomPool().
+  OnDeedClicked() -- checks omenTriggerPoint before threshold, then
+    calls FlavorTextManager.ShowOmenForPool(pendingPool). On encounter
+    trigger, calls FlavorTextManager.ClearOmen() before firing.
+  TryTriggerEncounter() -- uses pendingPool for the encounter
+    (pendingPool ?? PickRandomPool() as a null safety). Pool selection
+    moved from encounter time to cycle start; a pool unlocked
+    mid-cycle becomes eligible next cycle (cycles are 10-30 clicks).
 
 ---
 
@@ -845,10 +874,10 @@ Command history: up/down arrow keys.
 
 UI structure (built in _Ready()):
   PanelContainer (dark background, top of screen, 160px tall)
-	VBoxContainer
-	  Label ("DEV CONSOLE" title)
-	  Label (output display, autowrap)
-	  LineEdit (command input, TextSubmitted signal)
+    VBoxContainer
+      Label ("DEV CONSOLE" title)
+      Label (output display, autowrap)
+      LineEdit (command input, TextSubmitted signal)
 
 Command processing:
   OnCommandSubmitted() adds to history, calls ExecuteCommand().
@@ -860,7 +889,7 @@ Commands:
   kleos <amount> -- calls KleosManager.AddKleos()
   level <target> -- grants XP to reach target level (single large grant)
   stat <str/end/cun/fav> <n> -- calls HeroManager.UpgradeStat() N times,
-	tracks actual applied count vs requested
+    tracks actual applied count vs requested
   clear <dungeonId> -- calls DungeonManager.ForceCompleteDungeon()
   layer <dungeonId> <count> -- calls OnLayerCleared() for next N layers
   hp <amount> -- RestoreFullHP then TakeDamage to set exact value
@@ -892,9 +921,9 @@ File paths:
 
 Key methods:
   Save(SaveData) -- serializes to JSON via BuildJson(), creates backup,
-	writes file
+    writes file
   Load() -- reads file via ParseJson(), falls back to backup, returns
-	empty SaveData if both fail
+    empty SaveData if both fail
   HasSaveData() -- checks if save file exists
   DeleteSaveData() -- deletes save and backup files
   ResetAllSaveData() -- alias for DeleteSaveData
@@ -955,6 +984,9 @@ Fields:
   CostMultiplier (float)
   RequiredArtisanId (string, empty if always unlocked)
   RequiredArtisanCount (int)
+  PurchaseFlavorLines (Array of string, exported) -- per-artisan
+	purchase flavor lines consumed by FlavorTextManager; empty array
+	falls back to the generic library pool.
 
 ### EnemyData (Resource)
 
@@ -1060,6 +1092,9 @@ Fields:
   PoolName (string)
   RequiredDungeon (DungeonData, null for always-active pools)
   Entries (Array of EncounterPoolEntry)
+  OmenLines (Array of string, exported, June 15) -- per-pool omen
+	lines shown by FlavorTextManager.ShowOmenForPool; empty array
+	falls back to the generic library pool.
 
 Helper: GetEntry(int index) for typed access.
 
@@ -1085,17 +1120,42 @@ to replace {0} placeholders with the enemy name.
 Asset: res://Resources/BattleText/battle_text_library.tres
 Loaded by BattleSystem in _Ready() via GD.Load().
 
+### FlavorTextLibrary (Resource, June 12, 2026)
+
+Resource class for generic flavor text pools. Mirrors
+BattleTextLibrary: exported Array[string] pools under ExportGroups, a
+private GetRandom(pool, fallback) helper, and public accessors with
+hardcoded last-resort fallbacks.
+
+Pools:
+  GenericOmenLines (eight region-neutral lines, after the four
+	Forest-specific lines moved to the Forest pool June 15)
+  GenericArtisanLines (four neutral fallback lines)
+  MilestoneLines (reserved, empty -- V0.7 awakening sequence)
+
+Accessors: GetRandomOmenLine(), GetRandomGenericArtisanLine(),
+GetRandomMilestoneLine().
+
+File:  res://Resources/FlavorText/FlavorTextLibrary.cs
+Asset: res://Resources/FlavorText/flavor_text_library.tres
+Loaded by FlavorTextManager in _Ready() via GD.Load().
+
+Owner-specific lines take priority over this library everywhere:
+ArtisanData.PurchaseFlavorLines for artisan flavor, and
+EncounterPool.OmenLines for omens (June 15). The library is always the
+fallback, never the first choice.
+
 ### SaveData (Plain C# classes extending RefCounted)
 
   SaveData -- root container
-    Version (string)
-    LastSaveTime (long)
-    Kleos (KleosSaveData)
-    Artisans (ArtisanSaveData)
-    Upgrades (UpgradeSaveData)
-    Dungeons (DungeonSaveData)
-    Hero (HeroSaveData)
-    HeroAbilities (HeroAbilitySaveData) -- May 2026
+	Version (string)
+	LastSaveTime (long)
+	Kleos (KleosSaveData)
+	Artisans (ArtisanSaveData)
+	Upgrades (UpgradeSaveData)
+	Dungeons (DungeonSaveData)
+	Hero (HeroSaveData)
+	HeroAbilities (HeroAbilitySaveData) -- May 2026
 
 Each sub-class extends RefCounted and contains only serializable
 properties (strings, ints, floats, dictionaries, arrays).
@@ -1113,17 +1173,17 @@ Controller: MainMenuController.cs
 
 Node tree:
   MainMenu (Control)
-    Background (ColorRect)
-    StartButton (Button -- invisible, full screen click target)
-    CenterContainer (VBoxContainer)
-      TitleLabel (Label -- "KLEOS")
-      PromptLabel (Label -- pulsing text)
-    SettingsButton (Button)
-    SettingsPanel (PanelContainer, starts hidden)
-      VBoxContainer
-        SettingsTitle, MusicRow, SfxRow, FullscreenToggle,
-        DeleteSaveButton, CloseSettingsButton
-    FadeOverlay (ColorRect)
+	Background (ColorRect)
+	StartButton (Button -- invisible, full screen click target)
+	CenterContainer (VBoxContainer)
+	  TitleLabel (Label -- "KLEOS")
+	  PromptLabel (Label -- pulsing text)
+	SettingsButton (Button)
+	SettingsPanel (PanelContainer, starts hidden)
+	  VBoxContainer
+		SettingsTitle, MusicRow, SfxRow, FullscreenToggle,
+		DeleteSaveButton, CloseSettingsButton
+	FadeOverlay (ColorRect)
 
 Flow:
   _Ready() checks SaveManager.HasSaveData() for first-play detection.
@@ -1138,57 +1198,57 @@ Controller: MainGameController.cs
 
 Node tree:
   MainGame (Control)
-    Background (ColorRect)
-    RootLayout (VBoxContainer)
-      TopBar (HBoxContainer)
-        HeroPortrait (PanelContainer, compact display, clickable)
-          VBoxContainer
-            HeroLevelLabel
-            HeroHPBar (ProgressBar)
-            HeroXPBar (ProgressBar)
-        KleosLabel
-        ProductionLabel
-      MainPanel (HBoxContainer)
-        LeftPanel (VBoxContainer)
-          TopSpacer, DungeonButton, MiddleSpacer, UpgradeButton, BottomSpacer
-        CenterPanel (VBoxContainer)
-          DeedButtonContainer (Control, DeedButtonEvolution.cs)
-            DeedGlow (ColorRect, behind button, starts hidden)
-            DeedButton (Button)
-          DeedContextLabel
-          FlavorTextLabel (Label, managed by FlavorTextManager)
-        RightPanel (VBoxContainer)
-          ArtisanScrollContainer > ArtisanList (VBoxContainer)
-    HeroPanel (PanelContainer, overlay, hidden)
-      VBoxContainer with stat rows, bars, upgrade buttons
-    DungeonPanel (PanelContainer, overlay, hidden)
-      ScrollContainer > DungeonList (VBoxContainer)
-    UpgradePanel (PanelContainer, overlay, hidden)
-      ScrollContainer > UpgradeList (VBoxContainer)
-    AbilityPanel (PanelContainer, overlay, hidden) -- May 2026
-      ScrollContainer > AbilityList (VBoxContainer)
-    BattlePanel (Control, overlay, hidden)
-      BattleBackground (ColorRect, Full Rect)
-      CombatArea (Control, Full Rect)
-        EncounterHeaderLabel (Label, Center Top)
-        HeroSection (VBoxContainer, Bottom Left)
-          HeroHPText, HeroHPBar, HeroPortrait, HeroNameLabel, HeroLevelLabel
-        EnemySection (VBoxContainer, Top Right)
-          EnemyNameLabel, EnemyPortrait, EnemyHPBar, EnemyHPText
-        BattleLogContainer (VBoxContainer, Center Bottom)
-          LogLine1, LogLine2, LogLine3, LogLine4
-        SpeedToggleButton (Button, Top Left, hidden)
-      ResultOverlay (Control, Full Rect, hidden)
-        ResultContent (VBoxContainer, Center)
-          ResultSubtitleLabel, ResultTitleLabel, ResultFlavorLabel,
-          ResultRewardLabel, ResultLuckLabel, ResultSummaryLabel,
-          ResultConsolationLabel, ResultActionButton, ViewBattleLogButton
-      PostCombatLogOverlay (Control, Full Rect, hidden)
-        LogMargin (MarginContainer, Full Rect, margins 20/20/20/60)
-          PostCombatLogScroll (ScrollContainer)
-            PostCombatLogList (VBoxContainer)
-        BackToResultsButton (Button, Center Bottom)
-    FadeOverlay (ColorRect)
+	Background (ColorRect)
+	RootLayout (VBoxContainer)
+	  TopBar (HBoxContainer)
+		HeroPortrait (PanelContainer, compact display, clickable)
+		  VBoxContainer
+			HeroLevelLabel
+			HeroHPBar (ProgressBar)
+			HeroXPBar (ProgressBar)
+		KleosLabel
+		ProductionLabel
+	  MainPanel (HBoxContainer)
+		LeftPanel (VBoxContainer)
+		  TopSpacer, DungeonButton, MiddleSpacer, UpgradeButton, BottomSpacer
+		CenterPanel (VBoxContainer)
+		  DeedButtonContainer (Control, DeedButtonEvolution.cs)
+			DeedGlow (ColorRect, behind button, starts hidden)
+			DeedButton (Button)
+		  DeedContextLabel
+		  FlavorTextLabel (Label, managed by FlavorTextManager)
+		RightPanel (VBoxContainer)
+		  ArtisanScrollContainer > ArtisanList (VBoxContainer)
+	HeroPanel (PanelContainer, overlay, hidden)
+	  VBoxContainer with stat rows, bars, upgrade buttons
+	DungeonPanel (PanelContainer, overlay, hidden)
+	  ScrollContainer > DungeonList (VBoxContainer)
+	UpgradePanel (PanelContainer, overlay, hidden)
+	  ScrollContainer > UpgradeList (VBoxContainer)
+	AbilityPanel (PanelContainer, overlay, hidden) -- May 2026
+	  ScrollContainer > AbilityList (VBoxContainer)
+	BattlePanel (Control, overlay, hidden)
+	  BattleBackground (ColorRect, Full Rect)
+	  CombatArea (Control, Full Rect)
+		EncounterHeaderLabel (Label, Center Top)
+		HeroSection (VBoxContainer, Bottom Left)
+		  HeroHPText, HeroHPBar, HeroPortrait, HeroNameLabel, HeroLevelLabel
+		EnemySection (VBoxContainer, Top Right)
+		  EnemyNameLabel, EnemyPortrait, EnemyHPBar, EnemyHPText
+		BattleLogContainer (VBoxContainer, Center Bottom)
+		  LogLine1, LogLine2, LogLine3, LogLine4
+		SpeedToggleButton (Button, Top Left, hidden)
+	  ResultOverlay (Control, Full Rect, hidden)
+		ResultContent (VBoxContainer, Center)
+		  ResultSubtitleLabel, ResultTitleLabel, ResultFlavorLabel,
+		  ResultRewardLabel, ResultLuckLabel, ResultSummaryLabel,
+		  ResultConsolationLabel, ResultActionButton, ViewBattleLogButton
+	  PostCombatLogOverlay (Control, Full Rect, hidden)
+		LogMargin (MarginContainer, Full Rect, margins 20/20/20/60)
+		  PostCombatLogScroll (ScrollContainer)
+			PostCombatLogList (VBoxContainer)
+		BackToResultsButton (Button, Center Bottom)
+	FadeOverlay (ColorRect)
 
 MainGameController responsibilities:
   Connects all button signals in _Ready().
@@ -1198,11 +1258,11 @@ MainGameController responsibilities:
   Spawns ArtisanRow instances into ArtisanList via PopulateArtisanList().
   Spawns DungeonRow instances into DungeonList via PopulateDungeonList().
   Spawns UpgradeRow and TierHeader instances into UpgradeList via
-    PopulateUpgradeList().
+	PopulateUpgradeList().
   Spawns AbilityRow instances into AbilityList via PopulateAbilityList().
   Wires FlavorTextLabel to FlavorTextManager via SetLabel() in _Ready().
   Refreshes kleos display, production display, deed context,
-    hero portrait bars, and hero panel stats.
+	hero portrait bars, and hero panel stats.
   Handles stat upgrade button presses.
   Fade-in on scene entry.
 
@@ -1213,14 +1273,14 @@ Root node: PanelContainer
 
 Node tree:
   ArtisanRow (PanelContainer)
-    HBoxContainer
-      ArtisanInfoContainer (VBoxContainer)
-        ArtisanNameLabel (Label)
-        ArtisanKPSLabel (Label)
-      ArtisanRightContainer (VBoxContainer)
-        ArtisanCostLabel (Label)
-        ArtisanBuyButton (Button)
-        ArtisanOwnedLabel (Label)
+	HBoxContainer
+	  ArtisanInfoContainer (VBoxContainer)
+		ArtisanNameLabel (Label)
+		ArtisanKPSLabel (Label)
+	  ArtisanRightContainer (VBoxContainer)
+		ArtisanCostLabel (Label)
+		ArtisanBuyButton (Button)
+		ArtisanOwnedLabel (Label)
 
 Two visual states managed internally:
 
@@ -1256,12 +1316,12 @@ Root node: PanelContainer
 
 Node tree:
   DungeonRow (PanelContainer)
-    VBoxContainer
-      HeaderRow (HBoxContainer)
-        DungeonNameLabel (Label)
-        ProgressLabel (Label)
-      LayerInfoLabel (Label)
-      DungeonActionButton (Button)
+	VBoxContainer
+	  HeaderRow (HBoxContainer)
+		DungeonNameLabel (Label)
+		ProgressLabel (Label)
+	  LayerInfoLabel (Label)
+	  DungeonActionButton (Button)
 
 Four visual states managed internally:
 
@@ -1289,7 +1349,7 @@ Signal subscriptions:
   DungeonManager.LayerCleared -- refreshes display for this dungeon.
   DungeonManager.DungeonCompleted -- refreshes when this dungeon completes
 	OR when the completed dungeon is this row's RequiredDungeon
-	(so downstream dungeons unlock immediately).
+    (so downstream dungeons unlock immediately).
   KleosManager.KleosChanged -- refreshes if dungeon has kleos requirement.
 
 OnActionPressed() calls BattleSystem.Instance.StartDungeonBattle()
@@ -1309,13 +1369,13 @@ Root node: PanelContainer
 
 Node tree:
   UpgradeRow (PanelContainer)
-	VBoxContainer
-	  HeaderRow (HBoxContainer)
-		UpgradeNameLabel (Label)
-		UpgradeCostLabel (Label)
-	  DescriptionLabel (Label)
-	  LockReasonLabel (Label, hidden by default)
-	  UpgradeBuyButton (Button)
+    VBoxContainer
+      HeaderRow (HBoxContainer)
+        UpgradeNameLabel (Label)
+        UpgradeCostLabel (Label)
+      DescriptionLabel (Label)
+      LockReasonLabel (Label, hidden by default)
+      UpgradeBuyButton (Button)
 
 Five visual states managed internally:
 
@@ -1340,15 +1400,15 @@ Individual Locked:
 Lock checks:
   IsTierUnlocked() checks RequiredDungeon completion.
   TryGetIndividualLockReason() checks hero level, prerequisite upgrade,
-	and artisan count. Returns lock reason string if locked.
+    and artisan count. Returns lock reason string if locked.
   Dead GetIndividualLockReason() method removed (April 2026 cleanup).
 
 Signal subscriptions:
   KleosManager.KleosChanged -- refreshes affordability.
   UpgradeManager.UpgradePurchased -- refreshes all rows (prerequisite
-	checks may have changed).
+    checks may have changed).
   DungeonManager.DungeonCompleted -- refreshes tier-gated rows when
-	their RequiredDungeon is completed (added April 2026).
+    their RequiredDungeon is completed (added April 2026).
 
 _ExitTree() unsubscribes from all signals with -= operators.
 Fixed April 2026: was previously using += instead of -= for
@@ -1381,7 +1441,7 @@ Visual elements:
   Left accent bar (ColorRect, green when unlocked, hidden when locked)
   Ability name label + type badges (HBoxContainer)
   Type badges: color-coded pills auto-determined from AbilityEffect data
-	(Attack = red, Heal = green, Buff = blue, Debuff = purple, etc.)
+    (Attack = red, Heal = green, Buff = blue, Debuff = purple, etc.)
   Description label: auto-generated from effect data
   Flavor text label: from CastFlavorText, dimmed italic
   Bottom row: unlock condition + status/purchase button
@@ -1440,10 +1500,10 @@ Animation methods:
 
 Helper methods:
   GetEnemyAttackLine(string) -- priority chain: enemy-specific
-	AttackLines array, then BattleTextLibrary generic pool,
-	then hardcoded fallback.
+    AttackLines array, then BattleTextLibrary generic pool,
+    then hardcoded fallback.
   SetProgressBarColor() -- creates StyleBoxFlat and applies as
-	theme override for ProgressBar fill color.
+    theme override for ProgressBar fill color.
 
 Export properties: 30 node references wired in the editor Inspector.
 All exports use null checks before access for safety.
@@ -1482,7 +1542,7 @@ DungeonManager.LayerCleared:
 DungeonManager.DungeonCompleted:
   RandomEncounterManager.OnDungeonCompleted (marks pools dirty)
   DungeonRow.OnDungeonCompleted (per row, refreshes self and
-	rows whose RequiredDungeon matches)
+    rows whose RequiredDungeon matches)
   UpgradeRow.OnDungeonCompleted (per row, refreshes tier gate)
   HeroAbilityManager.OnDungeonCompleted (dungeon reward unlocks, May 2026)
   AbilityRow.OnDungeonCompleted (per row, May 2026)
@@ -1599,9 +1659,9 @@ Control vs PanelContainer for overlays:
 9. UpgradeRow -- removed dead GetIndividualLockReason() method,
    cleaned ShowIndividualLocked.
 10. DungeonRow cleared count -- clamped with Mathf.Min() to
-    prevent exceeding totalLayers.
+	prevent exceeding totalLayers.
 11. DungeonRow.OnActionPressed -- uses IsDungeonCompleted() check
-    instead of bounds comparison.
+	instead of bounds comparison.
 
 ---
 

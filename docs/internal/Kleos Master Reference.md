@@ -550,16 +550,20 @@ and rolls against a threshold (configurable range, default 10-30).
 
 Multi-pool system: multiple EncounterPool assets, each gated by a
 dungeon completion requirement. Forest pool is always active (no gate).
-When an encounter triggers, a random active pool is selected, then a
-random enemy from that pool using weighted selection.
+The pool for the coming encounter is pre-selected at the start of each
+cycle (pendingPool); a random enemy is then drawn from it by weighted
+selection when the encounter fires. Pre-selecting the pool lets the
+omen match the encounter (see Section 15).
 
 Bosses and mini-bosses excluded from all encounter pools. They are
 dungeon-exclusive.
 
-Omen integration (June 2026): each encounter cycle rolls an omen
-trigger point 3-8 clicks before the threshold. When reached,
-FlavorTextManager displays a warning in amber. Cleared when the
-encounter fires. See Section 15 for full omen details.
+Omen integration (June 2026; per-pool June 15): each cycle rolls an
+omen trigger point 3-8 clicks before the threshold. When reached,
+FlavorTextManager displays an amber warning drawn from the
+pre-selected pool's own OmenLines, with a generic library fallback,
+so the warning matches the coming fight. Cleared when the encounter
+fires. See Section 15 for full omen details.
 
 ---
 
@@ -627,33 +631,33 @@ Controller script: MainGameController.cs
 Layout structure:
 
   MainGame (Control, full screen)
-    Background (ColorRect)
-    RootLayout (VBoxContainer)
-      TopBar (HBoxContainer)
-        HeroPortrait -- compact, top left
-        KleosLabel
-        ProductionLabel
-      MainPanel (HBoxContainer)
-        LeftPanel (VBoxContainer, fixed width)
-          UpgradeButton
-          AbilityButton ("Combat Arts")
-          DungeonButton
-        CenterPanel (VBoxContainer, expands)
-          DeedButtonContainer (Control, DeedButtonEvolution.cs)
-            DeedGlow (ColorRect, behind button, hidden by default)
-            DeedButton (Button)
-          DeedContextLabel
-          FlavorTextLabel
-        RightPanel (VBoxContainer, fixed width)
-          ArtisanScrollContainer
-            ArtisanList
-    HeroPanel (overlay, starts hidden)
-    DungeonPanel (overlay, starts hidden)
-    UpgradePanel (overlay, starts hidden)
-    AbilityPanel (overlay, starts hidden) -- May 2026
-      ScrollContainer > AbilityList
-    BattlePanel (overlay, starts hidden)
-    FadeOverlay (ColorRect)
+	Background (ColorRect)
+	RootLayout (VBoxContainer)
+	  TopBar (HBoxContainer)
+		HeroPortrait -- compact, top left
+		KleosLabel
+		ProductionLabel
+	  MainPanel (HBoxContainer)
+		LeftPanel (VBoxContainer, fixed width)
+		  UpgradeButton
+		  AbilityButton ("Combat Arts")
+		  DungeonButton
+		CenterPanel (VBoxContainer, expands)
+		  DeedButtonContainer (Control, DeedButtonEvolution.cs)
+			DeedGlow (ColorRect, behind button, hidden by default)
+			DeedButton (Button)
+		  DeedContextLabel
+		  FlavorTextLabel
+		RightPanel (VBoxContainer, fixed width)
+		  ArtisanScrollContainer
+			ArtisanList
+	HeroPanel (overlay, starts hidden)
+	DungeonPanel (overlay, starts hidden)
+	UpgradePanel (overlay, starts hidden)
+	AbilityPanel (overlay, starts hidden) -- May 2026
+	  ScrollContainer > AbilityList
+	BattlePanel (overlay, starts hidden)
+	FadeOverlay (ColorRect)
 
 Four overlay panels: Dungeon, Upgrade, and Ability are mutually
 exclusive (opening one closes the others). HeroPanel toggles
@@ -667,23 +671,23 @@ Displays all 9 hero abilities grouped into three sections:
   "Learned through experience" -- level-based abilities, sorted by level.
   "Purchased with kleos" -- buyable abilities, sorted by cost.
   "Earned through conquest" -- dungeon reward abilities, sorted by
-    dungeon progression order.
+	dungeon progression order.
 
 AbilityRow displays per ability:
   Top row: ability name + type badges.
   Type badges: color-coded pills auto-determined from effects.
-    Attack (red), Self buff (olive), Poison/Debuff (amber),
-    Heal/Regen (teal), Cleanse (blue).
+	Attack (red), Self buff (olive), Poison/Debuff (amber),
+	Heal/Regen (teal), Cleanse (blue).
 	Multi-type abilities show two badges (Viper's Bite: Attack + Poison).
   Description: auto-generated from effect data. Includes trigger
-	condition, cooldown, one-time-use, replaces-attack info.
+    condition, cooldown, one-time-use, replaces-attack info.
   Flavor text: from CastFlavorText field, dimmed italic style.
   Bottom row: unlock condition + status/purchase button.
-	Level-based: "Unlocked at level N" or "Requires level N".
-	Purchasable: cost in kleos with Purchase button.
-	Dungeon reward: "Clear {Dungeon Name}".
+    Level-based: "Unlocked at level N" or "Requires level N".
+    Purchasable: cost in kleos with Purchase button.
+    Dungeon reward: "Clear {Dungeon Name}".
   Three visual states: Unlocked (green left accent), Purchasable
-	(dimmed with active button), Locked (dimmed with "Locked" badge).
+    (dimmed with active button), Locked (dimmed with "Locked" badge).
 
 AbilityRow refreshes on KleosChanged, LevelUp, AbilityUnlocked,
 and DungeonCompleted signals.
@@ -730,21 +734,21 @@ The visual presentation reflects the world's growing recognition.
 Four tiers based on unique artisan types unlocked:
 
   Tier 0 -- Bronze (0-1 unique artisans):
-    Terracotta background, dark brown border (1px), light text.
-    The hero is unknown. Plain unfired clay.
+	Terracotta background, dark brown border (1px), light text.
+	The hero is unknown. Plain unfired clay.
 
   Tier 1 -- Silver (2-3 unique artisans):
-    Cooler earth tone background, warm grey border (2px).
-    Word is spreading. The clay has been fired.
+	Cooler earth tone background, warm grey border (2px).
+	Word is spreading. The clay has been fired.
 
   Tier 2 -- Gold (4-5 unique artisans):
-    Warm bronze-gold background, golden border (2px).
+	Warm bronze-gold background, golden border (2px).
 	The hero's name is known.
 
   Tier 3 -- Divine (6 unique artisans, all unlocked):
-	Deep navy background, bright gold border (3px), gold text.
-	Persistent gold glow pulse behind the button.
-	The gods have taken notice.
+    Deep navy background, bright gold border (3px), gold text.
+    Persistent gold glow pulse behind the button.
+    The gods have taken notice.
 
 Tier-up animation (during gameplay only, not on load):
   Step 1: White flash burst from button center (0.3 seconds).
@@ -762,7 +766,7 @@ Button evolution tier thresholds for owned artisan counts:
   Silver:  25 Scribes, 15 Bards, 10 Potters
   Gold:    50 Scribes, 30 Bards, 20 Potters, 10 Sculptors
   Divine:  75 Scribes, 50 Bards, 35 Potters, 20 Sculptors,
-		   15 Playwrights, 5 Historians
+           15 Playwrights, 5 Historians
 
 Implementation: DeedButtonEvolution.cs on DeedButtonContainer node.
 Uses StyleBoxFlat theme overrides (normal, hover, pressed, focus).
@@ -770,7 +774,7 @@ Subscribes to ArtisanManager.ArtisanPurchased signal.
 
 ---
 
-## Section 15 -- Flavor Text and Omen System (June 2026)
+## Section 15 -- Flavor Text and Omen System (June 2026; data-driven June 12; per-pool omens June 15)
 
 FlavorTextManager is an Autoload singleton (position 12) that manages
 a dedicated FlavorTextLabel in CenterPanel, below DeedContextLabel.
@@ -778,17 +782,18 @@ a dedicated FlavorTextLabel in CenterPanel, below DeedContextLabel.
 Two message types with different priority and behavior:
 
   Flavor text (low priority):
-	Brief messages triggered by artisan purchases. Fades in over 0.3
-	seconds, holds for 2.5 seconds, fades out over 0.5 seconds.
-	Suppressed while an omen is active.
+    Brief messages triggered by artisan purchases. Fades in over 0.3
+    seconds, holds for 2.5 seconds, fades out over 0.5 seconds.
+    Suppressed while an omen is active.
 
-	Each artisan type has a pool of four themed messages:
-	  Scribe: "A reed pen scratches parchment..."
-	  Bard: "A new voice joins the chorus..."
-	  Potter: "Clay takes shape beneath steady hands..."
-	  Sculptor: "Chisel strikes marble..."
-	  Playwright: "A new act unfolds on the stage..."
-	  Historian: "The chronicles grow longer..."
+    Artisan purchase lines are data-driven. Each artisan carries its
+    own PurchaseFlavorLines array on its ArtisanData .tres file (four
+    lines each, e.g. Scribe: "A reed pen scratches parchment...").
+    Priority chain on purchase:
+	  1. the artisan's own PurchaseFlavorLines, if non-empty
+	  2. GenericArtisanLines from flavor_text_library.tres
+	This mirrors the EnemyData AttackLines precedent: owner lines
+	first, library fallback second.
 
   Omen text (high priority):
 	Pre-battle warnings from RandomEncounterManager. Appears in amber
@@ -796,23 +801,23 @@ Two message types with different priority and behavior:
 	Replaces any current flavor text immediately.
 
 	Omen trigger: RandomEncounterManager rolls an omenTriggerPoint
-	(3-8 clicks before the encounter threshold). When the click
-	counter reaches the omen point, a random omen is displayed.
-	When the encounter fires, ClearOmen() fades the text out.
+	(3-8 clicks before the encounter threshold) and pre-selects the
+	coming encounter pool at the start of the cycle (pendingPool).
+	When the click counter reaches the omen point, an omen for that
+	pool is displayed, so the warning matches the danger. When the
+	encounter fires, ClearOmen() fades the text out and the same
+	pendingPool is used to choose the enemy.
 
-	Omen text pool (12 atmospheric warnings):
-      "The birds have gone quiet..."
-      "A cold wind stirs the dust..."
-      "Something watches from the treeline..."
-      "The shadows grow restless..."
-      "Your hand reaches for a weapon..."
-      "The air tastes of iron..."
-      "A branch snaps in the distance..."
-      "The hairs on your neck rise..."
-      "An unnatural stillness settles..."
-      "The ground trembles faintly..."
-      "A crow circles overhead..."
-      "The wind carries a low growl..."
+	Omen lines are data-driven with a priority chain (per-pool omens,
+	June 15):
+	  1. the coming pool's own OmenLines on its EncounterPool .tres,
+         if non-empty (Forest, Brigands, and Coastal each carry six
+         themed lines)
+      2. GenericOmenLines from flavor_text_library.tres (eight
+         region-neutral lines, e.g. "A cold wind stirs the dust...")
+    This is the same owner-first, library-fallback pattern used for
+    artisan lines. A pool unlocked mid-cycle becomes eligible on the
+    next cycle (cycles are 10-30 clicks).
 
 Colors:
   Flavor text: muted earth tone (#B8A88A)
@@ -826,6 +831,16 @@ DeedContextLabel remains as a separate system: it shows persistent
 progression text based on total artisan count ("Training in solitude..."
 through "Historians record your selfless acts..."). FlavorTextLabel
 shows temporary messages below it.
+
+FlavorTextLibrary (June 12, 2026): resource class at
+res://Resources/FlavorText/FlavorTextLibrary.cs, mirroring the
+BattleTextLibrary pattern. Pools: GenericOmenLines (now eight, after
+the four Forest-specific lines moved to the Forest pool in the
+June 15 omen rework), GenericArtisanLines (four neutral fallback
+lines), and MilestoneLines (reserved, empty -- V0.7 awakening
+sequence). Data asset:
+res://Resources/FlavorText/flavor_text_library.tres, loaded by
+FlavorTextManager in _Ready() via GD.Load (database loading pattern).
 
 ---
 
@@ -903,9 +918,9 @@ BattleSystem C# events drive: BattlePanel (BattleStarted,
 
   res://Autoloads/                -- manager scripts
   res://Autoloads/Cobat/          -- combat system classes
-	StatusEffectType.cs, StatusEffect.cs, StatusEffectManager.cs,
-	AbilityResolver.cs, AbilityEnums.cs, AbilityEffect.cs,
-	CombatAbility.cs
+    StatusEffectType.cs, StatusEffect.cs, StatusEffectManager.cs,
+    AbilityResolver.cs, AbilityEnums.cs, AbilityEffect.cs,
+    CombatAbility.cs
   res://Resources/Artisans/       -- 6 artisan .tres + database
   res://Resources/Dungeons/       -- 3 dungeon .tres + database
   res://Resources/Enemies/        -- enemy .tres by dungeon
@@ -913,10 +928,10 @@ BattleSystem C# events drive: BattlePanel (BattleStarted,
   res://Resources/EncounterPools/ -- 3 pool .tres + database
   res://Resources/BattleText/     -- battle_text_library.tres
   res://Resources/Abilities/
-	Enemies/                      -- 20 enemy ability .tres
-	Hero/                         -- 9 hero ability .tres + database
+    Enemies/                      -- 20 enemy ability .tres
+    Hero/                         -- 9 hero ability .tres + database
   res://Scenes/Game/              -- game scene, UI row scripts/scenes,
-	DeedButtonEvolution.cs
+    DeedButtonEvolution.cs
   res://Scenes/MainMenu/          -- main menu scene
 
 ---
