@@ -245,6 +245,8 @@ size_flags_vertical = 3
 [node name="ArtisanList" type="VBoxContainer" parent="RootLayout/MainPanel/RightPanel/ArtisanScrollContainer" unique_id=723193549]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
+alignment = 1
 
 [node name="HeroPanel" type="PanelContainer" parent="." unique_id=935143896]
 visible = false
