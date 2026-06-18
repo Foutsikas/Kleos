@@ -14,7 +14,7 @@ public partial class EncounterPool : Resource
     [Export] public Array Entries { get; set; } = new();
 
     [ExportGroup("Omens")]
-    [Export] public Godot.Collections.Array<string> OmenLines { get; set; } = new();
+    [Export] public Array<string> OmenLines { get; set; } = new();
 
     public EncounterPoolEntry GetEntry(int index)
     {

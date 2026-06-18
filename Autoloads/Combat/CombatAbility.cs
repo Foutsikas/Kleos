@@ -1,14 +1,3 @@
-// CombatAbility.cs
-// Location: res://Resources/Combat/CombatAbility.cs
-//
-// A combat ability defined as a Godot Resource. Each enemy or hero ability
-// is saved as a .tres file in res://Resources/Abilities/Enemies/ or
-// res://Resources/Abilities/Hero/.
-//
-// The AbilityResolver evaluates a list of these each turn, checks trigger
-// conditions and use conditions, sorts by priority, and returns the
-// winner or null for a normal attack.
-
 using Godot;
 using Godot.Collections;
 

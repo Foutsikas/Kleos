@@ -1,14 +1,3 @@
-// AbilityResolver.cs
-// Location: res://Autoloads/Combat/AbilityResolver.cs
-//
-// Evaluates a combatant's ability list each turn and decides which
-// ability to use (or null for a normal attack).
-//
-// One instance per combatant. BattleSystem creates two: one for hero,
-// one for enemy. Both reset on battle end.
-//
-// Not a Node, not an Autoload. Plain C# class.
-
 using System.Collections.Generic;
 using Godot;
 using Godot.Collections;

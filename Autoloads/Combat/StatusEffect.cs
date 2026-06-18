@@ -1,10 +1,3 @@
-// StatusEffect.cs
-// Location: res://Autoloads/Combat/StatusEffect.cs
-//
-// A single status effect instance on a combatant. Created when an
-// ability applies an effect, destroyed when duration reaches zero.
-// Plain C# class -- not a Node, not a Resource.
-
 using Godot;
 
 public class StatusEffect

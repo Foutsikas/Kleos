@@ -1,12 +1,3 @@
-// AbilityEffect.cs
-// Location: res://Resources/Combat/AbilityEffect.cs
-//
-// One effect within a CombatAbility. An ability can have multiple effects
-// (e.g. deal damage AND apply a debuff in the same action).
-//
-// This is a Godot Resource so it can be edited in the Inspector as part
-// of a CombatAbility's Effects array.
-
 using Godot;
 
 [GlobalClass]

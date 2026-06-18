@@ -1,12 +1,3 @@
-// StatusEffectManager.cs
-// Location: res://Autoloads/Combat/StatusEffectManager.cs
-//
-// Manages all active status effects on a single combatant.
-// BattleSystem creates two instances: one for the hero, one for the enemy.
-// Both are cleared when the battle ends.
-//
-// Plain C# class -- not a Node, not an Autoload. No scene tree dependency.
-
 using System;
 using System.Collections.Generic;
 using Godot;

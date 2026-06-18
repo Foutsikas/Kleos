@@ -1,8 +1,3 @@
-// AbilityEnums.cs
-// Location: res://Resources/Combat/AbilityEnums.cs
-//
-// All enums used by the ability framework.
-
 public enum AbilityEffectType
 {
     DealDamage,
