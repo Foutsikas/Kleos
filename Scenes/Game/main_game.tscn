@@ -57,7 +57,7 @@ FavorUpgradeButton = NodePath("HeroPanel/VBoxContainer/StatsContainer/FavorRow/F
 StatPointsLabel = NodePath("HeroPanel/VBoxContainer/StatPointsLabel")
 CombatStatsLabel = NodePath("HeroPanel/VBoxContainer/CombatStatsLabel")
 ArtisanRowScene = ExtResource("2_88ity")
-ArtisanList = NodePath("RootLayout/MainPanel/RightPanel/ArtisanScrollContainer/ArtisanList")
+ArtisanList = NodePath("RootLayout/MainPanel/RightPanel/ArtisanPanelLayout/ArtisanScrollContainer/ArtisanList")
 UpgradeRowScene = ExtResource("3_fuq2u")
 TierHeaderScene = ExtResource("4_q5o1p")
 UpgradeList = NodePath("UpgradePanel/ScrollContainer/UpgradeList")
@@ -237,16 +237,32 @@ custom_minimum_size = Vector2(280, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ArtisanScrollContainer" type="ScrollContainer" parent="RootLayout/MainPanel/RightPanel" unique_id=1800082175]
+[node name="ArtisanPanelLayout" type="VBoxContainer" parent="RootLayout/MainPanel/RightPanel" unique_id=1531431247]
+layout_mode = 2
+
+[node name="ArtisanHeaderLabel" type="Label" parent="RootLayout/MainPanel/RightPanel/ArtisanPanelLayout" unique_id=825023796]
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ArtisanScrollContainer" type="ScrollContainer" parent="RootLayout/MainPanel/RightPanel/ArtisanPanelLayout" unique_id=1800082175]
 custom_minimum_size = Vector2(0, 200)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="ArtisanList" type="VBoxContainer" parent="RootLayout/MainPanel/RightPanel/ArtisanScrollContainer" unique_id=723193549]
+[node name="ArtisanList" type="VBoxContainer" parent="RootLayout/MainPanel/RightPanel/ArtisanPanelLayout/ArtisanScrollContainer" unique_id=723193549]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 alignment = 1
+
+[node name="FooterRow" type="HBoxContainer" parent="RootLayout/MainPanel/RightPanel/ArtisanPanelLayout" unique_id=632426194]
+layout_mode = 2
+
+[node name="BuyMultButton" type="Button" parent="RootLayout/MainPanel/RightPanel/ArtisanPanelLayout/FooterRow" unique_id=626311225]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Buy x1"
 
 [node name="HeroPanel" type="PanelContainer" parent="." unique_id=935143896]
 visible = false
