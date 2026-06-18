@@ -1,9 +1,9 @@
 # Kleos Master Reference -- Godot Edition
-# KMR_Godot -- Updated June 10, 2026
+# KMR_Godot -- Updated June 18, 2026
 # Engine: Godot 4.6.2 .NET (C#)
 # Status: Combat RPG system complete, Combat Arts UI, NumberFormatter,
 #   Deed Button Visual Evolution, artisan unlock rebalance,
-#   FlavorTextManager, Omen system
+#   FlavorTextManager, Omen system, artisan rounded bulk purchase
 
 ---
 
@@ -37,7 +37,8 @@ Main Menu scene: Complete -- fade, prompt text, settings panel,
   scientific notation toggle.
 Game scene: Complete -- core layout with three-panel structure,
   Combat Arts panel, Deed Button visual evolution.
-Artisan UI: Complete -- rows with locked/unlocked states, hire flow.
+Artisan UI: Complete -- rows with locked/unlocked states, hire flow,
+  rounded bulk purchase (x1/x10) with pinned multiplier button.
   Unlock chain rebalanced June 2026.
 Hero portrait and panel: Complete -- compact display, full stat panel.
 Dungeon UI: Complete -- DungeonRow with progress display and layer info.
@@ -100,8 +101,29 @@ for mid and late game are planned for future development.
 Cost formula: BaseCost * CostMultiplier ^ ownedCount.
 Production formula: KleosPerSecond * ownedCount * GetMultiplier(ArtisanProductionMultiplier).
 
+Bulk purchase (added June 2026):
+A global buy multiplier (x1 / x10) applies to every artisan row. The
+multiplier is held on ArtisanManager and cycled by a single button pinned
+to the artisan panel footer. A third x100 tier exists in the cycle but is
+gated behind IsBuyMultiplierUnlocked and stays locked until the "the
+Tireless" deed epithet ships in V0.95; locked tiers are skipped when
+cycling.
+
+Rounded bulk purchase: x10 does not buy ten more, it buys up to the next
+clean multiple of ten. Owning 8 with x10 buys 2 (reaching 10); owning 15
+buys 5 (reaching 20); owning 0 buys the full 10. GetRoundedQuantity
+returns this count; x1 always returns 1.
+
+Bulk cost is a geometric series, not the current price times the quantity,
+since each hire raises the next price by CostMultiplier:
+  total = first * (CostMultiplier ^ quantity - 1) / (CostMultiplier - 1)
+where first is the cost at the current owned count. GetBulkCost computes
+this. Buying is all-or-nothing on the rounded quantity: the Hire button is
+enabled only when the player can afford the whole batch.
+
 Unlock cascade: ArtisanManager.RefreshUnlocks() runs after every
-purchase and checks all artisan unlock conditions.
+purchase and checks all artisan unlock conditions. A bulk purchase fires
+ArtisanPurchased once for the batch and runs the cascade a single time.
 
 Artisan UI (ArtisanRow):
 All six artisans are visible at all times. Locked artisans appear
@@ -110,9 +132,13 @@ The Hire button shows "Locked" and is disabled. When the requirement is
 met (detected via ArtisanPurchased signal), the row transitions to its
 unlocked state without rebuilding the list.
 
-Unlocked rows show the artisan name, KpS, current cost, owned count,
-and a Hire button that disables when the player cannot afford it. The
-affordability check refreshes on every KleosChanged signal.
+Unlocked rows show the artisan name, KpS, current bulk cost, owned count,
+and a Hire button that disables when the player cannot afford the rounded
+batch. In x1 mode the button reads "Hire"; in x10 mode it shows the actual
+rounded count, for example "Hire 2" when owning 8. The cost label reflects
+the rounded batch cost. Affordability refreshes on every KleosChanged
+signal, and the full row refreshes when the buy multiplier changes
+(BuyMultiplierChanged signal).
 
 ---
 
@@ -648,9 +674,13 @@ Layout structure:
 			DeedButton (Button)
 		  DeedContextLabel
 		  FlavorTextLabel
-		RightPanel (VBoxContainer, fixed width)
-		  ArtisanScrollContainer
-			ArtisanList
+		RightPanel (PanelContainer, fixed width, dark style, shrink center)
+		  RightColumn (VBoxContainer)
+			ArtisanHeaderLabel ("Artisans")
+			ArtisanScrollContainer
+			  ArtisanList
+			FooterRow (HBoxContainer)
+			  BuyMultButton (pinned bottom-left, cycles buy multiplier)
 	HeroPanel (overlay, starts hidden)
 	DungeonPanel (overlay, starts hidden)
 	UpgradePanel (overlay, starts hidden)

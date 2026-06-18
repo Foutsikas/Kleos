@@ -1,9 +1,9 @@
 # Kleos Architecture Reference -- Godot Edition
-# KAR_Godot -- Updated June 10, 2026
+# KAR_Godot -- Updated June 18, 2026
 # Engine: Godot 4.6.2 .NET (C#)
 # Status: Combat RPG complete, abilities, status effects,
 #   NumberFormatter, Deed Button Visual Evolution,
-#   FlavorTextManager, Omen system
+#   FlavorTextManager, Omen system, artisan rounded bulk purchase
 
 ---
 
@@ -263,11 +263,15 @@ Signals:
   ArtisanPurchased(string artisanId) -- fires after successful purchase
   ArtisanUnlocked(string artisanId) -- fires when a new artisan unlocks
   ProductionRecalculated(float totalKPS) -- fires after production update
+  BuyMultiplierChanged(int multiplier) -- fires when the buy multiplier
+	cycles; ArtisanRow refreshes and MainGameController relabels the button
 
 State:
   ownedCounts (Dictionary, string to int)
   unlockedArtisans (List of string)
   hasInitialized (bool, guard flag)
+  currentBuyMultiplier (int, default 1)
+  BuyMultiplierCycle (static int array {1, 10, 100})
 
 Config loading:
   Uses ResourceScanner.LoadAll<ArtisanData>("res://Resources/Artisans/").
@@ -276,17 +280,42 @@ Config loading:
   requirement is the previous one in the chain.
 
 Key methods:
-  PurchaseArtisan(ArtisanData) -- spends kleos, increments count,
+  PurchaseArtisan(ArtisanData) -- spends kleos, increments count by 1,
 	recalculates production, checks for new unlocks
+  PurchaseArtisan(ArtisanData, int quantity) -- bulk overload; spends the
+	geometric bulk cost, adds quantity, fires ArtisanPurchased once,
+	runs the unlock cascade and production recalc a single time
   IsArtisanUnlocked(ArtisanData) -- checks unlock condition
   GetOwnedCount(string artisanId) -- returns count for given artisan
   GetCurrentCost(ArtisanData) -- BaseCost * CostMultiplier ^ owned
-  CanPurchase(ArtisanData) -- checks unlocked and affordable
+  GetBulkCost(ArtisanData, int quantity) -- geometric series total for
+	buying quantity from the current owned count; guards CostMultiplier
+	of 1 with a flat-price fallback
+  CanPurchase(ArtisanData) -- checks unlocked and affordable (single)
+  CanPurchase(ArtisanData, int quantity) -- all-or-nothing on the bulk
+	cost of the rounded quantity
+  GetBuyMultiplier() -- returns currentBuyMultiplier
+  CycleBuyMultiplier() -- steps to the next unlocked tier in
+	BuyMultiplierCycle, wrapping; emits BuyMultiplierChanged
+  IsBuyMultiplierUnlocked(int multiplier) -- x1 and x10 always true;
+	x100 returns false until the "the Tireless" epithet (V0.95). Single
+	point to flip when epithets ship.
+  GetRoundedQuantity(ArtisanData) -- count to reach the next clean
+	multiple of the current multiplier; always 1 in x1 mode
   RecalculateTotalProduction() -- sums all artisan output with modifiers
   RefreshUnlocks() -- checks all artisan unlock conditions after purchase
   GetArtisanById(string artisanId) -- returns ArtisanData by ID
   GetUnlockedCount() -- returns unlockedArtisans.Count (used by
 	DeedButtonEvolution for tier calculation)
+
+Bulk purchase notes:
+  Rounded quantity: x10 buys up to the next multiple of ten, not ten
+  more. GetRoundedQuantity uses ((owned / mult) + 1) * mult - owned.
+  Bulk cost is first * (ratio ^ quantity - 1) / (ratio - 1), where
+  first is the cost at the current owned count and ratio is CostMultiplier.
+  The single-argument PurchaseArtisan and CanPurchase are retained
+  unchanged for backward compatibility; the quantity overloads sit
+  alongside them.
 
 Production calculation:
   For each artisan:
@@ -1217,8 +1246,12 @@ Node tree:
 			DeedButton (Button)
 		  DeedContextLabel
 		  FlavorTextLabel (Label, managed by FlavorTextManager)
-		RightPanel (VBoxContainer)
-		  ArtisanScrollContainer > ArtisanList (VBoxContainer)
+		RightPanel (PanelContainer, dark StyleBoxFlat, shrink-center vertical)
+		  RightColumn (VBoxContainer)
+			ArtisanHeaderLabel (Label, "Artisans")
+			ArtisanScrollContainer > ArtisanList (VBoxContainer)
+			FooterRow (HBoxContainer)
+			  BuyMultButton (Button, pinned bottom-left)
 	HeroPanel (PanelContainer, overlay, hidden)
 	  VBoxContainer with stat rows, bars, upgrade buttons
 	DungeonPanel (PanelContainer, overlay, hidden)
@@ -1256,6 +1289,8 @@ MainGameController responsibilities:
   Manages panel visibility (hero, dungeon, upgrade, ability).
   Dungeon, Upgrade, and Ability panels are mutually exclusive (ActivePanel enum).
   Spawns ArtisanRow instances into ArtisanList via PopulateArtisanList().
+  Wires BuyMultButton in _Ready(): Pressed cycles the artisan buy
+	multiplier, BuyMultiplierChanged relabels the button ("Buy x1" etc.).
   Spawns DungeonRow instances into DungeonList via PopulateDungeonList().
   Spawns UpgradeRow and TierHeader instances into UpgradeList via
 	PopulateUpgradeList().
@@ -1294,7 +1329,17 @@ Unlocked state:
   Modulate set to white (1, 1, 1, 1) -- full color.
   ArtisanKPSLabel shows production value.
   Cost and owned labels visible.
-  Buy button text "Hire", disabled only when unaffordable.
+  Buy button disabled only when the rounded batch is unaffordable.
+  Button text comes from GetBuyButtonText: "Hire" in x1 mode, "Hire N"
+  in x10/x100 mode where N is the rounded quantity. SetUnlocked no longer
+  hardcodes "Hire"; RefreshDisplay owns the button text.
+
+Bulk-aware display:
+  RefreshDisplay computes the rounded quantity (GetRoundedQuantity), the
+  batch cost (GetBulkCost), and affordability (CanPurchase with quantity).
+  The cost label shows the batch cost. OnBuyPressed buys the rounded
+  quantity. OnKleosChanged updates only the button's disabled state
+  (cost and quantity do not change on a kleos tick).
 
 State transitions:
   Setup(ArtisanData) checks IsArtisanUnlocked and calls SetLocked or
@@ -1303,8 +1348,10 @@ State transitions:
   and re-checks unlock condition. If now unlocked, calls SetUnlocked().
 
 Signal subscriptions:
-  KleosManager.KleosChanged -- updates affordability and cost display.
+  KleosManager.KleosChanged -- updates affordability of the rounded batch.
   ArtisanManager.ArtisanPurchased -- checks if this row should unlock.
+  ArtisanManager.BuyMultiplierChanged -- full RefreshDisplay so cost,
+    button text, and affordability track the new multiplier.
 
 PopulateArtisanList() in MainGameController spawns all six rows
 regardless of lock state. Each row manages its own appearance.
@@ -1316,12 +1363,12 @@ Root node: PanelContainer
 
 Node tree:
   DungeonRow (PanelContainer)
-	VBoxContainer
-	  HeaderRow (HBoxContainer)
-		DungeonNameLabel (Label)
-		ProgressLabel (Label)
-	  LayerInfoLabel (Label)
-	  DungeonActionButton (Button)
+    VBoxContainer
+      HeaderRow (HBoxContainer)
+        DungeonNameLabel (Label)
+        ProgressLabel (Label)
+      LayerInfoLabel (Label)
+      DungeonActionButton (Button)
 
 Four visual states managed internally:
 
@@ -1349,7 +1396,7 @@ Signal subscriptions:
   DungeonManager.LayerCleared -- refreshes display for this dungeon.
   DungeonManager.DungeonCompleted -- refreshes when this dungeon completes
 	OR when the completed dungeon is this row's RequiredDungeon
-    (so downstream dungeons unlock immediately).
+	(so downstream dungeons unlock immediately).
   KleosManager.KleosChanged -- refreshes if dungeon has kleos requirement.
 
 OnActionPressed() calls BattleSystem.Instance.StartDungeonBattle()
@@ -1369,13 +1416,13 @@ Root node: PanelContainer
 
 Node tree:
   UpgradeRow (PanelContainer)
-    VBoxContainer
-      HeaderRow (HBoxContainer)
-        UpgradeNameLabel (Label)
-        UpgradeCostLabel (Label)
-      DescriptionLabel (Label)
-      LockReasonLabel (Label, hidden by default)
-      UpgradeBuyButton (Button)
+	VBoxContainer
+	  HeaderRow (HBoxContainer)
+		UpgradeNameLabel (Label)
+		UpgradeCostLabel (Label)
+	  DescriptionLabel (Label)
+	  LockReasonLabel (Label, hidden by default)
+	  UpgradeBuyButton (Button)
 
 Five visual states managed internally:
 
@@ -1400,15 +1447,15 @@ Individual Locked:
 Lock checks:
   IsTierUnlocked() checks RequiredDungeon completion.
   TryGetIndividualLockReason() checks hero level, prerequisite upgrade,
-    and artisan count. Returns lock reason string if locked.
+	and artisan count. Returns lock reason string if locked.
   Dead GetIndividualLockReason() method removed (April 2026 cleanup).
 
 Signal subscriptions:
   KleosManager.KleosChanged -- refreshes affordability.
   UpgradeManager.UpgradePurchased -- refreshes all rows (prerequisite
-    checks may have changed).
+	checks may have changed).
   DungeonManager.DungeonCompleted -- refreshes tier-gated rows when
-    their RequiredDungeon is completed (added April 2026).
+	their RequiredDungeon is completed (added April 2026).
 
 _ExitTree() unsubscribes from all signals with -= operators.
 Fixed April 2026: was previously using += instead of -= for
@@ -1441,7 +1488,7 @@ Visual elements:
   Left accent bar (ColorRect, green when unlocked, hidden when locked)
   Ability name label + type badges (HBoxContainer)
   Type badges: color-coded pills auto-determined from AbilityEffect data
-    (Attack = red, Heal = green, Buff = blue, Debuff = purple, etc.)
+	(Attack = red, Heal = green, Buff = blue, Debuff = purple, etc.)
   Description label: auto-generated from effect data
   Flavor text label: from CastFlavorText, dimmed italic
   Bottom row: unlock condition + status/purchase button
@@ -1500,10 +1547,10 @@ Animation methods:
 
 Helper methods:
   GetEnemyAttackLine(string) -- priority chain: enemy-specific
-    AttackLines array, then BattleTextLibrary generic pool,
-    then hardcoded fallback.
+	AttackLines array, then BattleTextLibrary generic pool,
+	then hardcoded fallback.
   SetProgressBarColor() -- creates StyleBoxFlat and applies as
-    theme override for ProgressBar fill color.
+	theme override for ProgressBar fill color.
 
 Export properties: 30 node references wired in the editor Inspector.
 All exports use null checks before access for safety.
@@ -1542,7 +1589,7 @@ DungeonManager.LayerCleared:
 DungeonManager.DungeonCompleted:
   RandomEncounterManager.OnDungeonCompleted (marks pools dirty)
   DungeonRow.OnDungeonCompleted (per row, refreshes self and
-    rows whose RequiredDungeon matches)
+	rows whose RequiredDungeon matches)
   UpgradeRow.OnDungeonCompleted (per row, refreshes tier gate)
   HeroAbilityManager.OnDungeonCompleted (dungeon reward unlocks, May 2026)
   AbilityRow.OnDungeonCompleted (per row, May 2026)
@@ -1659,9 +1706,9 @@ Control vs PanelContainer for overlays:
 9. UpgradeRow -- removed dead GetIndividualLockReason() method,
    cleaned ShowIndividualLocked.
 10. DungeonRow cleared count -- clamped with Mathf.Min() to
-	prevent exceeding totalLayers.
+    prevent exceeding totalLayers.
 11. DungeonRow.OnActionPressed -- uses IsDungeonCompleted() check
-	instead of bounds comparison.
+    instead of bounds comparison.
 
 ---
 
