@@ -26,12 +26,14 @@ public partial class ArtisanRow : PanelContainer
 
 		KleosManager.Instance.KleosChanged += OnKleosChanged;
 		ArtisanManager.Instance.ArtisanPurchased += OnAnyArtisanPurchased;
+		ArtisanManager.Instance.BuyMultiplierChanged += OnBuyMultiplierChanged;
 	}
 
 	public override void _ExitTree()
 	{
 		KleosManager.Instance.KleosChanged -= OnKleosChanged;
 		ArtisanManager.Instance.ArtisanPurchased -= OnAnyArtisanPurchased;
+		ArtisanManager.Instance.BuyMultiplierChanged -= OnBuyMultiplierChanged;
 	}
 
 	// --- Setup ---
@@ -83,9 +85,6 @@ public partial class ArtisanRow : PanelContainer
 		if (ArtisanOwnedLabel != null)
 			ArtisanOwnedLabel.Visible = true;
 
-		if (ArtisanBuyButton != null)
-			ArtisanBuyButton.Text = "Hire";
-
 		RefreshDisplay();
 	}
 
@@ -120,8 +119,9 @@ public partial class ArtisanRow : PanelContainer
 		if (artisanData == null || isLocked) return;
 
 		int owned = ArtisanManager.Instance.GetOwnedCount(artisanData.ArtisanId);
-		float cost = ArtisanManager.Instance.GetCurrentCost(artisanData);
-		bool canAfford = ArtisanManager.Instance.CanPurchase(artisanData);
+		int quantity = ArtisanManager.Instance.GetRoundedQuantity(artisanData);
+		float cost = ArtisanManager.Instance.GetBulkCost(artisanData, quantity);
+		bool canAfford = ArtisanManager.Instance.CanPurchase(artisanData, quantity);
 
 		if (ArtisanNameLabel != null)
 			ArtisanNameLabel.Text = artisanData.ArtisanName;
@@ -132,12 +132,24 @@ public partial class ArtisanRow : PanelContainer
 		if (ArtisanCostLabel != null)
 			ArtisanCostLabel.Text = NumberFormatter.FormatCost(cost);
 
-
 		if (ArtisanOwnedLabel != null)
 			ArtisanOwnedLabel.Text = $"Owned: {owned}";
 
 		if (ArtisanBuyButton != null)
+		{
+			ArtisanBuyButton.Text = GetBuyButtonText(quantity);
 			ArtisanBuyButton.Disabled = !canAfford;
+		}
+	}
+
+	// Hire button label. In x1 mode it stays a plain "Hire". In x10 / x100 mode
+	// it shows the actual rounded count being bought, which can be fewer than
+	// the multiplier when the owned total is mid-way to a clean multiple.
+	private string GetBuyButtonText(int quantity)
+	{
+		int mult = ArtisanManager.Instance.GetBuyMultiplier();
+		if (mult <= 1) return "Hire";
+		return $"Hire {quantity}";
 	}
 
 	// --- Handlers ---
@@ -145,24 +157,21 @@ public partial class ArtisanRow : PanelContainer
 	private void OnBuyPressed()
 	{
 		if (artisanData == null || isLocked) return;
-		if (ArtisanManager.Instance.PurchaseArtisan(artisanData))
+
+		int quantity = ArtisanManager.Instance.GetRoundedQuantity(artisanData);
+		if (ArtisanManager.Instance.PurchaseArtisan(artisanData, quantity))
 			RefreshDisplay();
 	}
 
 	private void OnKleosChanged(float amount)
-	{
-		if (artisanData == null || isLocked) return;
+    {
+        if (artisanData == null || isLocked) return;
 
-		bool canAfford = ArtisanManager.Instance.CanPurchase(artisanData);
-		if (ArtisanBuyButton != null)
-			ArtisanBuyButton.Disabled = !canAfford;
-
-		if (ArtisanCostLabel != null)
-		{
-			float cost = ArtisanManager.Instance.GetCurrentCost(artisanData);
-			ArtisanCostLabel.Text = NumberFormatter.FormatCost(cost);
-		}
-	}
+        int quantity = ArtisanManager.Instance.GetRoundedQuantity(artisanData);
+        bool canAfford = ArtisanManager.Instance.CanPurchase(artisanData, quantity);
+        if (ArtisanBuyButton != null)
+            ArtisanBuyButton.Disabled = !canAfford;
+    }
 
 	private void OnAnyArtisanPurchased(string artisanId)
 	{
@@ -172,4 +181,10 @@ public partial class ArtisanRow : PanelContainer
 		if (ArtisanManager.Instance.IsArtisanUnlocked(artisanData))
 			SetUnlocked();
 	}
+
+	private void OnBuyMultiplierChanged(int multiplier)
+    {
+        if (artisanData == null || isLocked) return;
+        RefreshDisplay();
+    }
 }

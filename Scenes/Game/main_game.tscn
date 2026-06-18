@@ -11,6 +11,13 @@
 [ext_resource type="Script" uid="uid://dvussrwxd2447" path="res://Scenes/Game/StatusEffectDisplay.cs" id="7_qkdyd"]
 [ext_resource type="Script" uid="uid://d3qtmdigc8040" path="res://Scenes/Game/DeedButtonEvolution.cs" id="8_qferr"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rightpanel"]
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+bg_color = Color(0.1, 0.09, 0.08, 1)
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gucqa"]
 bg_color = Color(0.3133042, 0.2716998, 0.22091639, 1)
 border_width_left = 1
@@ -19,7 +26,7 @@ border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.6262097, 0.50638646, 0.3491902, 1)
 
-[node name="MainGame" type="Control" unique_id=365822274 node_paths=PackedStringArray("KleosLabel", "ProductionLabel", "HeroPortrait", "HeroLevelLabel", "HeroHPBar", "HeroXPBar", "DeedButton", "DeedContextLabel", "FlavorTextLabel", "DungeonButton", "UpgradeButton", "DungeonPanel", "UpgradePanel", "HeroPanel", "HeroPanelTitle", "HeroNameLabel", "HeroLevelDetailLabel", "HeroHPDetailBar", "HeroXPDetailBar", "StrengthValueLabel", "EnduranceValueLabel", "CunningValueLabel", "FavorValueLabel", "StrengthUpgradeButton", "EnduranceUpgradeButton", "CunningUpgradeButton", "FavorUpgradeButton", "StatPointsLabel", "CombatStatsLabel", "ArtisanList", "UpgradeList", "DungeonList", "AbilityButton", "AbilityPanel", "AbilityList", "FadeOverlay")]
+[node name="MainGame" type="Control" unique_id=365822274 node_paths=PackedStringArray("KleosLabel", "ProductionLabel", "HeroPortrait", "HeroLevelLabel", "HeroHPBar", "HeroXPBar", "DeedButton", "DeedContextLabel", "FlavorTextLabel", "DungeonButton", "UpgradeButton", "DungeonPanel", "UpgradePanel", "HeroPanel", "HeroPanelTitle", "HeroNameLabel", "HeroLevelDetailLabel", "HeroHPDetailBar", "HeroXPDetailBar", "StrengthValueLabel", "EnduranceValueLabel", "CunningValueLabel", "FavorValueLabel", "StrengthUpgradeButton", "EnduranceUpgradeButton", "CunningUpgradeButton", "FavorUpgradeButton", "StatPointsLabel", "CombatStatsLabel", "ArtisanList", "BuyMultButton", "UpgradeList", "DungeonList", "AbilityButton", "AbilityPanel", "AbilityList", "FadeOverlay")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -57,7 +64,8 @@ FavorUpgradeButton = NodePath("HeroPanel/VBoxContainer/StatsContainer/FavorRow/F
 StatPointsLabel = NodePath("HeroPanel/VBoxContainer/StatPointsLabel")
 CombatStatsLabel = NodePath("HeroPanel/VBoxContainer/CombatStatsLabel")
 ArtisanRowScene = ExtResource("2_88ity")
-ArtisanList = NodePath("RootLayout/MainPanel/RightPanel/ArtisanPanelLayout/ArtisanScrollContainer/ArtisanList")
+ArtisanList = NodePath("RootLayout/MainPanel/RightPanel/RightColumn/ArtisanScrollContainer/ArtisanList")
+BuyMultButton = NodePath("RootLayout/MainPanel/RightPanel/RightColumn/FooterRow/BuyMultButton")
 UpgradeRowScene = ExtResource("3_fuq2u")
 TierHeaderScene = ExtResource("4_q5o1p")
 UpgradeList = NodePath("UpgradePanel/ScrollContainer/UpgradeList")
@@ -232,34 +240,35 @@ horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
 
-[node name="RightPanel" type="VBoxContainer" parent="RootLayout/MainPanel" unique_id=1659221913]
+[node name="RightPanel" type="PanelContainer" parent="RootLayout/MainPanel" unique_id=1659221913]
 custom_minimum_size = Vector2(280, 0)
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_rightpanel")
 
-[node name="ArtisanPanelLayout" type="VBoxContainer" parent="RootLayout/MainPanel/RightPanel" unique_id=1531431247]
+[node name="RightColumn" type="VBoxContainer" parent="RootLayout/MainPanel/RightPanel" unique_id=1531431247]
 layout_mode = 2
 
-[node name="ArtisanHeaderLabel" type="Label" parent="RootLayout/MainPanel/RightPanel/ArtisanPanelLayout" unique_id=825023796]
+[node name="ArtisanHeaderLabel" type="Label" parent="RootLayout/MainPanel/RightPanel/RightColumn" unique_id=825023796]
 layout_mode = 2
+text = "Artisans"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ArtisanScrollContainer" type="ScrollContainer" parent="RootLayout/MainPanel/RightPanel/ArtisanPanelLayout" unique_id=1800082175]
-custom_minimum_size = Vector2(0, 200)
+[node name="ArtisanScrollContainer" type="ScrollContainer" parent="RootLayout/MainPanel/RightPanel/RightColumn" unique_id=1800082175]
+custom_minimum_size = Vector2(0, 360)
 layout_mode = 2
-size_flags_vertical = 3
+horizontal_scroll_mode = 0
 
-[node name="ArtisanList" type="VBoxContainer" parent="RootLayout/MainPanel/RightPanel/ArtisanPanelLayout/ArtisanScrollContainer" unique_id=723193549]
+[node name="ArtisanList" type="VBoxContainer" parent="RootLayout/MainPanel/RightPanel/RightColumn/ArtisanScrollContainer" unique_id=723193549]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 3
-alignment = 1
 
-[node name="FooterRow" type="HBoxContainer" parent="RootLayout/MainPanel/RightPanel/ArtisanPanelLayout" unique_id=632426194]
+[node name="FooterRow" type="HBoxContainer" parent="RootLayout/MainPanel/RightPanel/RightColumn" unique_id=632426194]
 layout_mode = 2
 
-[node name="BuyMultButton" type="Button" parent="RootLayout/MainPanel/RightPanel/ArtisanPanelLayout/FooterRow" unique_id=626311225]
+[node name="BuyMultButton" type="Button" parent="RootLayout/MainPanel/RightPanel/RightColumn/FooterRow" unique_id=626311225]
 layout_mode = 2
 size_flags_horizontal = 0
 text = "Buy x1"

@@ -50,6 +50,7 @@ public partial class MainGameController : Control
     // Artisan List
     [Export] public PackedScene ArtisanRowScene { get; set; }
     [Export] public VBoxContainer ArtisanList { get; set; }
+    [Export] public Button BuyMultButton { get; set; }
 
     //Upgrade List
     [Export] public PackedScene UpgradeRowScene { get; set; }
@@ -98,9 +99,16 @@ public partial class MainGameController : Control
         PopulateAbilityList();
         PopulateDungeonList();
 
-         // Wire flavor text label to manager
+        // Wire flavor text label to manager
         if (FlavorTextLabel != null && FlavorTextManager.Instance != null)
             FlavorTextManager.Instance.SetLabel(FlavorTextLabel);
+
+        if (BuyMultButton != null)
+        {
+            BuyMultButton.Pressed += OnBuyMultPressed;
+            ArtisanManager.Instance.BuyMultiplierChanged += OnBuyMultiplierChanged;
+            UpdateBuyMultButtonLabel(ArtisanManager.Instance.GetBuyMultiplier());
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -497,6 +505,27 @@ public partial class MainGameController : Control
     {
         GD.Print($"[MainGame] Hero reached level {newLevel}!");
     }
+
+    // -------------------------------------------------------------------------
+    // Button Handlers
+    // -------------------------------------------------------------------------
+
+    private void OnBuyMultPressed()
+    {
+        ArtisanManager.Instance.CycleBuyMultiplier();
+    }
+
+    private void OnBuyMultiplierChanged(int multiplier)
+    {
+        UpdateBuyMultButtonLabel(multiplier);
+    }
+
+    private void UpdateBuyMultButtonLabel(int multiplier)
+    {
+        if (BuyMultButton != null)
+            BuyMultButton.Text = $"Buy x{multiplier}";
+    }
+
 
     // -------------------------------------------------------------------------
     // Fade
