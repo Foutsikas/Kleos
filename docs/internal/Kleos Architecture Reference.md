@@ -1,5 +1,5 @@
 # Kleos Architecture Reference -- Godot Edition
-# KAR_Godot -- Updated June 18, 2026
+# KAR_Godot -- Updated June 19, 2026
 # Engine: Godot 4.6.2 .NET (C#)
 # Status: Combat RPG complete, abilities, status effects,
 #   NumberFormatter, Deed Button Visual Evolution,
@@ -9,13 +9,9 @@
 
 ## About This Document
 
-This is the technical architecture reference for the Godot port of Kleos.
+This is the technical architecture reference for Kleos.
 It documents how each system is implemented in Godot, including class
 structures, signal wiring, file paths, and Godot-specific patterns.
-
-The Unity KAR (KAR_Updated_2026-03-20.md) remains the reference for
-Unity-specific implementation. This document is independent and does not
-duplicate Unity content. Only Godot architecture is recorded here.
 
 ---
 
@@ -33,53 +29,73 @@ Target: Desktop (Windows, Linux)
 ```
 res://
   Autoloads/
-	SettingsManager.cs
-	SaveManager.cs
-	UpgradeManager.cs
-	KleosManager.cs
-	ArtisanManager.cs
-	HeroManager.cs
-	DungeonManager.cs
-	RandomEncounterManager.cs
-	BattleSystem.cs
+	Combat/                      (all seven combat classes live here)
+	  AbilityEffect.cs           ([GlobalClass] Resource)
+	  AbilityEnums.cs            (AbilityEffectType, AbilityTargetType, AbilityTrigger enums)
+	  AbilityResolver.cs         (plain C# class, per-combatant ability AI)
+	  CombatAbility.cs           ([GlobalClass] Resource)
+	  StatusEffect.cs            (plain C# class, single effect instance)
+	  StatusEffectManager.cs     (plain C# class, per-combatant effect tracker)
+	  StatusEffectType.cs        (StatusEffectType and StatusEffectMode enums)
+	ArtisanManager.cs            (Autoload)
 	BattleContext.cs             (plain C# class, not an Autoload)
+	BattleSystem.cs              (Autoload)
+	DevConsole.cs                (Autoload)
+	DungeonManager.cs            (Autoload)
 	DungeonRewardCalculator.cs   (static utility, not an Autoload)
-	DevConsole.cs
-	ResourceScanner.cs           (static utility, not an Autoload)
-	NumberFormatter.cs           (static utility, not an Autoload)
-	Cobat/
-	  StatusEffectType.cs
-	  StatusEffect.cs
-	  StatusEffectManager.cs
-	  AbilityEnums.cs
-	  AbilityEffect.cs
-	  CombatAbility.cs
-	  AbilityResolver.cs
-	HeroAbilityManager.cs        (Autoload)
 	FlavorTextManager.cs         (Autoload)
+	HeroAbilityManager.cs        (Autoload)
+	HeroManager.cs               (Autoload)
+	KleosManager.cs              (Autoload)
+	NumberFormatter.cs           (static utility, not an Autoload)
+	RandomEncounterManager.cs    (Autoload)
+	SaveData.cs                  (plain C# RefCounted save classes, not an Autoload)
+	SaveManager.cs               (Autoload)
+	SettingsManager.cs           (Autoload)
+	UpgradeManager.cs            (Autoload)
   Resources/
-	ArtisanData.cs
-	EnemyData.cs
-	DungeonData.cs
-	DungeonLayer.cs
-	UpgradeConfig.cs
-	HeroData.cs
-	EncounterPool.cs
-	EncounterPoolEntry.cs
-	BattleTextLibrary.cs
-	ModifierEffect.cs
-	ModifierEnums.cs            (ModifierType and ModifierMode enums)
-	HeroStat.cs                 (enum)
-	CombatAbility.cs            ([GlobalClass] Resource)
-	AbilityEffect.cs            ([GlobalClass] Resource)
-	HeroAbilityDatabase.cs      ([GlobalClass] Resource)
+	ArtisanData.cs               ([GlobalClass] Resource)
+	BattleTextLibrary.cs         ([GlobalClass] Resource)
+	DungeonData.cs               ([GlobalClass] Resource)
+	DungeonLayer.cs              ([GlobalClass] Resource)
+	EncounterPool.cs             ([GlobalClass] Resource)
+	EncounterPoolEntry.cs        ([GlobalClass] Resource)
+	EnemyData.cs                 ([GlobalClass] Resource)
+	HeroData.cs                  ([GlobalClass] Resource)
+	HeroStat.cs                  (enum)
+	ModifierEffect.cs            ([GlobalClass] Resource)
+	ModifierEnums.cs             (ModifierType and ModifierMode enums)
+	UpgradeConfig.cs             ([GlobalClass] Resource)
+	Abilities/
+	  HeroAbilityDatabase.cs     ([GlobalClass] Resource)
+	  Enemies/
+		20 enemy ability .tres files (across 3 dungeons)
+	  Hero/
+		9 hero ability .tres files
+		hero_ability_database.tres
 	Artisans/
+	  ArtisanDatabase.cs         ([GlobalClass] Resource)
+	  artisan_database.tres
 	  scribe.tres
 	  bard.tres
 	  potter.tres
 	  sculptor.tres
 	  playwright.tres
 	  historian.tres
+	BattleText/
+	  battle_text_library.tres
+	Dungeons/
+	  DungeonDatabase.cs         ([GlobalClass] Resource)
+	  dungeon_database.tres
+	  forest.tres
+	  brigands.tres
+	  coastal.tres
+	EncounterPools/
+	  EncounterPoolDatabase.cs   ([GlobalClass] Resource)
+	  encounter_database.tres
+	  pool_forest.tres
+	  pool_brigands.tres
+	  pool_coastal.tres
 	Enemies/
 	  1. Forest/
 		1.wild_dog.tres
@@ -111,27 +127,16 @@ res://
 		8.scylla_spawn.tres
 		9.charybdis_maw.tres
 		10.siren_queen.tres
-	Dungeons/
-	  forest.tres
-	  brigands.tres
-	  coastal.tres
+	FlavorText/
+	  FlavorTextLibrary.cs       ([GlobalClass] Resource)
+	  flavor_text_library.tres
 	Upgrades/
+	  UpgradesDatabase.cs        ([GlobalClass] Resource, plural class name)
+	  upgrade_database.tres
 	  1_01_scribes_quill.tres
 	  1_02_bronze_training.tres
 	  ... (24 total, prefixed by tier and order)
 	  3_07_coastal_plunder.tres
-	EncounterPools/
-	  pool_forest.tres
-	  pool_brigands.tres
-	  pool_coastal.tres
-	BattleText/
-	  battle_text_library.tres
-	Abilities/
-	  Enemies/
-		20 enemy ability .tres files (across 3 dungeons)
-	  Hero/
-		9 hero ability .tres files
-		hero_ability_database.tres
   Scenes/
 	MainMenu/
 	  main_menu.tscn
@@ -149,6 +154,8 @@ res://
 	  TierHeader.tscn
 	  AbilityRow.tscn
 	  AbilityRow.cs
+	  AbilitySectionHeader.tscn
+	  StatusEffectDisplay.cs
 	  DeedButtonEvolution.cs
 ```
 
@@ -189,28 +196,23 @@ managers to exist.
 
 ---
 
-## ResourceScanner (Static Utility)
+## Resource Database Loading
 
-Purpose: Shared directory scanner for loading all Resource files of a
-given type from a folder. Used by ArtisanManager, DungeonManager,
-UpgradeManager, and RandomEncounterManager to eliminate hardcoded
-resource paths.
+Config-driven managers load a single database resource and read its
+exported array, rather than scanning a directory. Each database is a
+[GlobalClass] Resource holding one typed array:
 
-File: res://Autoloads/ResourceScanner.cs (static class, not an Autoload)
+  ArtisanDatabase.Artisans  -- res://Resources/Artisans/artisan_database.tres
+  DungeonDatabase.Dungeons  -- res://Resources/Dungeons/dungeon_database.tres
+  UpgradesDatabase.Upgrades -- res://Resources/Upgrades/upgrade_database.tres  (plural class name)
+  EncounterPoolDatabase.Pools -- res://Resources/EncounterPools/encounter_database.tres
+  HeroAbilityDatabase.Abilities -- res://Resources/Abilities/Hero/hero_ability_database.tres
 
-Key method:
-  static Array LoadAll<T>(string directoryPath) where T : Resource
-
-Behavior:
-  Opens directory via DirAccess.
-  Iterates all files ending in .tres or .res.
-  Loads each with GD.Load() (untyped).
-  Uses pattern match (resource is T) to filter correct types.
-  Skips files of wrong type silently instead of crashing.
-  Returns untyped Array for Godot export compatibility.
-
-The .res extension check handles exported builds where Godot packs
-.tres files into binary .res format inside .pck archives.
+Each manager calls GD.Load<TDatabase>(path) in its LoadConfigs(), casts
+the array to the untyped Godot Array it exposes, then applies its own
+sort. New content is added by dropping the .tres into the matching
+database's array in the Inspector. This replaced the earlier
+ResourceScanner directory-scan utility, which has been removed.
 
 ---
 
@@ -245,8 +247,8 @@ Click damage calculation:
 Passive income in _Process():
   passiveAccumulator += totalKleosPerSecond * (float)delta;
   while passiveAccumulator >= 1.0:
-	AddKleos(1f);
-	passiveAccumulator -= 1f;
+    AddKleos(1f);
+    passiveAccumulator -= 1f;
 
 Save/Load:
   GetSaveData() returns KleosSaveData
@@ -264,7 +266,7 @@ Signals:
   ArtisanUnlocked(string artisanId) -- fires when a new artisan unlocks
   ProductionRecalculated(float totalKPS) -- fires after production update
   BuyMultiplierChanged(int multiplier) -- fires when the buy multiplier
-	cycles; ArtisanRow refreshes and MainGameController relabels the button
+    cycles; ArtisanRow refreshes and MainGameController relabels the button
 
 State:
   ownedCounts (Dictionary, string to int)
@@ -274,39 +276,40 @@ State:
   BuyMultiplierCycle (static int array {1, 10, 100})
 
 Config loading:
-  Uses ResourceScanner.LoadAll<ArtisanData>("res://Resources/Artisans/").
+  Loads GD.Load<ArtisanDatabase>("res://Resources/Artisans/artisan_database.tres")
+  and reads its Artisans array. Null-checks the database.
   SortByUnlockOrder() chains artisans by RequiredArtisanId: the artisan
   with no requirement (Scribe) comes first, then each artisan whose
   requirement is the previous one in the chain.
 
 Key methods:
   PurchaseArtisan(ArtisanData) -- spends kleos, increments count by 1,
-	recalculates production, checks for new unlocks
+    recalculates production, checks for new unlocks
   PurchaseArtisan(ArtisanData, int quantity) -- bulk overload; spends the
-	geometric bulk cost, adds quantity, fires ArtisanPurchased once,
-	runs the unlock cascade and production recalc a single time
+    geometric bulk cost, adds quantity, fires ArtisanPurchased once,
+    runs the unlock cascade and production recalc a single time
   IsArtisanUnlocked(ArtisanData) -- checks unlock condition
   GetOwnedCount(string artisanId) -- returns count for given artisan
   GetCurrentCost(ArtisanData) -- BaseCost * CostMultiplier ^ owned
   GetBulkCost(ArtisanData, int quantity) -- geometric series total for
-	buying quantity from the current owned count; guards CostMultiplier
-	of 1 with a flat-price fallback
+    buying quantity from the current owned count; guards CostMultiplier
+    of 1 with a flat-price fallback
   CanPurchase(ArtisanData) -- checks unlocked and affordable (single)
   CanPurchase(ArtisanData, int quantity) -- all-or-nothing on the bulk
-	cost of the rounded quantity
+    cost of the rounded quantity
   GetBuyMultiplier() -- returns currentBuyMultiplier
   CycleBuyMultiplier() -- steps to the next unlocked tier in
-	BuyMultiplierCycle, wrapping; emits BuyMultiplierChanged
+    BuyMultiplierCycle, wrapping; emits BuyMultiplierChanged
   IsBuyMultiplierUnlocked(int multiplier) -- x1 and x10 always true;
-	x100 returns false until the "the Tireless" epithet (V0.95). Single
-	point to flip when epithets ship.
+    x100 returns false until the "the Tireless" epithet (V0.95). Single
+    point to flip when epithets ship.
   GetRoundedQuantity(ArtisanData) -- count to reach the next clean
-	multiple of the current multiplier; always 1 in x1 mode
+    multiple of the current multiplier; always 1 in x1 mode
   RecalculateTotalProduction() -- sums all artisan output with modifiers
   RefreshUnlocks() -- checks all artisan unlock conditions after purchase
   GetArtisanById(string artisanId) -- returns ArtisanData by ID
   GetUnlockedCount() -- returns unlockedArtisans.Count (used by
-	DeedButtonEvolution for tier calculation)
+    DeedButtonEvolution for tier calculation)
 
 Bulk purchase notes:
   Rounded quantity: x10 buys up to the next multiple of ten, not ten
@@ -319,9 +322,9 @@ Bulk purchase notes:
 
 Production calculation:
   For each artisan:
-	baseProd = KleosPerSecond * ownedCount
-	multiplier = UpgradeManager.GetMultiplier(ArtisanProductionMultiplier)
-	totalProd += baseProd * multiplier
+    baseProd = KleosPerSecond * ownedCount
+    multiplier = UpgradeManager.GetMultiplier(ArtisanProductionMultiplier)
+    totalProd += baseProd * multiplier
   Calls KleosManager.RecalculateTotalProduction(totalProd)
 
 Save/Load:
@@ -343,7 +346,8 @@ State:
   upgradeConfigLookup (Dictionary, string to UpgradeConfig)
 
 Config loading:
-  Uses ResourceScanner.LoadAll<UpgradeConfig>("res://Resources/Upgrades/").
+  Loads GD.Load<UpgradesDatabase>("res://Resources/Upgrades/upgrade_database.tres")
+  and reads its Upgrades array. (Class name is UpgradesDatabase, plural.)
   SortByTierAndCost() sorts by tier number first, then by cost within
   each tier. This guarantees correct display order regardless of
   filesystem ordering.
@@ -351,9 +355,9 @@ Config loading:
 
 Key methods:
   GetFlat(ModifierType type) -- sums all flat modifiers of given type
-	across purchased upgrades
+    across purchased upgrades
   GetMultiplier(ModifierType type) -- multiplies all multiplier modifiers
-	of given type across purchased upgrades (starts at 1.0)
+    of given type across purchased upgrades (starts at 1.0)
   PurchaseUpgrade(string upgradeId) -- spends kleos, adds to purchased list
   IsUpgradePurchased(string upgradeId) -- checks purchase state
   CanPurchase(string upgradeId) -- checks tier gate, individual lock, cost
@@ -361,7 +365,7 @@ Key methods:
 Lock checks:
   IsTierUnlocked(UpgradeConfig) -- checks RequiredDungeon completion
   IsIndividualLockMet(UpgradeConfig) -- checks hero level, prerequisite
-	upgrade, and artisan count requirements
+    upgrade, and artisan count requirements
 
 Save/Load:
   GetSaveData() returns UpgradeSaveData (purchased IDs list)
@@ -423,11 +427,12 @@ Signals:
 
 State:
   dungeonProgress (Dictionary, string to int -- dungeon name to highest
-	cleared layer)
+    cleared layer)
   completedDungeons (Dictionary, string to bool)
 
 Config loading:
-  Uses ResourceScanner.LoadAll<DungeonData>("res://Resources/Dungeons/").
+  Loads GD.Load<DungeonDatabase>("res://Resources/Dungeons/dungeon_database.tres")
+  and reads its Dungeons array. Null-checks the database.
   SortByProgression() chains dungeons by RequiredDungeon: dungeons with
   no RequiredDungeon come first, then each dungeon whose requirement is
   the previous one in the chain.
@@ -442,7 +447,7 @@ Key methods:
   GetLayer(string dungeonId, int index) -- returns DungeonLayer with null check
   OnLayerCleared(string dungeonId, int layerIndex) -- updates progress
   ForceCompleteDungeon(string dungeonId) -- DEV API, sets progress to
-	final layer, emits DungeonCompleted then LayerCleared
+    final layer, emits DungeonCompleted then LayerCleared
 
 Signal ordering in OnLayerCleared():
   1. Update dungeonProgress dictionary
@@ -474,10 +479,9 @@ State:
   activePools (list, rebuilt when dirty flag is set)
 
 Config loading:
-  Uses ResourceScanner.LoadAll<EncounterPool>("res://Resources/EncounterPools/").
-  Fixed April 2026 -- was previously hardcoded to only load pool_forest.tres
-  via GD.Load(). Now uses ResourceScanner so all pool .tres files in the
-  directory are loaded automatically.
+  Loads GD.Load<EncounterPoolDatabase>("res://Resources/EncounterPools/encounter_database.tres")
+  and reads its Pools array. Null-checks the database. Adding a new pool
+  means adding its .tres to the database's Pools array in the Inspector.
 
 Key methods:
   OnDeedClicked() -- increments counter, checks threshold
@@ -499,7 +503,7 @@ Subscribes to DungeonManager.DungeonCompleted to mark pools dirty.
 
 ### BattleSystem
 
-Singleton autoload (position 9). Core combat engine. Async timed
+Singleton autoload (position 10). Core combat engine. Async timed
 turn-based combat with C# events for UI communication.
 
 C# Events (not Godot signals -- plain C# classes as parameters):
@@ -629,13 +633,13 @@ Fields:
 
 ---
 
-### StatusEffectType (Enum, in Cobat/StatusEffectType.cs) (May 2026)
+### StatusEffectType (Enum, in Autoloads/Combat/StatusEffectType.cs) (May 2026)
 
 Values: AttackDamageUp, AttackDamageDown, DodgeUp, DodgeDown,
   CritChanceUp, CritImmunity, Stun, DamageOverTime, HealOverTime,
   Shield, Absorb, Reflect.
 
-### StatusEffect (Plain C# class, in Cobat/StatusEffect.cs) (May 2026)
+### StatusEffect (Plain C# class, in Autoloads/Combat/StatusEffect.cs) (May 2026)
 
 Fields:
   EffectType (StatusEffectType), EffectName (string), Value (float),
@@ -645,7 +649,7 @@ Fields:
 
 StatusEffectMode enum: Flat, Percentage.
 
-### StatusEffectManager (Plain C# class, in Cobat/StatusEffectManager.cs) (May 2026)
+### StatusEffectManager (Plain C# class, in Autoloads/Combat/StatusEffectManager.cs) (May 2026)
 
 One instance per combatant (hero and enemy each have one).
 Managed by BattleSystem, created fresh per battle.
@@ -665,13 +669,13 @@ Key methods:
 BattleSystem damage pipeline routes through StatusEffectManager:
   base damage -> modifiers -> shield absorption -> final damage.
 
-### AbilityEnums (in Cobat/AbilityEnums.cs) (May 2026)
+### AbilityEnums (in Autoloads/Combat/AbilityEnums.cs) (May 2026)
 
 AbilityEffectType: DealDamage, Heal, ApplyStatus.
 AbilityTrigger: OnCooldown, OnLowHP, OnBattleStart, OnAllyDeath.
 AbilityTargetType: Self, Enemy.
 
-### AbilityEffect (Resource, in Cobat/AbilityEffect.cs) (May 2026)
+### AbilityEffect (Resource, in Autoloads/Combat/AbilityEffect.cs) (May 2026)
 
 [GlobalClass] Resource. Fields:
   EffectType, Target, Value (for damage/heal),
@@ -679,7 +683,7 @@ AbilityTargetType: Self, Enemy.
   StatusIsDebuff, StatusMode, StatusMaxStacks,
   StatusApplyText, StatusExpireText.
 
-### CombatAbility (Resource, in Cobat/CombatAbility.cs) (May 2026)
+### CombatAbility (Resource, in Autoloads/Combat/CombatAbility.cs) (May 2026)
 
 [GlobalClass] Resource. Replaces Unity ScriptableObject.
 Fields:
@@ -690,7 +694,7 @@ Fields:
   CastFlavorText (string).
   Effects (Array of AbilityEffect).
 
-### AbilityResolver (in Cobat/AbilityResolver.cs) (May 2026)
+### AbilityResolver (in Autoloads/Combat/AbilityResolver.cs) (May 2026)
 
 One instance per combatant. Initialized with a list of CombatAbility.
 Evaluated each round by BattleSystem.
@@ -1660,11 +1664,11 @@ Typed array workaround:
   helper methods for typed access. This affects DungeonData.Layers,
   EncounterPool.Entries, and UpgradeConfig.Effects.
 
-Directory-based resource loading:
-  ResourceScanner.LoadAll<T>() scans directories instead of hardcoding
-  paths. New content is added by dropping .tres files into the correct
-  folder. Each manager applies its own sort after scanning to guarantee
-  correct display order.
+Database resource loading:
+  Each config-driven manager loads one database .tres via GD.Load<T>()
+  and reads its exported array. New content is added by dropping a .tres
+  into the matching database's array in the Inspector. Each manager
+  applies its own sort after loading to guarantee display order.
 
 Signal ordering:
   When state must be set before UI responds to a signal, run the state
@@ -1688,8 +1692,10 @@ Control vs PanelContainer for overlays:
 
 ## Bug Fixes Applied (April 2026)
 
-1. RandomEncounterManager.LoadConfigs() -- changed from hardcoded
-   forest pool path to ResourceScanner.LoadAll<EncounterPool>().
+1. RandomEncounterManager.LoadConfigs() -- changed from a hardcoded
+   single-pool GD.Load to loading EncounterPoolDatabase and reading its
+   Pools array (the directory-scan ResourceScanner step it briefly used
+   in between has since been removed project-wide).
 2. main_game.tscn -- HeroPortrait export fixed (was pointing to
    EnemySection/EnemyPortrait).
 3. DungeonRow.OnDungeonCompleted -- also refreshes when completed
@@ -1706,9 +1712,9 @@ Control vs PanelContainer for overlays:
 9. UpgradeRow -- removed dead GetIndividualLockReason() method,
    cleaned ShowIndividualLocked.
 10. DungeonRow cleared count -- clamped with Mathf.Min() to
-    prevent exceeding totalLayers.
+	prevent exceeding totalLayers.
 11. DungeonRow.OnActionPressed -- uses IsDungeonCompleted() check
-    instead of bounds comparison.
+	instead of bounds comparison.
 
 ---
 

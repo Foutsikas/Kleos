@@ -1,5 +1,5 @@
 # Kleos Master Reference -- Godot Edition
-# KMR_Godot -- Updated June 18, 2026
+# KMR_Godot -- Updated June 19, 2026
 # Engine: Godot 4.6.2 .NET (C#)
 # Status: Combat RPG system complete, Combat Arts UI, NumberFormatter,
 #   Deed Button Visual Evolution, artisan unlock rebalance,
@@ -9,22 +9,16 @@
 
 ## About This Document
 
-This is the gameplay and system reference for the Godot port of Kleos.
+This is the gameplay and system reference for Kleos.
 It documents what has been implemented, tested, and confirmed working
 in the Godot project specifically.
-
-All gameplay values (artisan costs, enemy stats, upgrade effects, hero
-formulas) are unchanged from the Unity version. Refer to the Unity KMR
-(KMR_Updated_2026-03-20.md) for balance tables and design rationale.
-This document only records Godot-specific implementation details and
-what has been confirmed functional.
 
 ---
 
 ## Port Status Overview
 
-Autoload managers: All eleven complete and tested (HeroAbilityManager
-  added May 2026).
+Autoload managers: All twelve complete and tested (HeroAbilityManager
+  added May 2026, FlavorTextManager added June 2026).
 Resource classes: All ten ported and functional (added CombatAbility,
   AbilityEffect, HeroAbilityDatabase May 2026).
 Asset data (.tres files): Artisans complete, all three dungeons complete,
@@ -758,7 +752,7 @@ DevConsole (full precision for debugging).
 ## Section 14 -- Deed Button Visual Evolution (June 2026)
 
 The Deed button changes appearance as the player progresses through
-artisan tiers. Button text always stays "Deeds" -- the hero is humble.
+artisan tiers. Button text always stays "Deed" -- the hero is humble.
 The visual presentation reflects the world's growing recognition.
 
 Four tiers based on unique artisan types unlocked:
@@ -876,7 +870,7 @@ FlavorTextManager in _Ready() via GD.Load (database loading pattern).
 
 ## Section 16 -- DevConsole
 
-Developer tool for testing. Registered as Autoload position 13.
+Developer tool for testing. Registered as Autoload position 11.
 CanvasLayer with Layer 100 so it renders above everything.
 
 Toggle: backtick (`) key.
@@ -946,20 +940,22 @@ BattleSystem C# events drive: BattlePanel (BattleStarted,
 
 ## Resource Directories
 
-  res://Autoloads/                -- manager scripts
-  res://Autoloads/Cobat/          -- combat system classes
+  res://Autoloads/                -- manager scripts + SaveData.cs
+  res://Autoloads/Combat/         -- all seven combat classes
     StatusEffectType.cs, StatusEffect.cs, StatusEffectManager.cs,
     AbilityResolver.cs, AbilityEnums.cs, AbilityEffect.cs,
     CombatAbility.cs
-  res://Resources/Artisans/       -- 6 artisan .tres + database
-  res://Resources/Dungeons/       -- 3 dungeon .tres + database
+  res://Resources/                -- [GlobalClass] Resource and enum scripts
+  res://Resources/Artisans/       -- 6 artisan .tres + artisan_database.tres + ArtisanDatabase.cs
+  res://Resources/Dungeons/       -- 3 dungeon .tres + dungeon_database.tres + DungeonDatabase.cs
   res://Resources/Enemies/        -- enemy .tres by dungeon
-  res://Resources/Upgrades/       -- 24 upgrade .tres + database
-  res://Resources/EncounterPools/ -- 3 pool .tres + database
+  res://Resources/Upgrades/       -- 24 upgrade .tres + upgrade_database.tres + UpgradesDatabase.cs
+  res://Resources/EncounterPools/ -- 3 pool .tres + encounter_database.tres + EncounterPoolDatabase.cs
   res://Resources/BattleText/     -- battle_text_library.tres
-  res://Resources/Abilities/
+  res://Resources/FlavorText/     -- flavor_text_library.tres + FlavorTextLibrary.cs
+  res://Resources/Abilities/      -- HeroAbilityDatabase.cs
     Enemies/                      -- 20 enemy ability .tres
-    Hero/                         -- 9 hero ability .tres + database
+    Hero/                         -- 9 hero ability .tres + hero_ability_database.tres
   res://Scenes/Game/              -- game scene, UI row scripts/scenes,
     DeedButtonEvolution.cs
   res://Scenes/MainMenu/          -- main menu scene
