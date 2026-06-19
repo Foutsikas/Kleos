@@ -1,5 +1,4 @@
 using Godot;
-using System;
 using System.Collections.Generic;
 
 public partial class BattlePanel : Control
@@ -108,6 +107,28 @@ public partial class BattlePanel : Control
 	// HP bar tween duration (seconds)
 	private const float HPBarTweenDuration = 0.3f;
 
+	// -------------------------------------------------------------------------
+	// Constants -- Damage Popups
+	// -------------------------------------------------------------------------
+
+	// How far a popup rises before it is gone (pixels)
+	private const float PopupRiseDistance = 50.0f;
+	// Popup lifetime before speed scaling (seconds)
+	private const float PopupDuration = 0.7f;
+	// Font size for a normal hit
+	private const int PopupFontSize = 22;
+	// Font size for a critical hit
+	private const int PopupCritFontSize = 34;
+	// A crit starts slightly enlarged and settles to normal scale
+	private const float PopupCritStartScale = 1.4f;
+	// Invisible box the label centers its text inside (pixels)
+	private const float PopupBoxWidth = 160.0f;
+	private const float PopupBoxHeight = 40.0f;
+	// How far above the health bar top a popup starts (pixels)
+	private const float PopupSpawnYOffset = 10.0f;
+	// Random sideways offset so back-to-back hits do not overlap (pixels)
+	private const float PopupJitterX = 18.0f;
+
 	// Result screen fade-in duration (seconds)
 	private const float ResultFadeDuration = 0.4f;
 
@@ -133,6 +154,10 @@ public partial class BattlePanel : Control
 	private Vector2 heroPortraitOrigin;
 	private Vector2 enemyPortraitOrigin;
 	private bool originsStored = false;
+
+	// Damage popup state
+	private Control popupLayer;
+	private List<Label> activePopups = new List<Label>();
 
 	// -------------------------------------------------------------------------
 	// Lifecycle
@@ -160,6 +185,8 @@ public partial class BattlePanel : Control
 		BattleSystem.Instance.EnemyAttackOccurred += OnEnemyAttack;
 		BattleSystem.Instance.RoundStarted += OnRoundStarted;
 		BattleSystem.Instance.BattleEnded += OnBattleEnded;
+
+		CreatePopupLayer();
 	}
 
 	public override void _ExitTree()
@@ -214,6 +241,7 @@ public partial class BattlePanel : Control
 
 		// Clear log lines
 		ClearLogLines();
+		ClearPopups();
 		if (HeroEffectDisplay != null) HeroEffectDisplay.Clear();
 		if (EnemyEffectDisplay != null) EnemyEffectDisplay.Clear();
 
@@ -386,6 +414,10 @@ public partial class BattlePanel : Control
 		// Animate enemy portrait: shake from taking damage
 		AnimateDamageShake(EnemyPortrait, enemyPortraitOrigin);
 
+		// Damage popup over the enemy health bar (gold and larger on a crit)
+		Color heroPopupColor = entry.IsCritical ? CritHighlightColor : HeroActionColor;
+		SpawnDamagePopup(EnemyHPBar, entry.Damage, heroPopupColor, entry.IsCritical);
+
 		// Build log line
 		string line;
 		Color lineColor;
@@ -443,6 +475,7 @@ public partial class BattlePanel : Control
 			AnimateAttackNudge(EnemyPortrait, enemyPortraitOrigin, -AttackNudgeDistance);
 
 			// No damage, no HP update, no shake
+			SpawnWordPopup(HeroHPBar, "Evaded", DodgeColor);
 
 			var textLib = BattleSystem.Instance.GetTextLibrary();
 			string dodgeText = textLib != null
@@ -464,6 +497,9 @@ public partial class BattlePanel : Control
 
 			// Animate hero portrait: shake from taking damage
 			AnimateDamageShake(HeroPortrait, heroPortraitOrigin);
+
+			// Damage popup over the hero health bar
+			SpawnDamagePopup(HeroHPBar, entry.Damage, EnemyActionColor, false);
 
 			var textLib2 = BattleSystem.Instance.GetTextLibrary();
 			string enemyText = textLib2 != null
@@ -538,6 +574,102 @@ public partial class BattlePanel : Control
 		tween.TweenProperty(bar, "value", (double)targetValue, duration)
 			.SetEase(Tween.EaseType.Out)
 			.SetTrans(Tween.TransitionType.Quad);
+	}
+
+	// -------------------------------------------------------------------------
+	// Damage Number Popups
+	// -------------------------------------------------------------------------
+
+	private void CreatePopupLayer()
+	{
+		popupLayer = new Control();
+		popupLayer.Name = "PopupLayer";
+		popupLayer.MouseFilter = Control.MouseFilterEnum.Ignore;
+		AddChild(popupLayer);
+		popupLayer.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.FullRect);
+	}
+
+	// Whole numbers up to 9999, compact suffix from 10000 up.
+	private string FormatPopupDamage(float amount)
+	{
+		if (amount < 10000f)
+			return amount.ToString("F0");
+		return NumberFormatter.FormatCompact(amount);
+	}
+
+	private void SpawnDamagePopup(Control anchor, float amount, Color color, bool emphasize)
+	{
+		SpawnPopupLabel(anchor, FormatPopupDamage(amount), color, emphasize);
+	}
+
+	private void SpawnWordPopup(Control anchor, string word, Color color)
+	{
+		SpawnPopupLabel(anchor, word, color, false);
+	}
+
+	private void SpawnPopupLabel(Control anchor, string text, Color color, bool emphasize)
+	{
+		if (popupLayer == null || anchor == null) return;
+
+		var label = new Label();
+		label.Text = text;
+		label.HorizontalAlignment = HorizontalAlignment.Center;
+		label.MouseFilter = Control.MouseFilterEnum.Ignore;
+		label.Modulate = new Color(color.R, color.G, color.B, 1f);
+		label.AddThemeFontSizeOverride("font_size", emphasize ? PopupCritFontSize : PopupFontSize);
+		label.Size = new Vector2(PopupBoxWidth, PopupBoxHeight);
+		label.PivotOffset = new Vector2(PopupBoxWidth / 2f, PopupBoxHeight / 2f);
+
+		popupLayer.AddChild(label);
+		activePopups.Add(label);
+
+		// Spawn just above the health bar of whoever took the hit, centered with a little jitter.
+		Rect2 rect = anchor.GetGlobalRect();
+		float centerX = rect.Position.X + rect.Size.X / 2f;
+		float topY = rect.Position.Y;
+		float jitter = (float)GD.RandRange(-PopupJitterX, PopupJitterX);
+
+		label.GlobalPosition = new Vector2(
+			centerX - PopupBoxWidth / 2f + jitter,
+			topY - PopupSpawnYOffset);
+
+		float startY = label.Position.Y;
+
+		if (emphasize)
+			label.Scale = new Vector2(PopupCritStartScale, PopupCritStartScale);
+
+		float speed = BattleSystem.Instance.GetCurrentSpeedMultiplier();
+		float duration = PopupDuration / speed;
+
+		// Tween bound to the label so freeing the label also kills the tween.
+		var tween = label.CreateTween();
+		tween.SetParallel(true);
+		tween.TweenProperty(label, "position:y", startY - PopupRiseDistance, duration)
+			.SetEase(Tween.EaseType.Out)
+			.SetTrans(Tween.TransitionType.Quad);
+		tween.TweenProperty(label, "modulate:a", 0.0f, duration)
+			.SetEase(Tween.EaseType.In)
+			.SetTrans(Tween.TransitionType.Quad);
+		if (emphasize)
+			tween.TweenProperty(label, "scale", Vector2.One, duration * 0.4f)
+				.SetEase(Tween.EaseType.Out)
+				.SetTrans(Tween.TransitionType.Back);
+		tween.SetParallel(false);
+		tween.TweenCallback(Callable.From(() =>
+		{
+			activePopups.Remove(label);
+			label.QueueFree();
+		}));
+	}
+
+	private void ClearPopups()
+	{
+		foreach (var popup in activePopups)
+		{
+			if (GodotObject.IsInstanceValid(popup))
+				popup.QueueFree();
+		}
+		activePopups.Clear();
 	}
 
 	// -------------------------------------------------------------------------
@@ -685,6 +817,7 @@ public partial class BattlePanel : Control
 
 	private void OnBattleEnded(BattleResult result)
 	{
+		ClearPopups();
 		isCombatActive = false;
 		if (HeroEffectDisplay != null) HeroEffectDisplay.Clear();
 		if (EnemyEffectDisplay != null) EnemyEffectDisplay.Clear();
