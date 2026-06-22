@@ -1,15 +1,16 @@
 # Kleos Architecture Reference -- Godot Edition
-# KAR_Godot -- Updated June 19, 2026
+# KAR_Godot -- Updated June 22, 2026
 # Engine: Godot 4.6.2 .NET (C#)
 # Status: Combat RPG complete, abilities, status effects,
 #   NumberFormatter, Deed Button Visual Evolution,
-#   FlavorTextManager, Omen system, artisan rounded bulk purchase
+#   FlavorTextManager, Omen system, artisan rounded bulk purchase,
+#   damage number popups
 
 ---
 
 ## About This Document
 
-This is the technical architecture reference for Kleos.
+This is the technical architecture reference for the Godot port of Kleos.
 It documents how each system is implemented in Godot, including class
 structures, signal wiring, file paths, and Godot-specific patterns.
 
@@ -1285,6 +1286,7 @@ Node tree:
 		  PostCombatLogScroll (ScrollContainer)
 			PostCombatLogList (VBoxContainer)
 		BackToResultsButton (Button, Center Bottom)
+	  PopupLayer (Control, Full Rect, added in code at runtime -- damage popups)
 	FadeOverlay (ColorRect)
 
 MainGameController responsibilities:
@@ -1556,6 +1558,44 @@ Helper methods:
   SetProgressBarColor() -- creates StyleBoxFlat and applies as
 	theme override for ProgressBar fill color.
 
+Damage popups (June 2026):
+  PopupLayer is a transparent Control created in code by CreatePopupLayer()
+  in _Ready(), added as the last child of the panel root so popups draw
+  above the combat display, and set to Full Rect. MouseFilter is Ignore so
+  it never intercepts result-screen input. No scene node and no new export.
+
+  Popups anchor to the HP bar ProgressBar nodes (EnemyHPBar, HeroHPBar),
+  not the portrait TextureRect nodes. The enemy portrait fills a tall
+  top-right region, so anchoring to its top edge placed the number up near
+  the screen header; the HP bar is a stable, well-placed reference on both
+  sides. PopupSpawnYOffset is the single tuning knob for how far above the
+  bar a popup begins.
+
+  Methods:
+	CreatePopupLayer() -- builds the runtime PopupLayer.
+	SpawnDamagePopup(Control anchor, float amount, Color, bool emphasize)
+	  -- formats the number, then spawns a label.
+	SpawnWordPopup(Control anchor, string word, Color) -- spawns a word
+	  label (used for "Evaded" on dodge).
+	SpawnPopupLabel(...) -- shared core. Creates the Label, positions it
+	  above the anchor's global rect with a small random horizontal jitter,
+      tweens position up and modulate alpha to zero, frees on completion.
+      Crits use a larger font and a scale punch. The tween is created from
+      the label (label.CreateTween()), so freeing the label kills its tween.
+    FormatPopupDamage(float) -- raw whole number below 10000,
+      NumberFormatter.FormatCompact at 10000 and above.
+    ClearPopups() -- frees all live popups; called on battle start and end.
+
+  Live popups are tracked in an activePopups list. Rise duration divides by
+  BattleSystem.GetCurrentSpeedMultiplier(), matching the other battle
+  animations.
+
+  Hook points: OnHeroAttack spawns over EnemyHPBar (crit color and scale
+  punch when entry.IsCritical is set). OnEnemyAttack spawns over HeroHPBar
+  on a hit, or the dodge word on a dodge. The RichTextOverride path
+  (ability name and flavor lines) returns before the damage section, so
+  ability lines never spawn a popup.
+
 Export properties: 30 node references wired in the editor Inspector.
 All exports use null checks before access for safety.
 
@@ -1593,7 +1633,7 @@ DungeonManager.LayerCleared:
 DungeonManager.DungeonCompleted:
   RandomEncounterManager.OnDungeonCompleted (marks pools dirty)
   DungeonRow.OnDungeonCompleted (per row, refreshes self and
-	rows whose RequiredDungeon matches)
+    rows whose RequiredDungeon matches)
   UpgradeRow.OnDungeonCompleted (per row, refreshes tier gate)
   HeroAbilityManager.OnDungeonCompleted (dungeon reward unlocks, May 2026)
   AbilityRow.OnDungeonCompleted (per row, May 2026)
@@ -1712,9 +1752,9 @@ Control vs PanelContainer for overlays:
 9. UpgradeRow -- removed dead GetIndividualLockReason() method,
    cleaned ShowIndividualLocked.
 10. DungeonRow cleared count -- clamped with Mathf.Min() to
-	prevent exceeding totalLayers.
+    prevent exceeding totalLayers.
 11. DungeonRow.OnActionPressed -- uses IsDungeonCompleted() check
-	instead of bounds comparison.
+    instead of bounds comparison.
 
 ---
 

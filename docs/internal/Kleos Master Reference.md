@@ -1,15 +1,16 @@
 # Kleos Master Reference -- Godot Edition
-# KMR_Godot -- Updated June 19, 2026
+# KMR_Godot -- Updated June 22, 2026
 # Engine: Godot 4.6.2 .NET (C#)
 # Status: Combat RPG system complete, Combat Arts UI, NumberFormatter,
 #   Deed Button Visual Evolution, artisan unlock rebalance,
-#   FlavorTextManager, Omen system, artisan rounded bulk purchase
+#   FlavorTextManager, Omen system, artisan rounded bulk purchase,
+#   damage number popups
 
 ---
 
 ## About This Document
 
-This is the gameplay and system reference for Kleos.
+This is the gameplay and system reference for the Godot port of Kleos.
 It documents what has been implemented, tested, and confirmed working
 in the Godot project specifically.
 
@@ -39,7 +40,7 @@ Dungeon UI: Complete -- DungeonRow with progress display and layer info.
 Upgrade UI: Complete -- UpgradeRow with five visual states and tier headers.
 Battle panel: Complete -- combat display, battle log, result screens,
   post-combat log, animations, text variety, status effect display,
-  ability name and flavor text log lines.
+  ability name and flavor text log lines, damage number popups.
 Combat Arts panel: Complete -- 9 hero abilities with type badges,
   auto-generated descriptions, purchase flow, three sections.
 DevConsole: Complete -- backtick toggle, 17 commands, command history.
@@ -347,6 +348,36 @@ StatusEffectDisplay:
 Animations (unchanged from previous):
   Portrait attack nudge, damage shake, HP bar tween, panel fade.
   All durations scale with battle speed multiplier.
+
+Damage Popups (June 2026):
+  Floating numbers rise from a combatant when it takes a hit, then fade.
+  Purely visual feedback layered over the battle log and portrait
+  animations. Combat math and the battle log are unchanged.
+
+  What shows a popup:
+    Hero hit on enemy: number over the enemy, copper (hero action color).
+    Hero critical hit: number over the enemy, gold (crit color), larger
+      font with a brief scale punch so a crit reads as heavier.
+    Enemy hit on hero: number over the hero, red (enemy action color).
+    Hero dodge: the word "Evaded" over the hero, steel grey (dodge color),
+      no number.
+
+  Number format: raw whole numbers up to 9999; from 10000 up the popup
+  uses NumberFormatter.FormatCompact (for example "10K"). Small hits match
+  the battle log exactly; large hits stay readable.
+
+  Behavior: each popup rises about 50 pixels while fading out, with a small
+  random horizontal offset so back-to-back hits do not stack on top of one
+  another. Rise time scales with the battle speed multiplier, so popups
+  clear quickly at x4. All live popups are cleared on battle start and
+  battle end.
+
+  Position: popups anchor to the HP bar of whoever took the hit, spawning
+  just above it. Anchoring to the bar (rather than the portrait) keeps the
+  number beside the combatant it belongs to regardless of portrait size.
+
+  Scope: direct attack hits only. Damage-over-time ticks, ability damage,
+  and heal numbers do not show popups yet.
 
 ---
 
