@@ -10,9 +10,9 @@
 
 ## About This Document
 
-This is the technical architecture reference for the Godot port of Kleos.
-It documents how each system is implemented in Godot, including class
-structures, signal wiring, file paths, and Godot-specific patterns.
+This is the technical architecture reference for Kleos. It documents how
+each system is implemented in Godot, including class structures, signal
+wiring, file paths, and Godot-specific patterns.
 
 ---
 
@@ -686,7 +686,7 @@ AbilityTargetType: Self, Enemy.
 
 ### CombatAbility (Resource, in Autoloads/Combat/CombatAbility.cs) (May 2026)
 
-[GlobalClass] Resource. Replaces Unity ScriptableObject.
+[GlobalClass] Resource.
 Fields:
   AbilityId, AbilityName, AbilityDescription, AbilityColor (Color).
   Trigger (AbilityTrigger), Priority (int), UseChance (float).
@@ -1671,7 +1671,7 @@ RandomEncounterManager.EncounterTriggered:
 
 ## Key Godot Patterns
 
-Signals vs Unity Events:
+Godot signals:
   Godot uses [Signal] delegate declarations. Signal names are derived
   from the delegate name minus "EventHandler". Emitted via EmitSignal().
   Connected via += operator on the signal property. Disconnected via -=.
@@ -1682,21 +1682,21 @@ C# Events for non-Variant types:
   classes that are not Variant-compatible. Godot signals can only carry
   Variant types. C# events work for C#-to-C# communication.
 
-Resource vs ScriptableObject:
-  Godot Resource classes replace Unity ScriptableObjects. Saved as .tres
-  files. Created in editor via right-click > New Resource. Referenced by
-  other resources or exported properties on nodes. [GlobalClass] attribute
-  makes them visible in the Godot editor resource picker.
+Resource classes:
+  Godot Resource classes are saved as .tres files. Created in editor via
+  right-click > New Resource. Referenced by other resources or exported
+  properties on nodes. [GlobalClass] attribute makes them visible in the
+  Godot editor resource picker.
 
-Autoload vs Singleton MonoBehaviour:
+Autoloads:
   Godot Autoloads are nodes added to the scene tree root before any
-  scene loads. They persist across scene changes automatically (no
-  DontDestroyOnLoad needed). Accessed via static Instance property.
+  scene loads. They persist across scene changes automatically. Accessed
+  via static Instance property.
 
 Scene instantiation:
-  PackedScene.Instantiate<T>() replaces Unity Instantiate(prefab).
-  AddChild() replaces SetParent(). Node tree order determines render
-  order (later children draw on top).
+  PackedScene.Instantiate<T>() creates a scene instance. AddChild() places
+  it in the tree. Node tree order determines render order (later children
+  draw on top).
 
 Typed array workaround:
   Godot C# does not support generic typed arrays in exported properties

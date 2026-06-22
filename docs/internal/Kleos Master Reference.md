@@ -10,40 +10,8 @@
 
 ## About This Document
 
-This is the gameplay and system reference for the Godot port of Kleos.
-It documents what has been implemented, tested, and confirmed working
-in the Godot project specifically.
-
----
-
-## Port Status Overview
-
-Autoload managers: All twelve complete and tested (HeroAbilityManager
-  added May 2026, FlavorTextManager added June 2026).
-Resource classes: All ten ported and functional (added CombatAbility,
-  AbilityEffect, HeroAbilityDatabase May 2026).
-Asset data (.tres files): Artisans complete, all three dungeons complete,
-  all three encounter pools complete, 24 upgrade assets complete,
-  BattleTextLibrary asset complete, 20 enemy ability assets complete,
-  9 hero ability assets complete, hero ability database complete.
-  Tier 2 and Tier 3 upgrade dungeon gates wired to brigands.tres
-  and coastal.tres.
-Main Menu scene: Complete -- fade, prompt text, settings panel,
-  scientific notation toggle.
-Game scene: Complete -- core layout with three-panel structure,
-  Combat Arts panel, Deed Button visual evolution.
-Artisan UI: Complete -- rows with locked/unlocked states, hire flow,
-  rounded bulk purchase (x1/x10) with pinned multiplier button.
-  Unlock chain rebalanced June 2026.
-Hero portrait and panel: Complete -- compact display, full stat panel.
-Dungeon UI: Complete -- DungeonRow with progress display and layer info.
-Upgrade UI: Complete -- UpgradeRow with five visual states and tier headers.
-Battle panel: Complete -- combat display, battle log, result screens,
-  post-combat log, animations, text variety, status effect display,
-  ability name and flavor text log lines, damage number popups.
-Combat Arts panel: Complete -- 9 hero abilities with type badges,
-  auto-generated descriptions, purchase flow, three sections.
-DevConsole: Complete -- backtick toggle, 17 commands, command history.
+This is the gameplay and system reference for Kleos. It documents what
+has been implemented, tested, and confirmed working in the Godot project.
 
 ---
 
@@ -54,8 +22,8 @@ Click value formula: 1 + UpgradeManager.GetFlat(ModifierType.ClickFlat).
 
 KleosManager.DoDeed() handles click logic. The Deed button in the game
 scene calls DoDeed() and RandomEncounterManager.OnDeedClicked() on each
-press. Godot Button.Pressed signal connects to a single method, so the
-duplicate handler bug from Unity does not apply here.
+press. Godot Button.Pressed connects to a single method, so each press
+is handled exactly once.
 
 Passive income accumulates via KleosManager._Process(). Each frame,
 totalKleosPerSecond * delta is added to a passiveAccumulator. When the
@@ -146,7 +114,7 @@ Four core attributes with Greek names:
   Cunning   (Metis)       -- base 5,  +1% dodge and crit per point
   Divine Favor (Charis Theon) -- base 0, +1% crit chance, +0.1x crit multiplier
 
-Combat stat formulas (identical to Unity):
+Combat stat formulas:
   Max HP: 40 + (Endurance * 5)
   Damage: 3 + (Strength * 1.0)
   Dodge Chance: Cunning * 0.01, max 30%
@@ -464,7 +432,7 @@ AbilityResolver (one instance per combatant):
   battle end.
 
 No behavior tree, no state machine. Priority-sorted list is sufficient
-for single-target turn-based combat. Confirmed in Unity testing.
+for single-target turn-based combat. Confirmed in testing.
 
 Ability execution in BattleSystem:
   Logs ability name (aligned with caster, ability color).
